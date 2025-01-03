@@ -5,12 +5,43 @@
 
 package probe
 
+import (
+	"fmt"
+)
+
 type Report struct {
-	Content map[string]string
+	DisplayName string
+	Content     map[string]bool
 }
 
-func NewReport() *Report {
+func NewReport(kara_displayname string) *Report {
 	return &Report{
-		Content: make(map[string]string),
+		DisplayName: kara_displayname,
+		Content:     make(map[string]bool),
 	}
+}
+
+func (r *Report) Pass(name string) {
+	r.Content[name] = true
+}
+
+func (r *Report) Fail(name string) {
+	r.Content[name] = false
+}
+
+func (r *Report) String() string {
+	return fmt.Sprintf("name: %s\n- automation: %t\n- resolution: %t\n- style: %t\n- first contribution: %t\n",
+		r.DisplayName,
+		r.Content["automation"],
+		r.Content["resolution"],
+		r.Content["style"],
+		r.SuitableFirstContribution(),
+	)
+}
+
+func (r *Report) SuitableFirstContribution() bool {
+	if r.Content["automation"] && (!r.Content["resolution"] || !r.Content["style"]) {
+		return true
+	}
+	return false
 }

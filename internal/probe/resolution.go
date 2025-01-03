@@ -7,23 +7,13 @@ package probe
 
 import (
 	"context"
-	"strconv"
 )
 
-type Resolution struct {
-	LyricsFile *Ass
-}
-
-func NewResolution(lyrics *Ass) *Resolution {
-	return &Resolution{LyricsFile: lyrics}
-}
-
-func (p *Resolution) Run(ctx context.Context) (*Report, error) {
-	report := NewReport()
-	pass := false
+func (p *Probe) CheckResolution(ctx context.Context) error {
 	if p.LyricsFile.ScriptInfo.PlayResX == 0 && p.LyricsFile.ScriptInfo.PlayResY == 0 {
-		pass = true
+		p.Report.Pass("resolution")
+		return nil
 	}
-	report.Content["pass"] = strconv.FormatBool(pass)
-	return report, nil
+	p.Report.Fail("resolution")
+	return nil
 }

@@ -3,12 +3,12 @@
 // found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-package probe
+package style
 
 import (
 	"errors"
 )
 
 var (
-	ErrNotImplemented = errors.New("Probe not implemented")
+	ErrMalformedLine = errors.New("Malformed style line")
 )

@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-package probe
+package ass
 
-import (
-	"errors"
-)
-
-var (
-	ErrNotImplemented = errors.New("Probe not implemented")
-)
+type ScriptInfo struct {
+	PlayResX uint32
+	PlayResY uint32
+}

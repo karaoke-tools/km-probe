@@ -7,56 +7,47 @@ package probe
 
 import (
 	"context"
-	"strconv"
 	"strings"
+
+	"github.com/louisroyer/km-probe/internal/ass/style"
 )
 
-type Style struct {
-	LyricsFile *Ass
-}
-
-func NewStyle(lyrics *Ass) *Style {
-	return &Style{LyricsFile: lyrics}
-}
-
-func (p *Style) Run(ctx context.Context) (*Report, error) {
-	report := NewReport()
-	pass := false
+func (p *Probe) CheckStyle(ctx context.Context) error {
 
 	nb_styles := 0
 	for _, line := range p.LyricsFile.Styles {
 		select {
 		case <-ctx.Done():
-			return nil, ctx.Err()
+			return ctx.Err()
 		default:
 			if strings.HasPrefix(line, "Style: ") && !strings.Contains(line, "-furigana") {
 				nb_styles += 1
-				break
-			}
-		}
-	}
-	if nb_styles > 1 {
-		// for the moment, we focus on single style karaoke
-		pass = true
-	} else {
-		for _, line := range p.LyricsFile.Styles {
-			select {
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			default:
-				if strings.HasPrefix(line, "Style: ") && !strings.Contains(line, "-furigana") {
-					s, err := ParseStyle(strings.TrimPrefix(line, "Style: "))
-					if err != nil {
-						return nil, err
-					}
-					if s.SecondaryColour == "&H00FFFFFF" {
-						pass = true
-					}
-					break
+				if nb_styles > 1 {
+					// for the moment, we focus on single style karaoke
+					p.Report.Fail("style")
+					return nil
 				}
 			}
 		}
 	}
-	report.Content["pass"] = strconv.FormatBool(pass)
-	return report, nil
+	for _, line := range p.LyricsFile.Styles {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			if strings.HasPrefix(line, "Style: ") && !strings.Contains(line, "-furigana") {
+				s, err := style.Parse(strings.TrimPrefix(line, "Style: "))
+				if err != nil {
+					return err
+				}
+				if s.SecondaryColour == "&H00FFFFFF" {
+					p.Report.Pass("style")
+					return nil
+				}
+				break
+			}
+		}
+	}
+	p.Report.Fail("style")
+	return nil
 }

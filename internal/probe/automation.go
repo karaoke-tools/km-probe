@@ -7,33 +7,22 @@ package probe
 
 import (
 	"context"
-	"strconv"
 	"strings"
 )
 
-type Automation struct {
-	LyricsFile *Ass
-}
-
-func NewAutomation(lyrics *Ass) *Automation {
-	return &Automation{LyricsFile: lyrics}
-}
-
-func (p *Automation) Run(ctx context.Context) (*Report, error) {
-	report := NewReport()
-	pass := false
+func (p *Probe) CheckAutomation(ctx context.Context) error {
 
 	for _, line := range p.LyricsFile.Events {
 		select {
 		case <-ctx.Done():
-			return nil, ctx.Err()
+			return ctx.Err()
 		default:
 			if strings.HasPrefix(line, "Comment: ") {
-				pass = true
-				break
+				p.Report.Pass("automation")
+				return nil
 			}
 		}
 	}
-	report.Content["pass"] = strconv.FormatBool(pass)
-	return report, nil
+	p.Report.Fail("automation")
+	return nil
 }

@@ -3,12 +3,14 @@
 // found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-package probe
+package ass
 
-import (
-	"errors"
-)
+type assState int
 
-var (
-	ErrNotImplemented = errors.New("Probe not implemented")
+const (
+	assInit assState = iota
+	assScriptInfo
+	assAegisubGarbage
+	assStyles
+	assEvents
 )

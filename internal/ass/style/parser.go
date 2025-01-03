@@ -3,13 +3,13 @@
 // found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-package probe
+package style
 
 import (
 	"strings"
 )
 
-type StyleParser struct {
+type Style struct {
 	Name            string
 	Fontname        string
 	Fontsize        string
@@ -35,12 +35,12 @@ type StyleParser struct {
 	Encoding        string
 }
 
-func ParseStyle(style string) (*StyleParser, error) {
+func Parse(style string) (*Style, error) {
 	r := strings.SplitN(style, ",", 23)
 	if len(r) != 23 {
-		return nil, ErrMalformedStyle
+		return nil, ErrMalformedLine
 	}
-	s := &StyleParser{
+	s := &Style{
 		Name:            r[0],
 		Fontname:        r[1],
 		Fontsize:        r[2],

@@ -3,12 +3,12 @@
 // found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-package probe
+package ass
 
 import (
 	"errors"
 )
 
 var (
-	ErrNotImplemented = errors.New("Probe not implemented")
+	ErrMalformedFile = errors.New("Malformed ASS file")
 )

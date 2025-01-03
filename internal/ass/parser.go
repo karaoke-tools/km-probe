@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-package probe
+package ass
 
 import (
 	"bufio"
@@ -19,22 +19,7 @@ type Ass struct {
 	Events     []string
 }
 
-type ScriptInfo struct {
-	PlayResX uint32
-	PlayResY uint32
-}
-
-type assState int
-
-const (
-	assInit assState = iota
-	assScriptInfo
-	assAegisubGarbage
-	assStyles
-	assEvents
-)
-
-func ParseAss(ctx context.Context, lyrics io.Reader) (*Ass, error) {
+func Parse(ctx context.Context, lyrics io.Reader) (*Ass, error) {
 	scanner := bufio.NewScanner(lyrics)
 	state := assInit
 	ass := &Ass{
@@ -72,14 +57,14 @@ func ParseAss(ctx context.Context, lyrics io.Reader) (*Ass, error) {
 			case "PlayResX":
 				res, err := strconv.ParseUint(lineSplit[1], 10, 32)
 				if err != nil {
-					return nil, ErrMalformedAss
+					return nil, ErrMalformedFile
 				}
 				ass.ScriptInfo.PlayResX = uint32(res)
 
 			case "PlayResY":
 				res, err := strconv.ParseUint(lineSplit[1], 10, 32)
 				if err != nil {
-					return nil, ErrMalformedAss
+					return nil, ErrMalformedFile
 				}
 				ass.ScriptInfo.PlayResY = uint32(res)
 			}

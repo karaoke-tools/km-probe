@@ -12,6 +12,7 @@ import (
 	"path"
 	"path/filepath"
 
+	"github.com/louisroyer/km-probe/internal/ass"
 	"github.com/louisroyer/km-probe/internal/probe"
 
 	"github.com/sirupsen/logrus"
@@ -58,30 +59,19 @@ func (s *Setup) Run(ctx context.Context) error {
 					return err
 				}
 				defer f.Close()
-				results := NewResults(p)
-				lyrics, err := probe.ParseAss(ctx, f)
+
+				lyrics, err := ass.Parse(ctx, f)
 				if err != nil {
 					logrus.WithError(err).WithFields(logrus.Fields{
 						"path": p,
 					}).Error("Error parsing ass")
 					return err
 				}
-				resolution, err := probe.NewResolution(lyrics).Run(ctx)
-				if err != nil {
+				probe := probe.NewProbe(p, lyrics)
+				if err := probe.Run(ctx); err != nil {
 					return err
 				}
-				results.Resolution = resolution
-				automation, err := probe.NewAutomation(lyrics).Run(ctx)
-				if err != nil {
-					return err
-				}
-				results.Automation = automation
-				style, err := probe.NewStyle(lyrics).Run(ctx)
-				if err != nil {
-					return err
-				}
-				results.Style = style
-				fmt.Println(results)
+				fmt.Println(probe.Report)
 				return nil
 			})
 			if err != nil {
