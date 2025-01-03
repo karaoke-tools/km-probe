@@ -76,6 +76,11 @@ func (s *Setup) Run(ctx context.Context) error {
 					return err
 				}
 				results.Automation = automation
+				style, err := probe.NewStyle(lyrics).Run(ctx)
+				if err != nil {
+					return err
+				}
+				results.Style = style
 				fmt.Println(results)
 				return nil
 			})

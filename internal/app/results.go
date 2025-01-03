@@ -15,6 +15,7 @@ type Results struct {
 	Path       string
 	Automation *probe.Report
 	Resolution *probe.Report
+	Style      *probe.Report
 }
 
 func NewResults(path string) *Results {
@@ -22,17 +23,18 @@ func NewResults(path string) *Results {
 }
 
 func (r *Results) String() string {
-	return fmt.Sprintf("name: %s\n- automation: %s\n- resolution: %s\n- first contribution: %s\n",
+	return fmt.Sprintf("name: %s\n- automation: %s\n- resolution: %s\n- style: %s\n- first contribution: %s\n",
 		r.Path,
 		r.Automation.Content["pass"],
 		r.Resolution.Content["pass"],
+		r.Style.Content["pass"],
 		r.SuitableFirstContribution(),
 	)
 }
 
 func (r *Results) SuitableFirstContribution() string {
 	//FIXME: return type
-	if r.Automation.Content["pass"] == "true" && r.Resolution.Content["pass"] == "false" {
+	if r.Automation.Content["pass"] == "true" && (r.Resolution.Content["pass"] == "false" || r.Style.Content["pass"] == "false") {
 		return "true"
 	}
 	return "false"

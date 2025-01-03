@@ -12,4 +12,5 @@ import (
 var (
 	ErrNotImplemented = errors.New("Probe not implemented")
 	ErrMalformedAss   = errors.New("Malformed ASS file")
+	ErrMalformedStyle = errors.New("Malformed Style line")
 )
