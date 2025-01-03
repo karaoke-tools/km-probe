@@ -58,6 +58,7 @@ func (s *Setup) Run(ctx context.Context) error {
 					return err
 				}
 				defer f.Close()
+				results := NewResults(p)
 				lyrics, err := probe.ParseAss(ctx, f)
 				if err != nil {
 					logrus.WithError(err).WithFields(logrus.Fields{
@@ -65,11 +66,17 @@ func (s *Setup) Run(ctx context.Context) error {
 					}).Error("Error parsing ass")
 					return err
 				}
-				res, err := probe.NewResolution(lyrics).Run(ctx)
+				resolution, err := probe.NewResolution(lyrics).Run(ctx)
 				if err != nil {
 					return err
 				}
-				fmt.Println(p, res)
+				results.Resolution = resolution
+				automation, err := probe.NewAutomation(lyrics).Run(ctx)
+				if err != nil {
+					return err
+				}
+				results.Automation = automation
+				fmt.Println(results)
 				return nil
 			})
 			if err != nil {
