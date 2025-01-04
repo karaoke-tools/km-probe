@@ -7,30 +7,50 @@ package probe
 
 import (
 	"context"
+	"os"
+	"path"
 
 	"github.com/louisroyer/km-probe/internal/ass"
+	"github.com/louisroyer/km-probe/internal/karajson"
 )
 
 type Probe struct {
-	LyricsFile *ass.Ass
-	Report     *Report
+	KaraJson *karajson.KaraJson
+	Lyrics   *ass.Ass
+	Report   *Report
 }
 
-func NewProbe(kara_displayname string, lyricsFile *ass.Ass) *Probe {
-	return &Probe{
-		LyricsFile: lyricsFile,
-		Report:     NewReport(kara_displayname),
+func FromKaraJson(ctx context.Context, basedir string, karaJson *karajson.KaraJson) (*Probe, error) {
+	probe := Probe{
+		KaraJson: karaJson,
+		Report:   NewReport(karaJson.Data.Songname),
 	}
+	if len(karaJson.Medias[0].Lyrics) == 0 {
+		return nil, ErrNoLyrics
+	}
+	lyricsPath := path.Join(basedir, "lyrics", karaJson.Medias[0].Lyrics[0].Filename)
+	f, err := os.OpenFile(lyricsPath, os.O_RDONLY, 0)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	lyrics, err := ass.Parse(ctx, f)
+	if err != nil {
+		return nil, err
+	}
+	probe.Lyrics = lyrics
+	return &probe, nil
 }
 
 func (p *Probe) Run(ctx context.Context) error {
-	if err := p.CheckAutomation(ctx); err != nil {
+	if err := p.checkAutomation(ctx); err != nil {
 		return err
 	}
-	if err := p.CheckResolution(ctx); err != nil {
+	if err := p.checkResolution(ctx); err != nil {
 		return err
 	}
-	if err := p.CheckStyle(ctx); err != nil {
+	if err := p.checkStyle(ctx); err != nil {
 		return err
 	}
 	return nil

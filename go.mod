@@ -4,6 +4,7 @@ go 1.22.9
 
 require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
+	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/urfave/cli/v2 v2.27.5 // indirect

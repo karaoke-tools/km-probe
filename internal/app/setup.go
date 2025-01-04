@@ -11,11 +11,10 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
-	"github.com/louisroyer/km-probe/internal/ass"
+	"github.com/louisroyer/km-probe/internal/karajson"
 	"github.com/louisroyer/km-probe/internal/probe"
-
-	"github.com/sirupsen/logrus"
 )
 
 type Setup struct {
@@ -43,35 +42,34 @@ func (s *Setup) Run(ctx context.Context) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
-			err := filepath.Walk(path.Join(repo.BaseDir, "lyrics"), func(p string, info os.FileInfo, err error) error {
+			err := filepath.Walk(path.Join(repo.BaseDir, "karaokes"), func(p string, info os.FileInfo, err error) error {
 				if err != nil {
 					return err
 				}
 				if info.IsDir() {
-					fmt.Println(p)
-					if p == path.Join(repo.BaseDir, "lyrics") {
+					if p == path.Join(repo.BaseDir, "karaokes") {
 						return nil
 					}
 					return filepath.SkipDir
 				}
-				f, err := os.OpenFile(p, os.O_RDONLY, 0)
+				if !strings.HasSuffix(info.Name(), ".kara.json") {
+					return nil
+				}
+				karaJson, err := karajson.FromFile(p)
 				if err != nil {
 					return err
 				}
-				defer f.Close()
-
-				lyrics, err := ass.Parse(ctx, f)
-				if err != nil {
-					logrus.WithError(err).WithFields(logrus.Fields{
-						"path": p,
-					}).Error("Error parsing ass")
+				prb, err := probe.FromKaraJson(ctx, repo.BaseDir, karaJson)
+				if err == probe.ErrNoLyrics {
+					// skip
+					return nil
+				} else if err != nil {
 					return err
 				}
-				probe := probe.NewProbe(p, lyrics)
-				if err := probe.Run(ctx); err != nil {
+				if err := prb.Run(ctx); err != nil {
 					return err
 				}
-				fmt.Println(probe.Report)
+				fmt.Println(prb.Report)
 				return nil
 			})
 			if err != nil {

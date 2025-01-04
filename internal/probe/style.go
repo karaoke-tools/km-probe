@@ -10,12 +10,18 @@ import (
 	"strings"
 
 	"github.com/louisroyer/km-probe/internal/ass/style"
+	"github.com/louisroyer/km-probe/internal/karajson"
 )
 
-func (p *Probe) CheckStyle(ctx context.Context) error {
-
+func (p *Probe) checkStyle(ctx context.Context) error {
+	for _, tag := range p.KaraJson.Data.Tags.Misc {
+		if tag == karajson.GroupSinging {
+			p.Report.Pass("style")
+			return nil
+		}
+	}
 	nb_styles := 0
-	for _, line := range p.LyricsFile.Styles {
+	for _, line := range p.Lyrics.Styles {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -30,7 +36,7 @@ func (p *Probe) CheckStyle(ctx context.Context) error {
 			}
 		}
 	}
-	for _, line := range p.LyricsFile.Styles {
+	for _, line := range p.Lyrics.Styles {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()

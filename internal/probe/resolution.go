@@ -9,8 +9,8 @@ import (
 	"context"
 )
 
-func (p *Probe) CheckResolution(ctx context.Context) error {
-	if p.LyricsFile.ScriptInfo.PlayResX == 0 && p.LyricsFile.ScriptInfo.PlayResY == 0 {
+func (p *Probe) checkResolution(ctx context.Context) error {
+	if p.Lyrics.ScriptInfo.PlayResX == 0 && p.Lyrics.ScriptInfo.PlayResY == 0 {
 		p.Report.Pass("resolution")
 		return nil
 	}

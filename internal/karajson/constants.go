@@ -3,13 +3,12 @@
 // found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-package probe
+package karajson
 
 import (
-	"errors"
+	"github.com/gofrs/uuid"
 )
 
 var (
-	ErrNotImplemented = errors.New("Probe not implemented")
-	ErrNoLyrics       = errors.New("No lyrics")
+	GroupSinging = uuid.Must(uuid.FromString("1d6ceadf-a885-47e5-b23b-c07bf668a424"))
 )

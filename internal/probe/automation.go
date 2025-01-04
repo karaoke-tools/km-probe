@@ -10,9 +10,8 @@ import (
 	"strings"
 )
 
-func (p *Probe) CheckAutomation(ctx context.Context) error {
-
-	for _, line := range p.LyricsFile.Events {
+func (p *Probe) checkAutomation(ctx context.Context) error {
+	for _, line := range p.Lyrics.Events {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
