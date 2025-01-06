@@ -30,17 +30,18 @@ func (r *Report) Fail(name string) {
 }
 
 func (r *Report) String() string {
-	return fmt.Sprintf("name: %s\n- automation: %t\n- resolution: %t\n- style: %t\n- first contribution: %t\n",
+	return fmt.Sprintf("name: %s\n- automation: %t\n- resolution: %t\n- style: %t\n- live download probably allowed: %t\n- first contribution: %t\n",
 		r.DisplayName,
 		r.Content["automation"],
 		r.Content["resolution"],
 		r.Content["style"],
+		r.Content[checkLiveDownloadProbablyAllowedKey],
 		r.SuitableFirstContribution(),
 	)
 }
 
 func (r *Report) SuitableFirstContribution() bool {
-	if r.Content["automation"] && (!r.Content["resolution"] || !r.Content["style"]) {
+	if r.Content["automation"] && r.Content[checkLiveDownloadProbablyAllowedKey] && (!r.Content["resolution"] || !r.Content["style"]) {
 		return true
 	}
 	return false

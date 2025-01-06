@@ -44,6 +44,9 @@ func FromKaraJson(ctx context.Context, basedir string, karaJson *karajson.KaraJs
 }
 
 func (p *Probe) Run(ctx context.Context) error {
+	if err := p.checkLiveDownloadProbablyAllowed(ctx); err != nil {
+		return err
+	}
 	if err := p.checkAutomation(ctx); err != nil {
 		return err
 	}
