@@ -30,7 +30,7 @@ func (p *Probe) checkStyle(ctx context.Context) error {
 				nb_styles += 1
 				if nb_styles > 1 {
 					// for the moment, we focus on single style karaoke
-					p.Report.Fail("style")
+					p.Report.Pass("style")
 					return nil
 				}
 			}
@@ -47,6 +47,7 @@ func (p *Probe) checkStyle(ctx context.Context) error {
 					return err
 				}
 				if s.SecondaryColour == "&H00FFFFFF" {
+					// secondary color must be white if single style karaoke
 					p.Report.Pass("style")
 					return nil
 				}

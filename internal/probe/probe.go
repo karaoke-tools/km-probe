@@ -56,5 +56,8 @@ func (p *Probe) Run(ctx context.Context) error {
 	if err := p.checkStyle(ctx); err != nil {
 		return err
 	}
+	if err := p.checkNoEolPunctuation(ctx); err != nil {
+		return err
+	}
 	return nil
 }

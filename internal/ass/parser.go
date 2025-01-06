@@ -11,23 +11,29 @@ import (
 	"io"
 	"strconv"
 	"strings"
+
+	"github.com/louisroyer/km-probe/internal/ass/lyrics"
 )
 
 type Ass struct {
-	ScriptInfo *ScriptInfo
-	Styles     []string
-	Events     []string
+	ScriptInfo              *ScriptInfo
+	Styles                  []string
+	Events                  []*lyrics.LyricsParser
+	Extradata               []string
+	assUnknownSectionsCount int
 }
 
-func Parse(ctx context.Context, lyrics io.Reader) (*Ass, error) {
-	scanner := bufio.NewScanner(lyrics)
+func Parse(ctx context.Context, lrc io.Reader) (*Ass, error) {
+	scanner := bufio.NewScanner(lrc)
 	state := assInit
 	ass := &Ass{
 		ScriptInfo: &ScriptInfo{},
 		Styles:     make([]string, 0),
-		Events:     make([]string, 0),
+		Events:     make([]*lyrics.LyricsParser, 0),
 	}
+	i := 0
 	for scanner.Scan() {
+		i++
 		line := scanner.Text()
 		if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
 			switch strings.TrimSuffix(strings.TrimPrefix(line, "["), "]") {
@@ -39,7 +45,16 @@ func Parse(ctx context.Context, lyrics io.Reader) (*Ass, error) {
 				state = assStyles
 			case "Events":
 				state = assEvents
+			case "Aegisub Extradata":
+				state = assAegisubExtradata
+			default:
+				state = assUnknownSection
+				ass.assUnknownSectionsCount += 1
 			}
+			continue
+		}
+		if line == "" {
+			// empty line
 			continue
 		}
 		switch state {
@@ -71,7 +86,13 @@ func Parse(ctx context.Context, lyrics io.Reader) (*Ass, error) {
 		case assStyles:
 			ass.Styles = append(ass.Styles, line)
 		case assEvents:
-			ass.Events = append(ass.Events, line)
+			lyr, err := lyrics.Parse(line)
+			if err != nil {
+				return nil, err
+			}
+			ass.Events = append(ass.Events, lyr)
+		case assAegisubExtradata:
+			ass.Extradata = append(ass.Extradata, line)
 		}
 	}
 	if err := scanner.Err(); err != nil {

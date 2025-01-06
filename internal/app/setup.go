@@ -7,6 +7,7 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -60,11 +61,11 @@ func (s *Setup) Run(ctx context.Context) error {
 					return err
 				}
 				prb, err := probe.FromKaraJson(ctx, repo.BaseDir, karaJson)
-				if err == probe.ErrNoLyrics {
+				if errors.Is(err, probe.ErrNoLyrics) {
 					// skip
 					return nil
 				} else if err != nil {
-					return err
+					return errors.Join(errors.New(info.Name()), err)
 				}
 				if err := prb.Run(ctx); err != nil {
 					return err

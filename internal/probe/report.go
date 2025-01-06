@@ -30,18 +30,26 @@ func (r *Report) Fail(name string) {
 }
 
 func (r *Report) String() string {
-	return fmt.Sprintf("name: %s\n- automation: %t\n- resolution: %t\n- style: %t\n- live download probably allowed: %t\n- first contribution: %t\n",
+	return fmt.Sprintf("name: %s\n- automation: %t\n- resolution: %t\n- probably-good-style: %t\n- no-eol-punct: %t\n- live download probably allowed: %t\n- first contribution: %t\n",
 		r.DisplayName,
 		r.Content["automation"],
 		r.Content["resolution"],
 		r.Content["style"],
+		r.Content[checkNoEolPunctuationKey],
 		r.Content[checkLiveDownloadProbablyAllowedKey],
 		r.SuitableFirstContribution(),
 	)
 }
 
 func (r *Report) SuitableFirstContribution() bool {
-	if r.Content["automation"] && r.Content[checkLiveDownloadProbablyAllowedKey] && (!r.Content["resolution"] || !r.Content["style"]) {
+	issue_cnt := 0
+	if !r.Content["style"] {
+		issue_cnt += 1
+	}
+	if !r.Content[checkNoEolPunctuationKey] {
+		issue_cnt += 1
+	}
+	if r.Content["automation"] && r.Content[checkLiveDownloadProbablyAllowedKey] && r.Content["resolution"] && issue_cnt == 1 {
 		return true
 	}
 	return false

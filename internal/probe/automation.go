@@ -7,7 +7,8 @@ package probe
 
 import (
 	"context"
-	"strings"
+
+	"github.com/louisroyer/km-probe/internal/ass/lyrics"
 )
 
 func (p *Probe) checkAutomation(ctx context.Context) error {
@@ -16,7 +17,7 @@ func (p *Probe) checkAutomation(ctx context.Context) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
-			if strings.HasPrefix(line, "Comment: ") {
+			if line.Type == lyrics.Comment {
 				p.Report.Pass("automation")
 				return nil
 			}

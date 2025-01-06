@@ -3,16 +3,12 @@
 // found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-package ass
+package lyrics
 
-type assState int
+import (
+	"errors"
+)
 
-const (
-	assInit assState = iota
-	assScriptInfo
-	assAegisubGarbage
-	assStyles
-	assEvents
-	assAegisubExtradata
-	assUnknownSection
+var (
+	ErrMalformedLine = errors.New("Malformed lyrics line")
 )
