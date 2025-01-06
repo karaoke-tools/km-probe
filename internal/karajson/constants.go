@@ -20,4 +20,7 @@ var (
 	CollectionShitpost  = uuid.Must(uuid.FromString("2fa2fe3f-bb56-45ee-aa38-eae60e76f224"))
 	CollectionKana      = uuid.Must(uuid.FromString("f2462778-f986-4844-a4b8-e1d3ccdb861b"))
 	CollectionWest      = uuid.Must(uuid.FromString("efe171c0-e8a1-4d03-98c0-60ecf741ad52"))
+
+	// langs
+	LangJPN = uuid.Must(uuid.FromString("4dcf9614-7914-42aa-99f4-dbce2e059133"))
 )
