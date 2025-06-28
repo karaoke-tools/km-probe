@@ -30,10 +30,11 @@ func (r *Report) Fail(name string) {
 }
 
 func (r *Report) String() string {
-	return fmt.Sprintf("name: %s\n- automation: %t\n- resolution: %t\n- probably-good-style: %t\n- no-eol-punct: %t\n- no-double-cons-issue: %t\n- live-dl-probably-allowed: %t\n- probably-good-first-contribution: %t\n",
+	return fmt.Sprintf("name: %s\n- automation: %t\n- resolution: %t\n- style-scale: %t\n- probably-good-style: %t\n- no-eol-punct: %t\n- no-double-cons-issue: %t\n- live-dl-probably-allowed: %t\n- probably-good-first-contribution: %t\n",
 		r.DisplayName,
 		r.Content["automation"],
 		r.Content["resolution"],
+		r.Content["style-scale"],
 		r.Content["style"],
 		r.Content[checkNoEolPunctuationKey],
 		r.Content[checkNoDoubleConsonnantIssuesKey],
