@@ -30,12 +30,13 @@ func (r *Report) Fail(name string) {
 }
 
 func (r *Report) String() string {
-	return fmt.Sprintf("name: %s\n- automation: %t\n- resolution: %t\n- style-scale: %t\n- probably-good-style: %t\n- no-eol-punct: %t\n- no-double-cons-issue: %t\n- live-dl-probably-allowed: %t\n- probably-good-first-contribution: %t\n",
+	return fmt.Sprintf("name: %s\n- automation: %t\n- resolution: %t\n- style-scale: %t\n- style-single-white: %t\n- style-black-border: %t\n- no-eol-punct: %t\n- no-double-cons-issue: %t\n- live-dl-probably-allowed: %t\n- probably-good-first-contribution: %t\n",
 		r.DisplayName,
 		r.Content["automation"],
 		r.Content["resolution"],
 		r.Content["style-scale"],
-		r.Content["style"],
+		r.Content["style-single-white"],
+		r.Content["style-black-border"],
 		r.Content[checkNoEolPunctuationKey],
 		r.Content[checkNoDoubleConsonnantIssuesKey],
 		r.Content[checkLiveDownloadProbablyAllowedKey],
@@ -45,7 +46,7 @@ func (r *Report) String() string {
 
 func (r *Report) SuitableFirstContribution() bool {
 	issue_cnt := 0
-	if !r.Content["style"] {
+	if !r.Content["style-single-white"] || !r.Content["style-black-border"] {
 		issue_cnt += 1
 	}
 	if !r.Content[checkNoEolPunctuationKey] {

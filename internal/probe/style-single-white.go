@@ -13,7 +13,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/karajson"
 )
 
-func (p *Probe) checkStyle(ctx context.Context) error {
+func (p *Probe) checkStyleSingleWhite(ctx context.Context) error {
 	for _, tag := range p.KaraJson.Data.Tags.Misc {
 		if tag == karajson.GroupSinging {
 			p.Report.Pass("style")
@@ -55,6 +55,6 @@ func (p *Probe) checkStyle(ctx context.Context) error {
 			}
 		}
 	}
-	p.Report.Fail("style")
+	p.Report.Fail("style-single-white")
 	return nil
 }
