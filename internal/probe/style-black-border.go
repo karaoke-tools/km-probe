@@ -13,6 +13,7 @@ import (
 )
 
 func (p *Probe) checkStyleBlackBorder(ctx context.Context) error {
+
 	for _, line := range p.Lyrics.Styles {
 		select {
 		case <-ctx.Done():
@@ -24,7 +25,7 @@ func (p *Probe) checkStyleBlackBorder(ctx context.Context) error {
 					return err
 				}
 				if s.OutlineColour != "&H00000000" {
-					// secondary color must be black
+					// border color must be black
 					p.Report.Fail("style")
 					return nil
 				}

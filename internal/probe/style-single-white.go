@@ -16,7 +16,7 @@ import (
 func (p *Probe) checkStyleSingleWhite(ctx context.Context) error {
 	for _, tag := range p.KaraJson.Data.Tags.Misc {
 		if tag == karajson.GroupSinging {
-			p.Report.Pass("style")
+			p.Report.Pass("style-single-white")
 			return nil
 		}
 	}
@@ -30,7 +30,7 @@ func (p *Probe) checkStyleSingleWhite(ctx context.Context) error {
 				nb_styles += 1
 				if nb_styles > 1 {
 					// for the moment, we focus on single style karaoke
-					p.Report.Pass("style")
+					p.Report.Pass("style-single-white")
 					return nil
 				}
 			}
@@ -48,7 +48,7 @@ func (p *Probe) checkStyleSingleWhite(ctx context.Context) error {
 				}
 				if s.SecondaryColour == "&H00FFFFFF" {
 					// secondary color must be white if single style karaoke
-					p.Report.Pass("style")
+					p.Report.Pass("style-single-white")
 					return nil
 				}
 				break
