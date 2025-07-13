@@ -37,7 +37,11 @@ func Parse(ctx context.Context, lrc io.Reader) (*Ass, error) {
 		i++
 		line := scanner.Text()
 		if i == 1 {
-			line = strings.TrimPrefix(line, string([]byte{0xEF, 0xBB, 0xBF}))
+			// In some files, BOM is present multiple times for no reason
+			BOM := string([]byte{0xEF, 0xBB, 0xBF})
+			for strings.HasPrefix(line, BOM) {
+				line = strings.TrimPrefix(line, BOM)
+			}
 		}
 		if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
 			switch strings.TrimSuffix(strings.TrimPrefix(line, "["), "]") {
