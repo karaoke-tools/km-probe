@@ -9,13 +9,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
+	"io/fs"
 	"path"
 	"path/filepath"
 	"strings"
 
+	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson"
-	"github.com/louisroyer/km-probe/internal/probe"
+	"github.com/louisroyer/km-probe/internal/probes"
 )
 
 type Setup struct {
@@ -43,34 +44,34 @@ func (s *Setup) Run(ctx context.Context) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
-			err := filepath.Walk(path.Join(repo.BaseDir, "karaokes"), func(p string, info os.FileInfo, err error) error {
+			err := filepath.WalkDir(path.Join(repo.BaseDir, "karaokes"), func(p string, d fs.DirEntry, err error) error {
 				if err != nil {
 					return err
 				}
-				if info.IsDir() {
+				if d.IsDir() {
 					if p == path.Join(repo.BaseDir, "karaokes") {
 						return nil
 					}
 					return filepath.SkipDir
 				}
-				if !strings.HasSuffix(info.Name(), ".kara.json") {
+				if !strings.HasSuffix(d.Name(), ".kara.json") {
 					return nil
 				}
 				karaJson, err := karajson.FromFile(p)
 				if err != nil {
 					return err
 				}
-				prb, err := probe.FromKaraJson(ctx, repo.BaseDir, karaJson)
-				if errors.Is(err, probe.ErrNoLyrics) {
+				a, err := probes.FromKaraJson(ctx, repo.BaseDir, karaJson, nil)
+				if errors.Is(err, karadata.ErrNoLyrics) {
 					// skip
 					return nil
 				} else if err != nil {
-					return errors.Join(errors.New(info.Name()), err)
+					return errors.Join(errors.New(d.Name()), err)
 				}
-				if err := prb.Run(ctx); err != nil {
+				if err := a.Run(ctx); err != nil {
 					return err
 				}
-				fmt.Println(prb.Report)
+				fmt.Println(a)
 				return nil
 			})
 			if err != nil {

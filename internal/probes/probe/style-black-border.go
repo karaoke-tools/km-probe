@@ -10,29 +10,38 @@ import (
 	"strings"
 
 	"github.com/louisroyer/km-probe/internal/ass/style"
+	"github.com/louisroyer/km-probe/internal/karadata"
+	"github.com/louisroyer/km-probe/internal/probes/report"
 )
 
-func (p *Probe) checkStyleBlackBorder(ctx context.Context) error {
+type StyleBlackBorder struct {
+	baseProbe
+}
 
-	for _, line := range p.Lyrics.Styles {
+func NewStyleBlackBorder(karaData *karadata.KaraData) Probe {
+	return &StyleBlackBorder{
+		newBaseProbe("style-black-border", karaData),
+	}
+}
+
+func (p *StyleBlackBorder) Run(ctx context.Context) (report.Report, error) {
+	for _, line := range p.karaData.Lyrics.Styles {
 		select {
 		case <-ctx.Done():
-			return ctx.Err()
+			return report.Abort(), ctx.Err()
 		default:
 			if strings.HasPrefix(line, "Style: ") && !strings.Contains(line, "-furigana") { // we don't care about furigana styles for the now
 				s, err := style.Parse(strings.TrimPrefix(line, "Style: "))
 				if err != nil {
-					return err
+					return report.Abort(), err
 				}
 				if s.OutlineColour != "&H00000000" {
 					// border color must be black
-					p.Report.Fail("style")
-					return nil
+					return report.Fail(), nil
 				}
 				break
 			}
 		}
 	}
-	p.Report.Pass("style-black-border")
-	return nil
+	return report.Pass(), nil
 }

@@ -34,77 +34,82 @@ func Parse(ctx context.Context, lrc io.Reader) (*Ass, error) {
 	}
 	i := 0
 	for scanner.Scan() {
-		i++
-		line := scanner.Text()
-		if i == 1 {
-			// In some files, BOM is present multiple times for no reason
-			BOM := string([]byte{0xEF, 0xBB, 0xBF})
-			for strings.HasPrefix(line, BOM) {
-				line = strings.TrimPrefix(line, BOM)
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		default:
+			i++
+			line := scanner.Text()
+			if i == 1 {
+				// In some files, BOM is present multiple times for no reason
+				BOM := string([]byte{0xEF, 0xBB, 0xBF})
+				for strings.HasPrefix(line, BOM) {
+					line = strings.TrimPrefix(line, BOM)
+				}
 			}
-		}
-		if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
-			switch strings.TrimSuffix(strings.TrimPrefix(line, "["), "]") {
-			case "Script Info":
-				state = assScriptInfo
-			case "Aegisub Project Garbage":
-				state = assAegisubGarbage
-			case "V4+ Styles":
-				state = assStyles
-			case "Events":
-				state = assEvents
-			case "Aegisub Extradata":
-				state = assAegisubExtradata
-			default:
-				state = assUnknownSection
-				ass.assUnknownSectionsCount += 1
-			}
-			continue
-		}
-		if line == "" {
-			// empty line
-			continue
-		}
-		switch state {
-		case assScriptInfo:
-			if strings.HasPrefix(line, ";") {
-				// comment line
+			if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
+				switch strings.TrimSuffix(strings.TrimPrefix(line, "["), "]") {
+				case "Script Info":
+					state = assScriptInfo
+				case "Aegisub Project Garbage":
+					state = assAegisubGarbage
+				case "V4+ Styles":
+					state = assStyles
+				case "Events":
+					state = assEvents
+				case "Aegisub Extradata":
+					state = assAegisubExtradata
+				default:
+					state = assUnknownSection
+					ass.assUnknownSectionsCount += 1
+				}
 				continue
 			}
-			lineSplit := strings.SplitN(line, ": ", 2)
-			if len(lineSplit) != 2 {
-				// unreadable
+			if line == "" {
+				// empty line
 				continue
 			}
-			switch lineSplit[0] {
-			case "PlayResX":
-				res, err := strconv.ParseUint(lineSplit[1], 10, 32)
-				if err != nil {
-					return nil, ErrMalformedFile
+			switch state {
+			case assScriptInfo:
+				if strings.HasPrefix(line, ";") {
+					// comment line
+					continue
 				}
-				ass.ScriptInfo.PlayResX = uint32(res)
-			case "PlayResY":
-				res, err := strconv.ParseUint(lineSplit[1], 10, 32)
-				if err != nil {
-					return nil, ErrMalformedFile
+				lineSplit := strings.SplitN(line, ": ", 2)
+				if len(lineSplit) != 2 {
+					// unreadable
+					continue
 				}
-				ass.ScriptInfo.PlayResY = uint32(res)
-			case "ScaledBorderAndShadow":
-				if err := ass.ScriptInfo.SetScaledBorderAndShadow(lineSplit[1]); err != nil {
+				switch lineSplit[0] {
+				case "PlayResX":
+					res, err := strconv.ParseUint(lineSplit[1], 10, 32)
+					if err != nil {
+						return nil, ErrMalformedFile
+					}
+					ass.ScriptInfo.PlayResX = uint32(res)
+				case "PlayResY":
+					res, err := strconv.ParseUint(lineSplit[1], 10, 32)
+					if err != nil {
+						return nil, ErrMalformedFile
+					}
+					ass.ScriptInfo.PlayResY = uint32(res)
+				case "ScaledBorderAndShadow":
+					if err := ass.ScriptInfo.SetScaledBorderAndShadow(lineSplit[1]); err != nil {
+						return nil, err
+					}
+				}
+			case assStyles:
+				ass.Styles = append(ass.Styles, line)
+			case assEvents:
+				lyr, err := lyrics.Parse(line)
+				if err != nil {
 					return nil, err
 				}
+				ass.Events = append(ass.Events, lyr)
+			case assAegisubExtradata:
+				ass.Extradata = append(ass.Extradata, line)
+			default:
 			}
-		case assStyles:
-			ass.Styles = append(ass.Styles, line)
-		case assEvents:
-			lyr, err := lyrics.Parse(line)
-			if err != nil {
-				return nil, err
-			}
-			ass.Events = append(ass.Events, lyr)
-		case assAegisubExtradata:
-			ass.Extradata = append(ass.Extradata, line)
-		default:
 		}
 	}
 	if err := scanner.Err(); err != nil {

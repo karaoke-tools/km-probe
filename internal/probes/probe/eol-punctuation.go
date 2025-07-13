@@ -10,15 +10,25 @@ import (
 	"strings"
 
 	"github.com/louisroyer/km-probe/internal/ass/lyrics"
+	"github.com/louisroyer/km-probe/internal/karadata"
+	"github.com/louisroyer/km-probe/internal/probes/report"
 )
 
-const checkNoEolPunctuationKey = "eol-punctuation"
+type EolPunctuation struct {
+	baseProbe
+}
 
-func (p *Probe) checkNoEolPunctuation(ctx context.Context) error {
-	for _, line := range p.Lyrics.Events {
+func NewEolPunctuation(karaData *karadata.KaraData) Probe {
+	return &EolPunctuation{
+		newBaseProbe("eol-punctuation", karaData),
+	}
+}
+
+func (p *EolPunctuation) Run(ctx context.Context) (report.Report, error) {
+	for _, line := range p.karaData.Lyrics.Events {
 		select {
 		case <-ctx.Done():
-			return ctx.Err()
+			return report.Abort(), ctx.Err()
 		default:
 			if (line.Type != lyrics.Format) && (!strings.HasPrefix(line.Effect, "template")) {
 				l := line.Text.StripTags()
@@ -26,12 +36,10 @@ func (p *Probe) checkNoEolPunctuation(ctx context.Context) error {
 					if strings.HasSuffix(l, "...") {
 						continue
 					}
-					p.Report.Fail(checkNoEolPunctuationKey)
-					return nil
+					return report.Fail(), nil
 				}
 			}
 		}
 	}
-	p.Report.Pass(checkNoEolPunctuationKey)
-	return nil
+	return report.Pass(), nil
 }

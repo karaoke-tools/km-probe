@@ -10,26 +10,36 @@ import (
 	"strings"
 
 	"github.com/louisroyer/km-probe/internal/ass/style"
+	"github.com/louisroyer/km-probe/internal/karadata"
+	"github.com/louisroyer/km-probe/internal/probes/report"
 )
 
-func (p *Probe) checkStyleScale(ctx context.Context) error {
-	for _, line := range p.Lyrics.Styles {
+type StyleScale struct {
+	baseProbe
+}
+
+func NewStyleScale(karaData *karadata.KaraData) Probe {
+	return &StyleScale{
+		newBaseProbe("style-scale", karaData),
+	}
+}
+
+func (p *StyleScale) Run(ctx context.Context) (report.Report, error) {
+	for _, line := range p.karaData.Lyrics.Styles {
 		select {
 		case <-ctx.Done():
-			return ctx.Err()
+			return report.Abort(), ctx.Err()
 		default:
 			if strings.HasPrefix(line, "Style: ") && !strings.Contains(line, "-furigana") {
 				s, err := style.Parse(strings.TrimPrefix(line, "Style: "))
 				if err != nil {
-					return err
+					return report.Abort(), err
 				}
 				if (s.ScaleX != "100") || (s.ScaleY != "100") {
-					p.Report.Fail("style-scale")
-					return nil
+					return report.Fail(), nil
 				}
 			}
 		}
 	}
-	p.Report.Pass("style-scale")
-	return nil
+	return report.Pass(), nil
 }

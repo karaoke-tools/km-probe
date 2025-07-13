@@ -11,5 +11,4 @@ import (
 
 var (
 	ErrNotImplemented = errors.New("Probe not implemented")
-	ErrNoLyrics       = errors.New("No lyrics")
 )

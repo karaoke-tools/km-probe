@@ -10,51 +10,59 @@ import (
 	"strings"
 
 	"github.com/louisroyer/km-probe/internal/ass/style"
+	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson"
+	"github.com/louisroyer/km-probe/internal/probes/report"
 )
 
-func (p *Probe) checkStyleSingleWhite(ctx context.Context) error {
-	for _, tag := range p.KaraJson.Data.Tags.Misc {
+type StyleSingleWhite struct {
+	baseProbe
+}
+
+func NewStyleSingleWhite(karaData *karadata.KaraData) Probe {
+	return &StyleSingleWhite{
+		newBaseProbe("style-single-white", karaData),
+	}
+}
+
+func (p *StyleSingleWhite) Run(ctx context.Context) (report.Report, error) {
+	for _, tag := range p.karaData.KaraJson.Data.Tags.Misc {
 		if tag == karajson.GroupSinging {
-			p.Report.Pass("style-single-white")
-			return nil
+			return report.Pass(), nil
 		}
 	}
 	nb_styles := 0
-	for _, line := range p.Lyrics.Styles {
+	for _, line := range p.karaData.Lyrics.Styles {
 		select {
 		case <-ctx.Done():
-			return ctx.Err()
+			return report.Abort(), ctx.Err()
 		default:
 			if strings.HasPrefix(line, "Style: ") && !strings.Contains(line, "-furigana") {
 				nb_styles += 1
 				if nb_styles > 1 {
 					// for the moment, we focus on single style karaoke
-					p.Report.Pass("style-single-white")
-					return nil
+					return report.Pass(), nil
 				}
 			}
 		}
 	}
-	for _, line := range p.Lyrics.Styles {
+	for _, line := range p.karaData.Lyrics.Styles {
 		select {
 		case <-ctx.Done():
-			return ctx.Err()
+			return report.Abort(), ctx.Err()
 		default:
 			if strings.HasPrefix(line, "Style: ") && !strings.Contains(line, "-furigana") {
 				s, err := style.Parse(strings.TrimPrefix(line, "Style: "))
 				if err != nil {
-					return err
+					return report.Abort(), err
 				}
 				if s.SecondaryColour == "&H00FFFFFF" {
 					// secondary color must be white if single style karaoke
-					p.Report.Pass("style-single-white")
-					return nil
+					return report.Pass(), nil
 				}
 				break
 			}
 		}
 	}
-	p.Report.Fail("style-single-white")
-	return nil
+	return report.Fail(), nil
 }

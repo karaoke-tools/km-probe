@@ -10,10 +10,20 @@ import (
 	"strings"
 
 	"github.com/louisroyer/km-probe/internal/ass/lyrics"
+	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson"
+	"github.com/louisroyer/km-probe/internal/probes/report"
 )
 
-const checkNoDoubleConsonnantIssuesKey = "double-consonnant"
+type DoubleConsonnant struct {
+	baseProbe
+}
+
+func NewDoubleConsonnant(karaData *karadata.KaraData) Probe {
+	return &DoubleConsonnant{
+		newBaseProbe("double-consonnant", karaData),
+	}
+}
 
 var doubleConsonnants = []string{
 	"kk",
@@ -29,18 +39,17 @@ var doubleConsonnants = []string{
 	"rr",
 }
 
-func (p *Probe) checkNoDoubleConsonnantIssues(ctx context.Context) error {
+func (p *DoubleConsonnant) Run(ctx context.Context) (report.Report, error) {
 	// we only check if language is full jpn
-	for _, tag := range p.KaraJson.Data.Tags.Langs {
+	for _, tag := range p.karaData.KaraJson.Data.Tags.Langs {
 		if tag != karajson.LangJPN {
-			p.Report.Pass(checkNoDoubleConsonnantIssuesKey)
-			return nil
+			return report.Pass(), nil
 		}
 	}
-	for _, line := range p.Lyrics.Events {
+	for _, line := range p.karaData.Lyrics.Events {
 		select {
 		case <-ctx.Done():
-			return ctx.Err()
+			return report.Abort(), ctx.Err()
 		default:
 			if (line.Type != lyrics.Format) && (!strings.HasPrefix(line.Effect, "template")) {
 				save := ""
@@ -49,8 +58,7 @@ func (p *Probe) checkNoDoubleConsonnantIssues(ctx context.Context) error {
 						if !strings.HasSuffix(save, " ") { // this is not a new word
 							for _, double := range doubleConsonnants {
 								if strings.HasPrefix(syll, double) {
-									p.Report.Fail(checkNoDoubleConsonnantIssuesKey)
-									return nil
+									return report.Fail(), nil
 								}
 							}
 
@@ -62,6 +70,5 @@ func (p *Probe) checkNoDoubleConsonnantIssues(ctx context.Context) error {
 			}
 		}
 	}
-	p.Report.Pass(checkNoDoubleConsonnantIssuesKey)
-	return nil
+	return report.Pass(), nil
 }
