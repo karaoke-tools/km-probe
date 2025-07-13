@@ -25,6 +25,7 @@ type Ass struct {
 
 func Parse(ctx context.Context, lrc io.Reader) (*Ass, error) {
 	scanner := bufio.NewScanner(lrc)
+
 	state := assInit
 	ass := &Ass{
 		ScriptInfo: &ScriptInfo{},
@@ -35,6 +36,9 @@ func Parse(ctx context.Context, lrc io.Reader) (*Ass, error) {
 	for scanner.Scan() {
 		i++
 		line := scanner.Text()
+		if i == 1 {
+			line = strings.TrimPrefix(line, string([]byte{0xEF, 0xBB, 0xBF}))
+		}
 		if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
 			switch strings.TrimSuffix(strings.TrimPrefix(line, "["), "]") {
 			case "Script Info":
@@ -75,13 +79,16 @@ func Parse(ctx context.Context, lrc io.Reader) (*Ass, error) {
 					return nil, ErrMalformedFile
 				}
 				ass.ScriptInfo.PlayResX = uint32(res)
-
 			case "PlayResY":
 				res, err := strconv.ParseUint(lineSplit[1], 10, 32)
 				if err != nil {
 					return nil, ErrMalformedFile
 				}
 				ass.ScriptInfo.PlayResY = uint32(res)
+			case "ScaledBorderAndShadow":
+				if err := ass.ScriptInfo.SetScaledBorderAndShadow(lineSplit[1]); err != nil {
+					return nil, err
+				}
 			}
 		case assStyles:
 			ass.Styles = append(ass.Styles, line)
@@ -93,6 +100,7 @@ func Parse(ctx context.Context, lrc io.Reader) (*Ass, error) {
 			ass.Events = append(ass.Events, lyr)
 		case assAegisubExtradata:
 			ass.Extradata = append(ass.Extradata, line)
+		default:
 		}
 	}
 	if err := scanner.Err(); err != nil {

@@ -53,6 +53,9 @@ func (p *Probe) Run(ctx context.Context) error {
 	if err := p.checkResolution(ctx); err != nil {
 		return err
 	}
+	if err := p.checkScaledBorderAndShadow(ctx); err != nil {
+		return err
+	}
 	if err := p.checkStyleSingleWhite(ctx); err != nil {
 		return err
 	}

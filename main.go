@@ -33,6 +33,25 @@ func main() {
 			}
 			return nil
 		},
+		Commands: []*cli.Command{
+			{
+				Name:  "parse-ass",
+				Usage: "parse ASS file",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "file",
+						Usage:    "File to parse",
+						Required: true,
+					},
+				},
+				Action: func(ctx *cli.Context) error {
+					if err := app.NewSetupParseAss(ctx.Path("file")).Run(ctx.Context); err != nil {
+						logrus.WithError(err).Fatal("Error while running, exiting…")
+					}
+					return nil
+				},
+			},
+		},
 	}
 	if err := app.RunContext(ctx, os.Args); err != nil {
 		logrus.Fatal(err)
