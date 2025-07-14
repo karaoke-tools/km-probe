@@ -16,6 +16,7 @@ var defaultProbes []probe.NewProbeFunc = []probe.NewProbeFunc{
 	probe.NewLiveDownload,
 	probe.NewResolution,
 	probe.NewScaledBorderAndShadow,
+	probe.NewSingleCollection,
 	probe.NewStyleBlackBorder,
 	probe.NewStyleScale,
 	probe.NewStyleSingleWhite,
