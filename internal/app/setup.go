@@ -10,46 +10,69 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"path"
+	"os"
+	"os/user"
 	"path/filepath"
 	"strings"
 
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson"
+	"github.com/louisroyer/km-probe/internal/kmconfig"
 	"github.com/louisroyer/km-probe/internal/probes"
 )
 
 type Setup struct {
-	ConfigPath   string
 	Repositories []Repository
 }
 
 func NewSetup() *Setup {
-	return &Setup{
-		ConfigPath: "/home/louis/local/share/karaokemugen-app/app/config.yml", // TODO: not hardcode
-		Repositories: []Repository{
-			// TODO: not hardcode
-			Repository{
-				Name:      "kara.moe",
-				BaseDir:   "/home/louis/Documents/kara.moe",
-				MediaPath: "repos/kara.moe/medias",
-			},
-		},
+	setup := Setup{
+		Repositories: make([]Repository, 0),
 	}
+	return &setup
 }
 
 func (s *Setup) Run(ctx context.Context) error {
+	xdgDataHome, ok := os.LookupEnv("XDG_DATA_HOME")
+	if !ok {
+		usr, err := user.Current()
+		if err != nil {
+			return err
+		}
+		xdgDataHome = filepath.Join(usr.HomeDir, ".local/share")
+	}
+	xdgPath := filepath.Join(xdgDataHome, "karaokemugen-app/app/")
+	kmConfig, err := kmconfig.ParseConf(filepath.Join(xdgPath, "config.yml"))
+	if err != nil {
+		return err
+	}
+	for _, v := range kmConfig.System.Repositories {
+		baseDir := v.BaseDir
+		if !filepath.IsAbs(baseDir) {
+			baseDir = filepath.Join(xdgPath, baseDir)
+		}
+		mediaPath := v.Path.Medias[0] // TODO: why is it an array?
+		if !filepath.IsAbs(mediaPath) {
+			mediaPath = filepath.Join(xdgPath, mediaPath)
+		}
+		s.Repositories = append(s.Repositories, Repository{
+			Name:      v.Name,
+			BaseDir:   baseDir,
+			MediaPath: mediaPath,
+		})
+	}
+
 	for _, repo := range s.Repositories {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
-			err := filepath.WalkDir(path.Join(repo.BaseDir, "karaokes"), func(p string, d fs.DirEntry, err error) error {
+			err := filepath.WalkDir(filepath.Join(repo.BaseDir, "karaokes"), func(p string, d fs.DirEntry, err error) error {
 				if err != nil {
 					return err
 				}
 				if d.IsDir() {
-					if p == path.Join(repo.BaseDir, "karaokes") {
+					if p == filepath.Join(repo.BaseDir, "karaokes") {
 						return nil
 					}
 					return filepath.SkipDir
