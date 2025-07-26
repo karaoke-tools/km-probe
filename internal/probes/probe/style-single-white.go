@@ -7,6 +7,7 @@ package probe
 
 import (
 	"context"
+	"slices"
 	"strings"
 
 	"github.com/louisroyer/km-probe/internal/ass/style"
@@ -26,10 +27,8 @@ func NewStyleSingleWhite(karaData *karadata.KaraData) Probe {
 }
 
 func (p *StyleSingleWhite) Run(ctx context.Context) (report.Report, error) {
-	for _, tag := range p.karaData.KaraJson.Data.Tags.Misc {
-		if tag == karajson.GroupSinging {
-			return report.Pass(), nil
-		}
+	if slices.Contains(p.karaData.KaraJson.Data.Tags.Misc, karajson.GroupSinging) {
+		return report.Skip(), nil
 	}
 	nb_styles := 0
 	for _, line := range p.karaData.Lyrics.Styles {
@@ -41,7 +40,7 @@ func (p *StyleSingleWhite) Run(ctx context.Context) (report.Report, error) {
 				nb_styles += 1
 				if nb_styles > 1 {
 					// for the moment, we focus on single style karaoke
-					return report.Pass(), nil
+					return report.Skip(), nil
 				}
 			}
 		}

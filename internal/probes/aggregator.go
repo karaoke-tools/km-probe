@@ -63,13 +63,13 @@ func (a *Aggregator) Run(ctx context.Context) error {
 			case <-ctx.Done():
 				return ctx.Err()
 			default:
-				go func(ctx context.Context, ch chan<- reportWithName) {
+				go func(ctx context.Context, p probe.Probe, ch chan<- reportWithName) {
 					if r, err := p.Run(ctx); err == nil {
 						ch <- reportWithName{name: p.Name(), r: r}
 					} else {
 						ch <- reportWithName{name: p.Name(), r: report.Abort()}
 					}
-				}(ctx, ch)
+				}(ctx, p, ch)
 			}
 		}
 		// get result of probes

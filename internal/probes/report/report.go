@@ -12,39 +12,51 @@ type Report interface {
 }
 
 type report struct {
-	status string
+	status Status
 	result bool
 }
 
+// When the issue is not detected
 func Pass() *report {
 	return &report{
-		status: "completed",
+		status: StatusCompleted,
 		result: true,
 	}
 }
 
+// When the issue is detected
 func Fail() *report {
 	return &report{
-		status: "completed",
+		status: StatusCompleted,
 		result: false,
 	}
 }
 
+// When the test is only to display some infos
 func Info(v bool) *report {
 	return &report{
-		status: "info",
+		status: StatusInfo,
 		result: v,
 	}
 }
 
+// When test has been canceled
 func Abort() *report {
 	return &report{
-		status: "aborted",
+		status: StatusAborted,
+	}
+}
+
+// When the test is not relevant
+func Skip() *report {
+	return &report{
+		result: true,
+		status: StatusSkipped,
 	}
 }
 
 func (r *report) Status() string {
-	return r.status
+	return r.status.String()
 }
 
 func (r *report) Result() bool {
@@ -52,15 +64,15 @@ func (r *report) Result() bool {
 }
 
 func (r *report) String() string {
-	if r.status == "info" {
+	if r.status == StatusInfo {
 		if r.result {
 			return "info: yes"
 		} else {
 			return "info: no"
 		}
 	}
-	if r.status != "completed" {
-		return r.status
+	if r.status != StatusCompleted {
+		return r.Status()
 	}
 	if r.result {
 		return "passed"

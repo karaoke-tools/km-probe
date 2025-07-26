@@ -7,6 +7,7 @@ package probe
 
 import (
 	"context"
+	"slices"
 	"strings"
 
 	"github.com/louisroyer/km-probe/internal/ass/lyrics"
@@ -41,10 +42,8 @@ var doubleConsonnants = []string{
 
 func (p *DoubleConsonnant) Run(ctx context.Context) (report.Report, error) {
 	// we only check if language is full jpn
-	for _, tag := range p.karaData.KaraJson.Data.Tags.Langs {
-		if tag != karajson.LangJPN {
-			return report.Pass(), nil
-		}
+	if !slices.Contains(p.karaData.KaraJson.Data.Tags.Langs, karajson.LangJPN) {
+		return report.Skip(), nil
 	}
 	for _, line := range p.karaData.Lyrics.Events {
 		select {

@@ -20,4 +20,5 @@ var defaultProbes []probe.NewProbeFunc = []probe.NewProbeFunc{
 	probe.NewStyleBlackBorder,
 	probe.NewStyleScale,
 	probe.NewStyleSingleWhite,
+	probe.NewOffVocalWithoutParent,
 }
