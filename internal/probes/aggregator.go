@@ -7,8 +7,6 @@ package probes
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson"
@@ -17,9 +15,9 @@ import (
 )
 
 type Aggregator struct {
-	Name    string
-	Reports map[string]report.Report
-	Probes  []probe.Probe
+	Name    string                   `json:"name"`
+	Reports map[string]report.Report `json:"reports"`
+	Probes  []probe.Probe            `json:"-"`
 }
 
 func FromKaraJson(ctx context.Context, basedir string, karaJson *karajson.KaraJson, probes *[]probe.NewProbeFunc) (*Aggregator, error) {
@@ -81,17 +79,10 @@ func (a *Aggregator) Run(ctx context.Context) error {
 				a.Reports[r.name] = r.r
 			}
 		}
+		// add additional reports
+		a.Reports["probably-good-first-contribution"] = report.Info(a.SuitableFirstContribution())
 		return nil
 	}
-}
-
-func (a *Aggregator) String() string {
-	ret := []string{fmt.Sprintf("name: %s", a.Name)}
-	for k, v := range a.Reports {
-		ret = append(ret, fmt.Sprintf("- %s: %s", k, v))
-	}
-	ret = append(ret, fmt.Sprintf("- probably-good-first-contribution: %t", a.SuitableFirstContribution()))
-	return strings.Join(ret, "\n")
 }
 
 func (a *Aggregator) SuitableFirstContribution() bool {

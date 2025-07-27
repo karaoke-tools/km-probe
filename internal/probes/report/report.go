@@ -5,15 +5,24 @@
 
 package report
 
+import (
+	"encoding/json"
+)
+
 type Report interface {
 	Result() bool
 	Status() string
 	String() string
+	MarshalJSON() ([]byte, error)
 }
 
 type report struct {
 	status Status
 	result bool
+}
+
+func (r *report) MarshalJSON() ([]byte, error) {
+	return json.Marshal(r.String())
 }
 
 // When the issue is not detected
@@ -66,9 +75,9 @@ func (r *report) Result() bool {
 func (r *report) String() string {
 	if r.status == StatusInfo {
 		if r.result {
-			return "info: yes"
+			return "yes"
 		} else {
-			return "info: no"
+			return "no"
 		}
 	}
 	if r.status != StatusCompleted {

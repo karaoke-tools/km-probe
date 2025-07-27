@@ -7,8 +7,8 @@ package app
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
-	"fmt"
 	"io/fs"
 	"os"
 	"os/user"
@@ -62,6 +62,9 @@ func (s *Setup) Run(ctx context.Context) error {
 		})
 	}
 
+	encoder := json.NewEncoder(os.Stdout)
+	encoder.SetIndent("", "  ")
+
 	for _, repo := range s.Repositories {
 		select {
 		case <-ctx.Done():
@@ -94,7 +97,9 @@ func (s *Setup) Run(ctx context.Context) error {
 				if err := a.Run(ctx); err != nil {
 					return err
 				}
-				fmt.Println(a)
+				if err := encoder.Encode(a); err != nil {
+					return err
+				}
 				return nil
 			})
 			if err != nil {
