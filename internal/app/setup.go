@@ -14,11 +14,14 @@ import (
 	"os/user"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson"
 	"github.com/louisroyer/km-probe/internal/kmconfig"
 	"github.com/louisroyer/km-probe/internal/probes"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Setup struct {
@@ -64,49 +67,108 @@ func (s *Setup) Run(ctx context.Context) error {
 
 	encoder := json.NewEncoder(os.Stdout)
 	encoder.SetIndent("", "  ")
+	ch := make(chan *probes.Aggregator)
+	printCtx, cancelPrint := context.WithCancel(ctx)
+	defer cancelPrint()
+	generateCtx, _ := context.WithCancel(printCtx)
+	go func(ctx context.Context, cancel context.CancelFunc, ch <-chan *probes.Aggregator) {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case a, ok := <-ch:
+				if !ok {
+					cancel()
+					return
+				}
+				if err := encoder.Encode(a); err != nil {
+					logrus.WithError(err).Error("Error while encoding json")
+				}
+			}
+		}
+	}(printCtx, cancelPrint, ch)
 
-	for _, repo := range s.Repositories {
+	if err := func() error {
+		defer close(ch)
+		wg := sync.WaitGroup{}
+		for _, repo := range s.Repositories {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			default:
+				err := filepath.WalkDir(filepath.Join(repo.BaseDir, "karaokes"), func(p string, d fs.DirEntry, err error) error {
+					if err != nil {
+						return err
+					}
+					if d.IsDir() {
+						if p == filepath.Join(repo.BaseDir, "karaokes") {
+							return nil
+						}
+						return filepath.SkipDir
+					}
+					if !strings.HasSuffix(d.Name(), ".kara.json") {
+						return nil
+					}
+					wg.Add(1)
+					go func(ctx context.Context, p string) {
+						defer wg.Done()
+						karaJson, err := karajson.FromFile(p)
+						if err != nil {
+							select {
+							case <-ctx.Done():
+							default:
+								logrus.WithError(err).WithFields(logrus.Fields{
+									"filename": p,
+								}).Error("Could not parse karajson")
+							}
+							return
+						}
+						a, err := probes.FromKaraJson(ctx, repo.BaseDir, karaJson, nil)
+						if errors.Is(err, karadata.ErrNoLyrics) {
+							// skip
+							return
+						} else if err != nil {
+							select {
+							case <-ctx.Done():
+							default:
+								logrus.WithError(errors.Join(errors.New(d.Name()), err)).WithFields(logrus.Fields{
+									"filename": p,
+								}).Error("Could not create probe aggregator")
+							}
+							return
+						}
+						if err := a.Run(ctx); err != nil {
+							select {
+							case <-ctx.Done():
+							default:
+								logrus.WithError(err).WithFields(logrus.Fields{
+									"filename": p,
+								}).Error("Probe aggregator failure")
+							}
+							return
+						} else {
+							ch <- a
+						}
+					}(generateCtx, p)
+					return nil
+				})
+				if err != nil {
+					return err
+				}
+			}
+		}
+		wg.Wait()
+		return nil
+	}(); err != nil {
+		return err
+	}
+	select {
+	case <-generateCtx.Done():
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
-			err := filepath.WalkDir(filepath.Join(repo.BaseDir, "karaokes"), func(p string, d fs.DirEntry, err error) error {
-				if err != nil {
-					return err
-				}
-				if d.IsDir() {
-					if p == filepath.Join(repo.BaseDir, "karaokes") {
-						return nil
-					}
-					return filepath.SkipDir
-				}
-				if !strings.HasSuffix(d.Name(), ".kara.json") {
-					return nil
-				}
-				karaJson, err := karajson.FromFile(p)
-				if err != nil {
-					return err
-				}
-				a, err := probes.FromKaraJson(ctx, repo.BaseDir, karaJson, nil)
-				if errors.Is(err, karadata.ErrNoLyrics) {
-					// skip
-					return nil
-				} else if err != nil {
-					return errors.Join(errors.New(d.Name()), err)
-				}
-				if err := a.Run(ctx); err != nil {
-					return err
-				}
-				if err := encoder.Encode(a); err != nil {
-					return err
-				}
-				return nil
-			})
-			if err != nil {
-				return err
-			}
+			return nil
 		}
-
 	}
-	return nil
 }
