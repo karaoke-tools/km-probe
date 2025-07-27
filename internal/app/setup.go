@@ -70,7 +70,9 @@ func (s *Setup) Run(ctx context.Context) error {
 	ch := make(chan *probes.Aggregator)
 	printCtx, cancelPrint := context.WithCancel(ctx)
 	defer cancelPrint()
-	generateCtx, _ := context.WithCancel(printCtx)
+	generateCtx, cancelGenerate := context.WithCancel(printCtx)
+	// not strictly required because we defer the CancelFunc of the parent, but `go vet` complains about it
+	defer cancelGenerate()
 	go func(ctx context.Context, cancel context.CancelFunc, ch <-chan *probes.Aggregator) {
 		for {
 			select {
