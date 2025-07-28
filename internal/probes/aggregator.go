@@ -80,25 +80,47 @@ func (a *Aggregator) Run(ctx context.Context) error {
 			}
 		}
 		// add additional reports
-		a.Reports["probably-good-first-contribution"] = report.Info(a.SuitableFirstContribution())
+		a.Reports["probably-good-first-contribution"] = a.SuitableFirstContribution()
 		return nil
 	}
 }
 
-func (a *Aggregator) SuitableFirstContribution() bool {
-	issue_cnt := 0
-	if !a.Reports["style-single-white"].Result() || !a.Reports["style-black-border"].Result() {
-		issue_cnt += 1
+func (a *Aggregator) SuitableFirstContribution() report.Report {
+	critical := []string{
+		"live-download",
+		"resolution",
+		"automation",
 	}
-	if !a.Reports["eol-punctuation"].Result() {
-		issue_cnt += 1
-	}
-	if !a.Reports["double-consonnant"].Result() {
-		issue_cnt += 1
+	for _, c := range critical {
+		if r, ok := a.Reports[c]; !ok {
+			return report.Skip()
+		} else if !r.Result() {
+			return report.Info(false)
+		}
 	}
 
-	if a.Reports["automation"].Result() && a.Reports["live-download"].Result() && a.Reports["resolution"].Result() && issue_cnt == 1 {
-		return true
+	scoring := [][]string{
+		// style issues
+		[]string{"style-single-white", "style-black-border"}, // minor issues
+		[]string{"resolution"},                               // can imply re-splitting some parts
+		// lyrics issues
+		[]string{"double-consonnant"},
 	}
-	return false
+
+	badness := 0
+	for _, s := range scoring {
+		local_badness := 0
+		for _, sb := range s {
+			if r, ok := a.Reports[sb]; !ok {
+				return report.Skip()
+			} else if !r.Result() {
+				local_badness++
+			}
+		}
+		if local_badness > 0 {
+			badness++
+		}
+	}
+
+	return report.Info(badness == 1)
 }
