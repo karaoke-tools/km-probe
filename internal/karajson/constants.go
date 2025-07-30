@@ -23,6 +23,7 @@ var (
 
 	// langs
 	LangJPN = uuid.Must(uuid.FromString("4dcf9614-7914-42aa-99f4-dbce2e059133"))
+	LangENG = uuid.Must(uuid.FromString("de5eda1c-5fb3-46a6-9606-d4554fc5a1d6"))
 
 	// versions
 	VersionOffVocal = uuid.Must(uuid.FromString("c0cc87b9-55b9-40f0-878a-fbb9e34c151e"))

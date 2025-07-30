@@ -13,6 +13,7 @@ var defaultProbes []probe.NewProbeFunc = []probe.NewProbeFunc{
 	probe.NewAutomation,
 	probe.NewDoubleConsonnant,
 	probe.NewEolPunctuation,
+	probe.NewSpaceBeforeDoublePunctuation,
 	probe.NewLiveDownload,
 	probe.NewResolution,
 	probe.NewScaledBorderAndShadow,
