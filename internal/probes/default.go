@@ -21,4 +21,5 @@ var defaultProbes []probe.NewProbeFunc = []probe.NewProbeFunc{
 	probe.NewStyleScale,
 	probe.NewStyleSingleWhite,
 	probe.NewOffVocalWithoutParent,
+	probe.NewKfShortSyllabes,
 }
