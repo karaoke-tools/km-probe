@@ -82,4 +82,5 @@ type Tags struct {
 	Songtypes    []uuid.UUID `json:"songtypes"`
 	Songwriters  []uuid.UUID `json:"songwriters"`
 	Versions     []uuid.UUID `json:"versions"`
+	Warnings     []uuid.UUID `json:"warnings"`
 }

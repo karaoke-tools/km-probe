@@ -10,6 +10,9 @@ import (
 )
 
 var (
+	// songtype
+	TypeAudioOnly = uuid.Must(uuid.FromString("42a262ae-acba-4ab5-a446-c5789c96c821"))
+
 	// misc
 	GroupSinging = uuid.Must(uuid.FromString("1d6ceadf-a885-47e5-b23b-c07bf668a424"))
 	Unavailable  = uuid.Must(uuid.FromString("7a1ad419-4001-484a-bd9c-d3e04bf54529"))
@@ -27,4 +30,10 @@ var (
 
 	// versions
 	VersionOffVocal = uuid.Must(uuid.FromString("c0cc87b9-55b9-40f0-878a-fbb9e34c151e"))
+
+	// warnings
+	WarningR18Lyrics = uuid.Must(uuid.FromString("e2b8419f-1d5a-44ad-a62c-d7765493190d"))
+	WarningR18Media  = uuid.Must(uuid.FromString("e82ce681-6d7b-4fb6-abe4-daa8aaa9bbf9"))
+	WarningSpoiler   = uuid.Must(uuid.FromString("24371984-5e4c-4485-a937-fb0c480ca23b"))
+	WarningEpilepsy  = uuid.Must(uuid.FromString("51288600-29e0-4e41-a42b-77f0498e5691"))
 )
