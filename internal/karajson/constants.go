@@ -36,4 +36,14 @@ var (
 	WarningR18Media  = uuid.Must(uuid.FromString("e82ce681-6d7b-4fb6-abe4-daa8aaa9bbf9"))
 	WarningSpoiler   = uuid.Must(uuid.FromString("24371984-5e4c-4485-a937-fb0c480ca23b"))
 	WarningEpilepsy  = uuid.Must(uuid.FromString("51288600-29e0-4e41-a42b-77f0498e5691"))
+
+	// years
+	Years1950 = uuid.Must(uuid.FromString("de0c8e96-9934-4251-9142-b7a5ee70dd6f"))
+	Years1960 = uuid.Must(uuid.FromString("b4240f1f-200d-4d10-b5eb-d3a740eed323"))
+	Years1970 = uuid.Must(uuid.FromString("57e5e0c0-e02e-4871-a6cb-d48ea604ebab"))
+	Years1980 = uuid.Must(uuid.FromString("7792cc27-9ff9-4d47-9287-2338b7db1575"))
+	Years1990 = uuid.Must(uuid.FromString("24db50aa-a126-4d34-a48a-e45db79c4245"))
+	Years2000 = uuid.Must(uuid.FromString("3c14c864-533c-49e6-a3cc-6969f1233775"))
+	Years2010 = uuid.Must(uuid.FromString("ae613721-1fbe-480d-ba6b-d6d0702b184d"))
+	Years2020 = uuid.Must(uuid.FromString("8e209ae4-4381-438f-89dc-1b21752027d2"))
 )
