@@ -9,11 +9,11 @@ import (
 	"context"
 	"slices"
 
-	"github.com/gofrs/uuid"
-
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+
+	"github.com/gofrs/uuid"
 )
 
 type LiveDownload struct {

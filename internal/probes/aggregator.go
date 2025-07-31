@@ -12,12 +12,15 @@ import (
 	"github.com/louisroyer/km-probe/internal/karajson"
 	"github.com/louisroyer/km-probe/internal/probes/probe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+
+	"github.com/gofrs/uuid"
 )
 
 type Aggregator struct {
-	Name    string                   `json:"name"`
-	Reports map[string]report.Report `json:"reports"`
-	Probes  []probe.Probe            `json:"-"`
+	Songname string                   `json:"songname"`
+	Kid      uuid.UUID                `json:"kid"`
+	Reports  map[string]report.Report `json:"reports"`
+	Probes   []probe.Probe            `json:"-"`
 }
 
 func FromKaraJson(ctx context.Context, basedir string, karaJson *karajson.KaraJson, probes *[]probe.NewProbeFunc) (*Aggregator, error) {
@@ -30,8 +33,9 @@ func FromKaraJson(ctx context.Context, basedir string, karaJson *karajson.KaraJs
 			return nil, err
 		}
 		aggregator := Aggregator{
-			Name:    data.KaraJson.Data.Songname,
-			Reports: make(map[string]report.Report),
+			Songname: data.KaraJson.Data.Songname,
+			Kid:      data.KaraJson.Data.Kid,
+			Reports:  make(map[string]report.Report),
 		}
 		if probes == nil {
 			probes = &defaultProbes
