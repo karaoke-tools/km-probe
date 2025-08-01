@@ -28,6 +28,7 @@ var defaultProbes []probe.NewProbeFunc = []probe.NewProbeFunc{
 	probe.NewDoubleYearGroup,
 	probe.NewWrongTsuSeparation,
 	probe.NewLongTagOnShortMedia,
+	probe.NewAudioOnlyWithVideoContainer,
 }
 
 var defaultAnalysers []analyser.NewAnalyserFunc = []analyser.NewAnalyserFunc{
