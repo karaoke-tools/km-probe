@@ -27,6 +27,7 @@ var defaultProbes []probe.NewProbeFunc = []probe.NewProbeFunc{
 	probe.NewMediaWarningAudioOnly,
 	probe.NewDoubleYearGroup,
 	probe.NewWrongTsuSeparation,
+	probe.NewLongTagOnShortMedia,
 }
 
 var defaultAnalysers []analyser.NewAnalyserFunc = []analyser.NewAnalyserFunc{

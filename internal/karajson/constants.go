@@ -46,4 +46,7 @@ var (
 	Years2000 = uuid.Must(uuid.FromString("3c14c864-533c-49e6-a3cc-6969f1233775"))
 	Years2010 = uuid.Must(uuid.FromString("ae613721-1fbe-480d-ba6b-d6d0702b184d"))
 	Years2020 = uuid.Must(uuid.FromString("8e209ae4-4381-438f-89dc-1b21752027d2"))
+
+	// misc
+	MiscLong = uuid.Must(uuid.FromString("86705d4b-24e4-4756-9687-2b9c98bcf366"))
 )
