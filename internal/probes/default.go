@@ -6,6 +6,7 @@
 package probes
 
 import (
+	"github.com/louisroyer/km-probe/internal/probes/analyser"
 	"github.com/louisroyer/km-probe/internal/probes/probe"
 )
 
@@ -26,4 +27,8 @@ var defaultProbes []probe.NewProbeFunc = []probe.NewProbeFunc{
 	probe.NewMediaWarningAudioOnly,
 	probe.NewDoubleYearGroup,
 	probe.NewWrongTsuSeparation,
+}
+
+var defaultAnalysers []analyser.NewAnalyserFunc = []analyser.NewAnalyserFunc{
+	analyser.NewSuitableFirstContribution,
 }

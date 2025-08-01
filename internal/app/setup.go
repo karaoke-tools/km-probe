@@ -68,90 +68,116 @@ func (s *Setup) Run(ctx context.Context) error {
 	encoder := json.NewEncoder(os.Stdout)
 	encoder.SetIndent("", "  ")
 	ch := make(chan *probes.Aggregator)
+
 	printCtx, cancelPrint := context.WithCancel(ctx)
 	defer cancelPrint()
-	generateCtx, cancelGenerate := context.WithCancel(printCtx)
-	// not strictly required because we defer the CancelFunc of the parent, but `go vet` complains about it
+	generateCtx, cancelGenerate := context.WithCancel(ctx)
 	defer cancelGenerate()
-	go func(ctx context.Context, cancel context.CancelFunc, ch <-chan *probes.Aggregator) {
+
+	wg := sync.WaitGroup{}
+	defer func() {
+		select {
+		case <-ctx.Done():
+		default:
+			wg.Wait()
+		}
+	}()
+
+	go func(ctx context.Context, ch <-chan *probes.Aggregator) {
 		for {
 			select {
 			case <-ctx.Done():
 				return
-			case a, ok := <-ch:
-				if !ok {
-					cancel()
-					return
-				}
+			case a := <-ch:
+				wg.Done()
 				if err := encoder.Encode(a); err != nil {
 					logrus.WithError(err).Error("Error while encoding json")
 				}
 			}
 		}
-	}(printCtx, cancelPrint, ch)
+	}(printCtx, ch)
 
-	if err := func() error {
-		defer close(ch)
-		wg := sync.WaitGroup{}
+	if err := func(ctx context.Context) error {
 		for _, repo := range s.Repositories {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
 			default:
 				err := filepath.WalkDir(filepath.Join(repo.BaseDir, "karaokes"), func(p string, d fs.DirEntry, err error) error {
-					if err != nil {
-						return err
-					}
-					if d.IsDir() {
-						if p == filepath.Join(repo.BaseDir, "karaokes") {
+					select {
+					case <-ctx.Done():
+						return filepath.SkipDir
+					default:
+						if err != nil {
+							return err
+						}
+						if d.IsDir() {
+							if p == filepath.Join(repo.BaseDir, "karaokes") {
+								return nil
+							}
+							return filepath.SkipDir
+						}
+						if !strings.HasSuffix(d.Name(), ".kara.json") {
 							return nil
 						}
-						return filepath.SkipDir
 					}
-					if !strings.HasSuffix(d.Name(), ".kara.json") {
-						return nil
-					}
-					wg.Add(1)
 					go func(ctx context.Context, p string) {
-						defer wg.Done()
+						select {
+						case <-ctx.Done():
+							return
+						default:
+							wg.Add(1)
+						}
 						karaJson, err := karajson.FromFile(p)
 						if err != nil {
 							select {
 							case <-ctx.Done():
+								return
 							default:
+								wg.Done()
 								logrus.WithError(err).WithFields(logrus.Fields{
 									"filename": p,
 								}).Error("Could not parse karajson")
+								return
 							}
-							return
 						}
-						a, err := probes.FromKaraJson(ctx, repo.BaseDir, karaJson, nil)
+						a, err := probes.FromKaraJson(ctx, repo.BaseDir, karaJson, nil, nil)
 						if errors.Is(err, karadata.ErrNoLyrics) {
 							// skip
+							wg.Done()
 							return
 						} else if err != nil {
 							select {
 							case <-ctx.Done():
+								return
 							default:
+								wg.Done()
 								logrus.WithError(errors.Join(errors.New(d.Name()), err)).WithFields(logrus.Fields{
 									"filename": p,
 								}).Error("Could not create probe aggregator")
+								return
 							}
-							return
 						}
 						if err := a.Run(ctx); err != nil {
 							select {
 							case <-ctx.Done():
+								return
 							default:
+								wg.Done()
 								logrus.WithError(err).WithFields(logrus.Fields{
 									"filename": p,
 								}).Error("Probe aggregator failure")
+								return
 							}
-							return
 						} else {
-							ch <- a
+							select {
+							case <-ctx.Done():
+								return
+							case ch <- a:
+								return
+							}
 						}
-					}(generateCtx, p)
+					}(ctx, p)
 					return nil
 				})
 				if err != nil {
@@ -159,18 +185,9 @@ func (s *Setup) Run(ctx context.Context) error {
 				}
 			}
 		}
-		wg.Wait()
 		return nil
-	}(); err != nil {
+	}(generateCtx); err != nil {
 		return err
 	}
-	select {
-	case <-generateCtx.Done():
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		default:
-			return nil
-		}
-	}
+	return nil
 }

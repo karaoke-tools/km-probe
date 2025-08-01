@@ -10,6 +10,7 @@ import (
 
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson"
+	"github.com/louisroyer/km-probe/internal/probes/analyser"
 	"github.com/louisroyer/km-probe/internal/probes/probe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 
@@ -17,13 +18,20 @@ import (
 )
 
 type Aggregator struct {
-	Songname string                   `json:"songname"`
-	Kid      uuid.UUID                `json:"kid"`
-	Reports  map[string]report.Report `json:"reports"`
-	Probes   []probe.Probe            `json:"-"`
+	// Identification of the karaoke
+	Songname string    `json:"songname"`
+	Kid      uuid.UUID `json:"kid"`
+	// `Probes` report direct features of the karaoke based on metadata, lyrics, etc.
+	// They can be used to detect common mistakes.
+	Probes  []probe.Probe            `json:"-"`
+	Reports map[string]report.Report `json:"reports"`
+	// `Analysis` give indirect features of the karaoke based on reports from probes.
+	// For example, "is it suitable to improve this karaoke as a first contribution?"
+	AnalyserFuncs []analyser.NewAnalyserFunc `json:"-"`
+	Analysis      map[string]report.Report   `json:"analysis"`
 }
 
-func FromKaraJson(ctx context.Context, basedir string, karaJson *karajson.KaraJson, probes *[]probe.NewProbeFunc) (*Aggregator, error) {
+func FromKaraJson(ctx context.Context, basedir string, karaJson *karajson.KaraJson, probes *[]probe.NewProbeFunc, analysers *[]analyser.NewAnalyserFunc) (*Aggregator, error) {
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
@@ -36,12 +44,19 @@ func FromKaraJson(ctx context.Context, basedir string, karaJson *karajson.KaraJs
 			Songname: data.KaraJson.Data.Songname,
 			Kid:      data.KaraJson.Data.Kid,
 			Reports:  make(map[string]report.Report),
+			Analysis: make(map[string]report.Report),
 		}
 		if probes == nil {
 			probes = &defaultProbes
 		}
 		for _, probe := range *probes {
 			aggregator.Probes = append(aggregator.Probes, probe(data))
+		}
+		if analysers == nil {
+			analysers = &defaultAnalysers
+		}
+		for _, a := range *analysers {
+			aggregator.AnalyserFuncs = append(aggregator.AnalyserFuncs, a)
 		}
 		return &aggregator, nil
 	}
@@ -67,9 +82,20 @@ func (a *Aggregator) Run(ctx context.Context) error {
 			default:
 				go func(ctx context.Context, p probe.Probe, ch chan<- reportWithName) {
 					if r, err := p.Run(ctx); err == nil {
-						ch <- reportWithName{name: p.Name(), r: r}
+						select {
+						case <-ctx.Done():
+							return
+						case ch <- reportWithName{name: p.Name(), r: r}:
+							return
+						}
 					} else {
-						ch <- reportWithName{name: p.Name(), r: report.Abort()}
+						select {
+						case <-ctx.Done():
+							return
+						case ch <- reportWithName{name: p.Name(), r: report.Abort()}:
+							return
+
+						}
 					}
 				}(ctx, p, ch)
 			}
@@ -83,48 +109,41 @@ func (a *Aggregator) Run(ctx context.Context) error {
 				a.Reports[r.name] = r.r
 			}
 		}
-		// add additional reports
-		a.Reports["probably-good-first-contribution"] = a.SuitableFirstContribution()
-		return nil
-	}
-}
-
-func (a *Aggregator) SuitableFirstContribution() report.Report {
-	critical := []string{
-		"live-download",
-		"resolution",
-		"automation",
-	}
-	for _, c := range critical {
-		if r, ok := a.Reports[c]; !ok {
-			return report.Skip()
-		} else if !r.Result() {
-			return report.Info(false)
-		}
-	}
-
-	scoring := [][]string{
-		// style issues
-		[]string{"style-single-white", "style-black-border"}, // minor issues
-		[]string{"resolution"},                               // can imply re-splitting some parts
-		// lyrics issues
-		[]string{"double-consonnant"},
-	}
-
-	badness := 0
-	for _, s := range scoring {
-		local_badness := 0
-		for _, sb := range s {
-			if r, ok := a.Reports[sb]; !ok {
-				return report.Skip()
-			} else if !r.Result() {
-				local_badness++
+		// start analysers
+		for _, f := range a.AnalyserFuncs {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			default:
+				go func(ctx context.Context, p analyser.Analyser, ch chan<- reportWithName) {
+					if r, err := p.Run(ctx); err == nil {
+						select {
+						case <-ctx.Done():
+							return
+						case ch <- reportWithName{name: p.Name(), r: r}:
+							return
+						}
+					} else {
+						select {
+						case <-ctx.Done():
+							return
+						case ch <- reportWithName{name: p.Name(), r: report.Abort()}:
+							return
+						}
+					}
+				}(ctx, f(a.Reports), ch)
 			}
 		}
-		if local_badness > 0 {
-			badness++
+		// get analysis
+		for _, _ = range a.AnalyserFuncs {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case r := <-ch:
+				a.Analysis[r.name] = r.r
+			}
 		}
-	}
 
-	return report.Info(badness == 1)
+		return nil
+	}
 }
