@@ -18,31 +18,19 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-type DoubleConsonnant struct {
+type WrongTsuSeparation struct {
 	baseProbe
 }
 
-func NewDoubleConsonnant(karaData *karadata.KaraData) Probe {
-	return &DoubleConsonnant{
-		newBaseProbe("double-consonnant", karaData),
+// In japanese, `つ` should be timed as a single syllabe: `tsu`.
+// For example, `ひとつ`(`hitotsu`) should be timed as `hi|to|tsu` and not as `hi|tot|su`.
+func NewWrongTsuSeparation(karaData *karadata.KaraData) Probe {
+	return &WrongTsuSeparation{
+		newBaseProbe("wrong-tsu-separation", karaData),
 	}
 }
 
-var doubleConsonnants = []string{
-	"kk",
-	"gg",
-	"ss",
-	"zz",
-	"tt",
-	"dd",
-	"nn",
-	"bb",
-	"pp",
-	"mm",
-	"rr",
-}
-
-func (p *DoubleConsonnant) Run(ctx context.Context) (report.Report, error) {
+func (p *WrongTsuSeparation) Run(ctx context.Context) (report.Report, error) {
 	// we only check if language is full jpn romaji
 	if slices.Contains(p.karaData.KaraJson.Data.Tags.Collections, karajson.CollectionKana) {
 		return report.Skip(), nil
@@ -59,25 +47,22 @@ func (p *DoubleConsonnant) Run(ctx context.Context) (report.Report, error) {
 			return report.Abort(), ctx.Err()
 		default:
 			if (line.Type != lyrics.Format) && (!strings.HasPrefix(line.Effect, "template")) {
-				save := ""
+				ok := false
 				for _, syll := range line.Text.TagsSplit {
 					select {
 					case <-ctx.Done():
 						return report.Abort(), ctx.Err()
 					default:
 						if !strings.HasPrefix(syll, "{") {
-							if !strings.HasSuffix(save, " ") { // this is not a new word
-								for _, double := range doubleConsonnants {
-									if strings.HasPrefix(syll, double) {
-										return report.Fail(), nil
-									}
-								}
-
+							if strings.HasSuffix(syll, "t") {
+								ok = true
+							} else if ok && strings.HasPrefix(syll, "su") {
+								return report.Fail(), nil
+							} else {
+								ok = false
 							}
-							save = syll
 						}
 					}
-
 				}
 			}
 		}

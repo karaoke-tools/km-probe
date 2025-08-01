@@ -7,7 +7,6 @@ package probe
 
 import (
 	"context"
-	"slices"
 	"strings"
 
 	"github.com/louisroyer/km-probe/internal/ass/lyrics"
@@ -30,21 +29,9 @@ func NewSpaceBeforeDoublePunctuation(karaData *karadata.KaraData) Probe {
 
 func (p *SpaceBeforeDoublePunctuation) Run(ctx context.Context) (report.Report, error) {
 	// we only check if language is full english, full japanese, or jpn+eng
-	if len(p.karaData.KaraJson.Data.Tags.Langs) > 2 {
-		return report.Skip(), nil
-	} else if len(p.karaData.KaraJson.Data.Tags.Langs) == 2 {
-		if !slices.Contains(p.karaData.KaraJson.Data.Tags.Langs, karajson.LangJPN) {
-			return report.Skip(), nil
-		}
-		if !slices.Contains(p.karaData.KaraJson.Data.Tags.Langs, karajson.LangENG) {
-			return report.Skip(), nil
-		}
-	} else if len(p.karaData.KaraJson.Data.Tags.Langs) == 1 {
-		if !slices.Contains([]uuid.UUID{karajson.LangJPN, karajson.LangENG}, p.karaData.KaraJson.Data.Tags.Langs[0]) {
-			return report.Skip(), nil
-		}
-	} else {
-		// no lang, how is that possible?
+	if res, err := p.karaData.KaraJson.HasOnlyLanguagesFrom(ctx, []uuid.UUID{karajson.LangJPN, karajson.LangENG}); err != nil {
+		return report.Abort(), err
+	} else if !res {
 		return report.Skip(), nil
 	}
 

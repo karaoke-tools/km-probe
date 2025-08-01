@@ -25,4 +25,5 @@ var defaultProbes []probe.NewProbeFunc = []probe.NewProbeFunc{
 	probe.NewKfShortSyllabes,
 	probe.NewMediaWarningAudioOnly,
 	probe.NewDoubleYearGroup,
+	probe.NewWrongTsuSeparation,
 }
