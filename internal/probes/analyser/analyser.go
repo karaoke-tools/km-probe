@@ -15,7 +15,7 @@ type NewAnalyserFunc func(map[string]report.Report) Analyser
 
 type baseAnalyser struct {
 	name    string
-	reports map[string]report.Report `json:"reports"`
+	reports map[string]report.Report
 }
 
 func newAnalyser(name string, reports map[string]report.Report) baseAnalyser {
