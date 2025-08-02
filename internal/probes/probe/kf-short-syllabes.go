@@ -7,6 +7,7 @@ package probe
 
 import (
 	"context"
+	"strconv"
 	"strings"
 
 	"github.com/louisroyer/km-probe/internal/ass/lyrics"
@@ -42,7 +43,7 @@ func (p *KfShortSyllabes) Run(ctx context.Context) (report.Report, error) {
 						// kf90 can also be okay sometimes
 						// but kf85 or lower is definitely bad
 						if l < 85 && l != 0 { // kf0 is the same as k0
-							return report.Fail(severity.Critical, "remove very short \\kf (found a `"+string(l)+"`)"), nil
+							return report.Fail(severity.Critical, "remove very short \\kf (found a `"+strconv.Itoa(l)+"`)"), nil
 						} else if l < 90 && l != 0 {
 							warning = true
 						}
