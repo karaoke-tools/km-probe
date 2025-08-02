@@ -11,7 +11,7 @@ import (
 
 	"github.com/louisroyer/km-probe/internal/ass/lyrics"
 	"github.com/louisroyer/km-probe/internal/karadata"
-	"github.com/louisroyer/km-probe/internal/karajson"
+	"github.com/louisroyer/km-probe/internal/karajson/language"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 
 	"github.com/gofrs/uuid"
@@ -29,7 +29,7 @@ func NewSpaceBeforeDoublePunctuation(karaData *karadata.KaraData) Probe {
 
 func (p *SpaceBeforeDoublePunctuation) Run(ctx context.Context) (report.Report, error) {
 	// we only check if language is full english, full japanese, or jpn+eng
-	if res, err := p.karaData.KaraJson.HasOnlyLanguagesFrom(ctx, []uuid.UUID{karajson.LangJPN, karajson.LangENG}); err != nil {
+	if res, err := p.karaData.KaraJson.HasOnlyLanguagesFrom(ctx, []uuid.UUID{language.JPN, language.ENG}); err != nil {
 		return report.Abort(), err
 	} else if !res {
 		return report.Skip(), nil

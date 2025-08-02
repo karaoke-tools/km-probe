@@ -10,7 +10,8 @@ import (
 	"slices"
 
 	"github.com/louisroyer/km-probe/internal/karadata"
-	"github.com/louisroyer/km-probe/internal/karajson"
+	"github.com/louisroyer/km-probe/internal/karajson/collection"
+	"github.com/louisroyer/km-probe/internal/karajson/misc"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 
 	"github.com/gofrs/uuid"
@@ -28,9 +29,9 @@ func NewLiveDownload(karaData *karadata.KaraData) Probe {
 
 // State of "no live download" collections as of 2025-01-06
 var collectionsNoLiveDownload = []uuid.UUID{
-	karajson.CollectionAsia,
-	karajson.CollectionKana,
-	karajson.CollectionWest,
+	collection.Asia,
+	collection.Kana,
+	collection.West,
 }
 
 func isNoLiveDownloadCollection(collection uuid.UUID) bool {
@@ -40,7 +41,7 @@ func isNoLiveDownloadCollection(collection uuid.UUID) bool {
 // Checking each tag may be long when probing the full repository.
 // This function only check for hardcoded collections and "unavailable" tag.
 func (p *LiveDownload) Run(ctx context.Context) (report.Report, error) {
-	if slices.Contains(p.karaData.KaraJson.Data.Tags.Misc, karajson.Unavailable) {
+	if slices.Contains(p.karaData.KaraJson.Data.Tags.Misc, misc.Unavailable) {
 		return report.Info(false), nil
 	}
 	if slices.ContainsFunc(p.karaData.KaraJson.Data.Tags.Collections, isNoLiveDownloadCollection) {

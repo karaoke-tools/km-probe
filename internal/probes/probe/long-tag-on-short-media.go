@@ -10,7 +10,7 @@ import (
 	"slices"
 
 	"github.com/louisroyer/km-probe/internal/karadata"
-	"github.com/louisroyer/km-probe/internal/karajson"
+	"github.com/louisroyer/km-probe/internal/karajson/misc"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 )
 
@@ -28,7 +28,7 @@ func (p *LongTagOnShortMedia) Run(ctx context.Context) (report.Report, error) {
 	if p.karaData.KaraJson.Medias[0].Duration > 300 {
 		return report.Skip(), nil
 	}
-	if slices.Contains(p.karaData.KaraJson.Data.Tags.Misc, karajson.MiscLong) {
+	if slices.Contains(p.karaData.KaraJson.Data.Tags.Misc, misc.Long) {
 		return report.Fail(), nil
 	}
 	return report.Pass(), nil

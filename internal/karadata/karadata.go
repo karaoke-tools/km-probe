@@ -14,11 +14,13 @@ import (
 	"github.com/louisroyer/km-probe/internal/karajson"
 )
 
+// Karaoke information
 type KaraData struct {
-	KaraJson *karajson.KaraJson
-	Lyrics   *ass.Ass
+	KaraJson *karajson.KaraJson // metadata of the karaoke
+	Lyrics   *ass.Ass           // lyrics of the karaoke
 }
 
+// Create a new `KaraData` from a `KaraJson`
 func FromKaraJson(ctx context.Context, basedir string, karaJson *karajson.KaraJson) (*KaraData, error) {
 	select {
 	case <-ctx.Done():

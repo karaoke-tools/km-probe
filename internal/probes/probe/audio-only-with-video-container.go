@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/louisroyer/km-probe/internal/karadata"
-	"github.com/louisroyer/km-probe/internal/karajson"
+	"github.com/louisroyer/km-probe/internal/karajson/songtype"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 )
 
@@ -38,7 +38,7 @@ func (p *AudioOnlyWithVideoContainer) Run(ctx context.Context) (report.Report, e
 	if !slices.Contains(videoExtensions, extension) {
 		return report.Skip(), nil
 	}
-	if slices.Contains(p.karaData.KaraJson.Data.Tags.Songtypes, karajson.TypeAudioOnly) {
+	if slices.Contains(p.karaData.KaraJson.Data.Tags.Songtypes, songtype.AudioOnly) {
 		return report.Fail(), nil
 	}
 	return report.Pass(), nil

@@ -10,7 +10,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/probe"
 )
 
-var defaultProbes []probe.NewProbeFunc = []probe.NewProbeFunc{
+var defaultProbes = []probe.NewProbeFunc{
 	probe.NewAutomation,
 	probe.NewDoubleConsonnant,
 	probe.NewEolPunctuation,
@@ -31,6 +31,6 @@ var defaultProbes []probe.NewProbeFunc = []probe.NewProbeFunc{
 	probe.NewAudioOnlyWithVideoContainer,
 }
 
-var defaultAnalysers []analyser.NewAnalyserFunc = []analyser.NewAnalyserFunc{
+var defaultAnalysers = []analyser.NewAnalyserFunc{
 	analyser.NewSuitableFirstContribution,
 }

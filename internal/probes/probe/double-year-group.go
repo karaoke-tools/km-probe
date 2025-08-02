@@ -10,7 +10,7 @@ import (
 	"slices"
 
 	"github.com/louisroyer/km-probe/internal/karadata"
-	"github.com/louisroyer/km-probe/internal/karajson"
+	"github.com/louisroyer/km-probe/internal/karajson/year"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 
 	"github.com/gofrs/uuid"
@@ -28,14 +28,14 @@ func NewDoubleYearGroup(karaData *karadata.KaraData) Probe {
 
 // warnings that are related to the media
 var yearsGroup []uuid.UUID = []uuid.UUID{
-	karajson.Years1950,
-	karajson.Years1960,
-	karajson.Years1970,
-	karajson.Years1980,
-	karajson.Years1990,
-	karajson.Years2000,
-	karajson.Years2010,
-	karajson.Years2020,
+	year.Y1950,
+	year.Y1960,
+	year.Y1970,
+	year.Y1980,
+	year.Y1990,
+	year.Y2000,
+	year.Y2010,
+	year.Y2020,
 }
 
 func (p *DoubleYearGroup) Run(ctx context.Context) (report.Report, error) {

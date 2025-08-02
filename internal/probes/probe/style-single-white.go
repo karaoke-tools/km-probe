@@ -12,7 +12,7 @@ import (
 
 	"github.com/louisroyer/km-probe/internal/ass/style"
 	"github.com/louisroyer/km-probe/internal/karadata"
-	"github.com/louisroyer/km-probe/internal/karajson"
+	"github.com/louisroyer/km-probe/internal/karajson/misc"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 )
 
@@ -27,7 +27,7 @@ func NewStyleSingleWhite(karaData *karadata.KaraData) Probe {
 }
 
 func (p *StyleSingleWhite) Run(ctx context.Context) (report.Report, error) {
-	if slices.Contains(p.karaData.KaraJson.Data.Tags.Misc, karajson.GroupSinging) {
+	if slices.Contains(p.karaData.KaraJson.Data.Tags.Misc, misc.GroupSinging) {
 		return report.Skip(), nil
 	}
 	nb_styles := 0

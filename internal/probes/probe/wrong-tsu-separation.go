@@ -12,7 +12,8 @@ import (
 
 	"github.com/louisroyer/km-probe/internal/ass/lyrics"
 	"github.com/louisroyer/km-probe/internal/karadata"
-	"github.com/louisroyer/km-probe/internal/karajson"
+	"github.com/louisroyer/km-probe/internal/karajson/collection"
+	"github.com/louisroyer/km-probe/internal/karajson/language"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 
 	"github.com/gofrs/uuid"
@@ -32,10 +33,10 @@ func NewWrongTsuSeparation(karaData *karadata.KaraData) Probe {
 
 func (p *WrongTsuSeparation) Run(ctx context.Context) (report.Report, error) {
 	// we only check if language is full jpn romaji
-	if slices.Contains(p.karaData.KaraJson.Data.Tags.Collections, karajson.CollectionKana) {
+	if slices.Contains(p.karaData.KaraJson.Data.Tags.Collections, collection.Kana) {
 		return report.Skip(), nil
 	}
-	if res, err := p.karaData.KaraJson.HasOnlyLanguagesFrom(ctx, []uuid.UUID{karajson.LangJPN}); err != nil {
+	if res, err := p.karaData.KaraJson.HasOnlyLanguagesFrom(ctx, []uuid.UUID{language.JPN}); err != nil {
 		return report.Abort(), err
 	} else if !res {
 		return report.Skip(), nil

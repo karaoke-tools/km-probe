@@ -10,7 +10,7 @@ import (
 	"slices"
 
 	"github.com/louisroyer/km-probe/internal/karadata"
-	"github.com/louisroyer/km-probe/internal/karajson"
+	"github.com/louisroyer/km-probe/internal/karajson/version"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 )
 
@@ -25,7 +25,7 @@ func NewOffVocalWithoutParent(karaData *karadata.KaraData) Probe {
 }
 
 func (p *OffVocalWithoutParent) Run(ctx context.Context) (report.Report, error) {
-	if !slices.Contains(p.karaData.KaraJson.Data.Tags.Versions, karajson.VersionOffVocal) {
+	if !slices.Contains(p.karaData.KaraJson.Data.Tags.Versions, version.OffVocal) {
 		return report.Skip(), nil
 	}
 

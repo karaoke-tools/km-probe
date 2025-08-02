@@ -10,7 +10,8 @@ import (
 	"slices"
 
 	"github.com/louisroyer/km-probe/internal/karadata"
-	"github.com/louisroyer/km-probe/internal/karajson"
+	"github.com/louisroyer/km-probe/internal/karajson/songtype"
+	"github.com/louisroyer/km-probe/internal/karajson/warning"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 
 	"github.com/gofrs/uuid"
@@ -28,13 +29,13 @@ func NewMediaWarningAudioOnly(karaData *karadata.KaraData) Probe {
 
 // warnings that are related to the media
 var mediaWarnings []uuid.UUID = []uuid.UUID{
-	karajson.WarningR18Media,
-	karajson.WarningSpoiler,
-	karajson.WarningEpilepsy,
+	warning.R18Media,
+	warning.Spoiler,
+	warning.Epilepsy,
 }
 
 func (p *MediaWarningAudioOnly) Run(ctx context.Context) (report.Report, error) {
-	if !slices.Contains(p.karaData.KaraJson.Data.Tags.Songtypes, karajson.TypeAudioOnly) {
+	if !slices.Contains(p.karaData.KaraJson.Data.Tags.Songtypes, songtype.AudioOnly) {
 		return report.Skip(), nil
 	}
 	for _, w := range mediaWarnings {
