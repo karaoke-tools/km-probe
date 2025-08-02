@@ -76,10 +76,16 @@ func (s *Setup) Run(ctx context.Context) error {
 
 	wg := sync.WaitGroup{}
 	defer func() {
+		// waiting in a gorouting to avoid waiting forever
+		// if ctx is Done after entering defer
+		ctxWait, cancel := context.WithCancel(ctx)
+		go func(cancel context.CancelFunc) {
+			wg.Wait()
+			cancel()
+		}(cancel)
 		select {
 		case <-ctx.Done():
-		default:
-			wg.Wait()
+		case <-ctxWait.Done():
 		}
 	}()
 
