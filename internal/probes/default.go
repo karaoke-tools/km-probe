@@ -29,6 +29,7 @@ var defaultProbes = []probe.NewProbeFunc{
 	probe.NewWrongTsuSeparation,
 	probe.NewLongTagOnShortMedia,
 	probe.NewAudioOnlyWithVideoContainer,
+	probe.NewAltVersionWithoutParent,
 }
 
 var defaultAnalysers = []analyser.NewAnalyserFunc{
