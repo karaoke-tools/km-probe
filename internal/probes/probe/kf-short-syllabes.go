@@ -12,6 +12,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/ass/lyrics"
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 )
 
 type KfShortSyllabes struct {
@@ -25,6 +26,7 @@ func NewKfShortSyllabes(karaData *karadata.KaraData) Probe {
 }
 
 func (p *KfShortSyllabes) Run(ctx context.Context) (report.Report, error) {
+	warning := false
 	for _, line := range p.karaData.Lyrics.Events {
 		select {
 		case <-ctx.Done():
@@ -40,12 +42,17 @@ func (p *KfShortSyllabes) Run(ctx context.Context) (report.Report, error) {
 						// kf90 can also be okay sometimes
 						// but kf85 or lower is definitely bad
 						if l < 85 && l != 0 { // kf0 is the same as k0
-							return report.Fail(), nil
+							return report.Fail(severity.Critical, "remove very short \\kf (found a `"+string(l)+"`)"), nil
+						} else if l < 90 && l != 0 {
+							warning = true
 						}
 					}
 				}
 			}
 		}
+	}
+	if warning {
+		return report.Fail(severity.Warning, "check if \\kf under 90 are relevant"), nil
 	}
 	return report.Pass(), nil
 }

@@ -15,6 +15,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/karajson/collection"
 	"github.com/louisroyer/km-probe/internal/karajson/language"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 
 	"github.com/gofrs/uuid"
 )
@@ -46,12 +47,12 @@ var doubleConsonnants = []string{
 func (p *DoubleConsonnant) Run(ctx context.Context) (report.Report, error) {
 	// we only check if language is full jpn romaji
 	if slices.Contains(p.karaData.KaraJson.Data.Tags.Collections, collection.Kana) {
-		return report.Skip(), nil
+		return report.Skip("kana version"), nil
 	}
 	if res, err := p.karaData.KaraJson.HasOnlyLanguagesFrom(ctx, []uuid.UUID{language.JPN}); err != nil {
 		return report.Abort(), err
 	} else if !res {
-		return report.Skip(), nil
+		return report.Skip("not a japanese only version"), nil
 	}
 
 	for _, line := range p.karaData.Lyrics.Events {
@@ -70,7 +71,10 @@ func (p *DoubleConsonnant) Run(ctx context.Context) (report.Report, error) {
 							if !strings.HasSuffix(save, " ") { // this is not a new word
 								for _, double := range doubleConsonnants {
 									if strings.HasPrefix(syll, double) {
-										return report.Fail(), nil
+										return report.Fail(severity.Critical,
+											"check for double consonnants: "+
+												"there is at least an uncorrectly splitted `"+
+												syll+"`"), nil
 									}
 								}
 

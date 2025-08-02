@@ -12,6 +12,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/ass/style"
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 )
 
 type StyleBlackBorder struct {
@@ -37,7 +38,7 @@ func (p *StyleBlackBorder) Run(ctx context.Context) (report.Report, error) {
 				}
 				if s.OutlineColour != "&H00000000" {
 					// border color must be black
-					return report.Fail(), nil
+					return report.Fail(severity.Warning, "outline must be black (cannot this probe can only check if this is pure black, nuances of black be be okay"), nil
 				}
 				break
 			}

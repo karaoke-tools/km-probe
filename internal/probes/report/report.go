@@ -7,85 +7,103 @@ package report
 
 import (
 	"encoding/json"
+
+	"github.com/louisroyer/km-probe/internal/probes/report/result"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/report/status"
 )
 
 type Report interface {
-	Result() bool
-	Status() string
-	String() string
-	MarshalJSON() ([]byte, error)
-}
-
-type report struct {
-	status Status
-	result bool
+	Result() result.Result // true: passed, false: failed
+	Status() status.Status // completed, aborted, skipped, etc.
+	Severity() severity.Severity
+	Message() string
+	json.Marshaler
 }
 
 func (r *report) MarshalJSON() ([]byte, error) {
-	return json.Marshal(r.String())
+	return json.Marshal(struct {
+		Status   string `json:"status"`
+		Result   string `json:"result"`
+		Message  string `json:"message,omitempty"`
+		Severity string `json:"severity"`
+	}{
+		Status:   r.status.String(),
+		Result:   r.result.String(),
+		Message:  r.message,
+		Severity: r.severity.String(),
+	})
+}
+
+type report struct {
+	status   status.Status
+	result   result.Result
+	message  string
+	severity severity.Severity
 }
 
 // When the issue is not detected
 func Pass() *report {
 	return &report{
-		status: StatusCompleted,
-		result: true,
+		status:   status.Completed,
+		severity: severity.Info,
+		result:   result.Passed,
 	}
 }
 
 // When the issue is detected
-func Fail() *report {
+func Fail(severity severity.Severity, message string) *report {
 	return &report{
-		status: StatusCompleted,
-		result: false,
+		severity: severity,
+		message:  message, // indicate what action must be done
+		status:   status.Completed,
+		result:   result.Failed,
 	}
 }
 
 // When the test is only to display some infos
 func Info(v bool) *report {
+	var r result.Result
+	if v {
+		r = result.Passed
+	} else {
+		r = result.Failed
+	}
 	return &report{
-		status: StatusInfo,
-		result: v,
+		status:   status.Info,
+		result:   r,
+		severity: severity.Info,
 	}
 }
 
 // When test has been canceled
 func Abort() *report {
 	return &report{
-		status: StatusAborted,
+		status: status.Aborted,
 	}
 }
 
 // When the test is not relevant
-func Skip() *report {
+func Skip(message string) *report {
 	return &report{
-		result: true,
-		status: StatusSkipped,
+		status:   status.Skipped,
+		severity: severity.Info,
+		message:  message, // indicate why the test has been skipped
 	}
 }
 
-func (r *report) Status() string {
-	return r.status.String()
+func (r *report) Status() status.Status {
+	return r.status
 }
 
-func (r *report) Result() bool {
+func (r *report) Result() result.Result {
 	return r.result
 }
 
-func (r *report) String() string {
-	if r.status == StatusInfo {
-		if r.result {
-			return "yes"
-		} else {
-			return "no"
-		}
-	}
-	if r.status != StatusCompleted {
-		return r.Status()
-	}
-	if r.result {
-		return "passed"
-	} else {
-		return "failed"
-	}
+func (r *report) Severity() severity.Severity {
+	return r.severity
+}
+
+func (r *report) Message() string {
+	return r.message
 }

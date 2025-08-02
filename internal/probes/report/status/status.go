@@ -3,26 +3,26 @@
 // found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-package report
+package status
 
 type Status int
 
 const (
-	StatusCompleted Status = iota
-	StatusInfo
-	StatusAborted
-	StatusSkipped
+	Completed Status = iota
+	Info
+	Aborted
+	Skipped
 )
 
 func (s Status) String() string {
 	switch s {
-	case StatusCompleted:
+	case Completed:
 		return "completed"
-	case StatusInfo:
+	case Info:
 		return "info"
-	case StatusAborted:
+	case Aborted:
 		return "aborted"
-	case StatusSkipped:
+	case Skipped:
 		return "skipped"
 	default:
 		return "unknown status"

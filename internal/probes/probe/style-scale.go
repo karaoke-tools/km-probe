@@ -12,6 +12,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/ass/style"
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 )
 
 type StyleScale struct {
@@ -36,7 +37,7 @@ func (p *StyleScale) Run(ctx context.Context) (report.Report, error) {
 					return report.Abort(), err
 				}
 				if (s.ScaleX != "100") || (s.ScaleY != "100") {
-					return report.Fail(), nil
+					return report.Fail(severity.Critical, "check scale of styles"), nil
 				}
 			}
 		}

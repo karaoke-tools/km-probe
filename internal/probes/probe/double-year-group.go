@@ -12,6 +12,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson/year"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 
 	"github.com/gofrs/uuid"
 )
@@ -45,7 +46,7 @@ func (p *DoubleYearGroup) Run(ctx context.Context) (report.Report, error) {
 	ok := false
 	for _, group := range p.karaData.KaraJson.Data.Tags.Groups {
 		if found := slices.Contains(yearsGroup, group); found && ok {
-			return report.Fail(), nil
+			return report.Fail(severity.Critical, "remove all years group and save to apply (let years hooks do their job)"), nil
 		} else if found {
 			ok = true
 		}

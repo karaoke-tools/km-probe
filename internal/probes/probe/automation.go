@@ -11,6 +11,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/ass/lyrics"
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 )
 
 type Automation struct {
@@ -34,5 +35,5 @@ func (p *Automation) Run(ctx context.Context) (report.Report, error) {
 			}
 		}
 	}
-	return report.Fail(), nil
+	return report.Fail(severity.Critical, "missing automation line in the lyrics file"), nil
 }

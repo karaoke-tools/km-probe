@@ -14,6 +14,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson/misc"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 )
 
 type StyleSingleWhite struct {
@@ -28,7 +29,7 @@ func NewStyleSingleWhite(karaData *karadata.KaraData) Probe {
 
 func (p *StyleSingleWhite) Run(ctx context.Context) (report.Report, error) {
 	if slices.Contains(p.karaData.KaraJson.Data.Tags.Misc, misc.GroupSinging) {
-		return report.Skip(), nil
+		return report.Skip("group singing karaoke: secondary color can be non white"), nil
 	}
 	nb_styles := 0
 	for _, line := range p.karaData.Lyrics.Styles {
@@ -40,7 +41,7 @@ func (p *StyleSingleWhite) Run(ctx context.Context) (report.Report, error) {
 				nb_styles += 1
 				if nb_styles > 1 {
 					// for the moment, we focus on single style karaoke
-					return report.Skip(), nil
+					return report.Fail(severity.Warning, "multiple styles: check if this is a group singing karaoke (and add the tag if it is), or invert choir style colors"), nil
 				}
 			}
 		}
@@ -63,5 +64,5 @@ func (p *StyleSingleWhite) Run(ctx context.Context) (report.Report, error) {
 			}
 		}
 	}
-	return report.Fail(), nil
+	return report.Fail(severity.Critical, "update style: secondary color must be white"), nil
 }

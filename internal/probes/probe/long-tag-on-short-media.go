@@ -12,6 +12,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson/misc"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 )
 
 type LongTagOnShortMedia struct {
@@ -26,10 +27,10 @@ func NewLongTagOnShortMedia(karaData *karadata.KaraData) Probe {
 
 func (p *LongTagOnShortMedia) Run(ctx context.Context) (report.Report, error) {
 	if p.karaData.KaraJson.Medias[0].Duration > 300 {
-		return report.Skip(), nil
+		return report.Skip("media over 300s"), nil
 	}
 	if slices.Contains(p.karaData.KaraJson.Data.Tags.Misc, misc.Long) {
-		return report.Fail(), nil
+		return report.Fail(severity.Critical, "remove long tag"), nil
 	}
 	return report.Pass(), nil
 }

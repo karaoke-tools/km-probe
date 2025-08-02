@@ -13,6 +13,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson/songtype"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 )
 
 type AudioOnlyWithVideoContainer struct {
@@ -36,10 +37,13 @@ func (p *AudioOnlyWithVideoContainer) Run(ctx context.Context) (report.Report, e
 	startExt := strings.LastIndexByte(filename, '.')
 	extension := filename[startExt+1:]
 	if !slices.Contains(videoExtensions, extension) {
-		return report.Skip(), nil
+		return report.Skip("is not an audio only"), nil
 	}
 	if slices.Contains(p.karaData.KaraJson.Data.Tags.Songtypes, songtype.AudioOnly) {
-		return report.Fail(), nil
+		return report.Fail(severity.Critical,
+				"if this is a still image replace media with an audio container, "+
+					"otherwise replace audio only tag with add appropriate family tag"),
+			nil
 	}
 	return report.Pass(), nil
 }

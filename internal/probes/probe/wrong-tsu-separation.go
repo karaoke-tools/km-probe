@@ -15,6 +15,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/karajson/collection"
 	"github.com/louisroyer/km-probe/internal/karajson/language"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 
 	"github.com/gofrs/uuid"
 )
@@ -34,12 +35,12 @@ func NewWrongTsuSeparation(karaData *karadata.KaraData) Probe {
 func (p *WrongTsuSeparation) Run(ctx context.Context) (report.Report, error) {
 	// we only check if language is full jpn romaji
 	if slices.Contains(p.karaData.KaraJson.Data.Tags.Collections, collection.Kana) {
-		return report.Skip(), nil
+		return report.Skip("kana karaoke"), nil
 	}
 	if res, err := p.karaData.KaraJson.HasOnlyLanguagesFrom(ctx, []uuid.UUID{language.JPN}); err != nil {
 		return report.Abort(), err
 	} else if !res {
-		return report.Skip(), nil
+		return report.Skip("not a japanese karaoke"), nil
 	}
 
 	for _, line := range p.karaData.Lyrics.Events {
@@ -58,7 +59,7 @@ func (p *WrongTsuSeparation) Run(ctx context.Context) (report.Report, error) {
 							if strings.HasSuffix(syll, "t") {
 								ok = true
 							} else if ok && strings.HasPrefix(syll, "su") {
-								return report.Fail(), nil
+								return report.Fail(severity.Critical, "`tsu` must be timed as a single syllabe"), nil
 							} else {
 								ok = false
 							}

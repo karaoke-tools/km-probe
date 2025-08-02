@@ -13,6 +13,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson/language"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 
 	"github.com/gofrs/uuid"
 )
@@ -32,7 +33,7 @@ func (p *SpaceBeforeDoublePunctuation) Run(ctx context.Context) (report.Report, 
 	if res, err := p.karaData.KaraJson.HasOnlyLanguagesFrom(ctx, []uuid.UUID{language.JPN, language.ENG}); err != nil {
 		return report.Abort(), err
 	} else if !res {
-		return report.Skip(), nil
+		return report.Skip("non english/japanese language"), nil
 	}
 
 	for _, line := range p.karaData.Lyrics.Events {
@@ -44,7 +45,7 @@ func (p *SpaceBeforeDoublePunctuation) Run(ctx context.Context) (report.Report, 
 				l := line.Text.StripTags()
 				if strings.Contains(l, " ?") || strings.Contains(l, " !") ||
 					strings.Contains(l, " ?") || strings.Contains(l, " !") { // non-breakable space
-					return report.Fail(), nil
+					return report.Fail(severity.Critical, "remove space before `?`/`!`"), nil
 				}
 			}
 		}

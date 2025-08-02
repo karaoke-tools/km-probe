@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/result"
 )
 
 type SuitableFirstContribution struct {
@@ -28,8 +29,8 @@ func (a *SuitableFirstContribution) Run(ctx context.Context) (report.Report, err
 	}
 	for _, c := range critical {
 		if r, ok := a.reports[c]; !ok {
-			return report.Skip(), nil
-		} else if !r.Result() {
+			return report.Skip("a report is missing"), nil
+		} else if r.Result() != result.Passed {
 			return report.Info(false), nil
 		}
 	}
@@ -47,8 +48,8 @@ func (a *SuitableFirstContribution) Run(ctx context.Context) (report.Report, err
 		local_badness := 0
 		for _, sb := range s {
 			if r, ok := a.reports[sb]; !ok {
-				return report.Skip(), nil
-			} else if !r.Result() {
+				return report.Skip("missing report"), nil
+			} else if r.Result() != result.Failed {
 				local_badness++
 			}
 		}

@@ -10,6 +10,7 @@ import (
 
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 )
 
 type Resolution struct {
@@ -26,5 +27,5 @@ func (p *Resolution) Run(ctx context.Context) (report.Report, error) {
 	if p.karaData.Lyrics.ScriptInfo.PlayResX == 0 && p.karaData.Lyrics.ScriptInfo.PlayResY == 0 {
 		return report.Pass(), nil
 	}
-	return report.Fail(), nil
+	return report.Fail(severity.Critical, "update resolution to be 0×0 (and check style size)"), nil
 }

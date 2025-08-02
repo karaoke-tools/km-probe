@@ -12,6 +12,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson/version"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 )
 
 type OffVocalWithoutParent struct {
@@ -26,11 +27,11 @@ func NewOffVocalWithoutParent(karaData *karadata.KaraData) Probe {
 
 func (p *OffVocalWithoutParent) Run(ctx context.Context) (report.Report, error) {
 	if !slices.Contains(p.karaData.KaraJson.Data.Tags.Versions, version.OffVocal) {
-		return report.Skip(), nil
+		return report.Skip("not an off vocal"), nil
 	}
 
 	if len(p.karaData.KaraJson.Data.Parents) == 0 {
-		return report.Fail(), nil
+		return report.Fail(severity.Critical, "add the right parent"), nil
 	}
 
 	return report.Pass(), nil

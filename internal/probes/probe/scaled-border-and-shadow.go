@@ -10,6 +10,7 @@ import (
 
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 )
 
 type ScaledBorderAndShadow struct {
@@ -26,5 +27,5 @@ func (p *ScaledBorderAndShadow) Run(ctx context.Context) (report.Report, error) 
 	if p.karaData.Lyrics.ScriptInfo.ScaledBorderAndShadow {
 		return report.Pass(), nil
 	}
-	return report.Fail(), nil
+	return report.Fail(severity.Critical, "check the \"Scale border and shadow\" box"), nil
 }

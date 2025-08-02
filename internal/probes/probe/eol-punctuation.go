@@ -12,6 +12,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/ass/lyrics"
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 )
 
 type EolPunctuation struct {
@@ -36,7 +37,7 @@ func (p *EolPunctuation) Run(ctx context.Context) (report.Report, error) {
 					if strings.HasSuffix(l, "...") {
 						continue
 					}
-					return report.Fail(), nil
+					return report.Fail(severity.Critical, "remove useless punctuation (`.` or `,`) at end of line"), nil
 				}
 			}
 		}

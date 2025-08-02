@@ -12,6 +12,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson/version"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 
 	"github.com/gofrs/uuid"
 )
@@ -41,13 +42,13 @@ func NewAltVersionWithoutParent(karaData *karadata.KaraData) Probe {
 
 func (p *AltVersionWithoutParent) Run(ctx context.Context) (report.Report, error) {
 	if len(p.karaData.KaraJson.Data.Parents) > 0 {
-		return report.Skip(), nil
+		return report.Skip("has a parent"), nil
 	}
 	if len(p.karaData.KaraJson.Data.Tags.Versions) == 0 {
-		return report.Skip(), nil
+		return report.Skip("not an alt version"), nil
 	}
 	if slices.ContainsFunc(p.karaData.KaraJson.Data.Tags.Versions, isVersionWithoutParentCritical) {
-		return report.Fail(), nil
+		return report.Fail(severity.Critical, "check if a potential parent exists, or if the version tag is relevant"), nil
 	}
 	return report.Pass(), nil
 }
