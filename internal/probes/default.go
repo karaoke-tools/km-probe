@@ -30,6 +30,7 @@ var defaultProbes = []probe.NewProbeFunc{
 	probe.NewLongTagOnShortMedia,
 	probe.NewAudioOnlyWithVideoContainer,
 	probe.NewAltVersionWithoutParent,
+	probe.NewMusicVideoCreditless,
 }
 
 var defaultAnalysers = []analyser.NewAnalyserFunc{
