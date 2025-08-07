@@ -32,6 +32,7 @@ var defaultProbes = []probe.NewProbeFunc{
 	probe.NewAltVersionWithoutParent,
 	probe.NewMusicVideoCreditless,
 	probe.NewCredits,
+	probe.NewVowelMacron,
 }
 
 var defaultAnalysers = []analyser.NewAnalyserFunc{
