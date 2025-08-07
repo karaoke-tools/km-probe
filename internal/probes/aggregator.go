@@ -7,6 +7,8 @@ package probes
 
 import (
 	"context"
+	"encoding/json"
+	"time"
 
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson"
@@ -19,8 +21,11 @@ import (
 
 type Aggregator struct {
 	// Identification of the karaoke
-	Songname string    `json:"songname"`
-	Kid      uuid.UUID `json:"kid"`
+	Songname   string      `json:"songname"`
+	Kid        uuid.UUID   `json:"kid"`
+	CreatedAt  time.Time   `json:"created-at"`
+	ModifiedAt time.Time   `json:"modified-at"`
+	Year       json.Number `json:"year"`
 	// `Probes` report direct features of the karaoke based on metadata, lyrics, etc.
 	// They can be used to detect common mistakes.
 	Probes  []probe.Probe            `json:"-"`
@@ -41,10 +46,13 @@ func FromKaraJson(ctx context.Context, basedir string, karaJson *karajson.KaraJs
 			return nil, err
 		}
 		aggregator := Aggregator{
-			Songname: data.KaraJson.Data.Songname,
-			Kid:      data.KaraJson.Data.Kid,
-			Reports:  make(map[string]report.Report),
-			Analysis: make(map[string]report.Report),
+			Songname:   data.KaraJson.Data.Songname,
+			Kid:        data.KaraJson.Data.Kid,
+			CreatedAt:  data.KaraJson.Data.CreatedAt,
+			ModifiedAt: data.KaraJson.Data.ModifiedAt,
+			Year:       data.KaraJson.Data.Year,
+			Reports:    make(map[string]report.Report),
+			Analysis:   make(map[string]report.Report),
 		}
 		if probes == nil {
 			probes = &defaultProbes

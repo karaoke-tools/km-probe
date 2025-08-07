@@ -8,6 +8,7 @@ package karajson
 import (
 	"encoding/json"
 	"io/ioutil"
+	"time"
 
 	"github.com/gofrs/uuid"
 )
@@ -52,10 +53,10 @@ type Lyric struct {
 }
 
 type Data struct {
-	CreatedAt             string            `json:"created_at"`
+	CreatedAt             time.Time         `json:"created_at"`
 	IgnoreHooks           bool              `json:"ignore-hooks"`
 	Kid                   uuid.UUID         `json:"kid"`
-	ModifiedAt            string            `json:"modified_at"`
+	ModifiedAt            time.Time         `json:"modified_at"`
 	Parents               []uuid.UUID       `json:"parents"`
 	Repository            string            `json:"repository"`
 	Songname              string            `json:"songname"`
