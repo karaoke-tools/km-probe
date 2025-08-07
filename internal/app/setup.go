@@ -54,6 +54,13 @@ func (s *Setup) Run(ctx context.Context) error {
 		if !filepath.IsAbs(baseDir) {
 			baseDir = filepath.Join(xdgPath, baseDir)
 		}
+		if _, err := os.Stat(baseDir); errors.Is(err, fs.ErrNotExist) {
+			logrus.WithFields(logrus.Fields{
+				"name":     v.Name,
+				"base-dir": baseDir,
+			}).Error("Repository is configured with a base directory that doesn't exist")
+			continue
+		}
 		mediaPath := v.Path.Medias[0] // TODO: why is it an array?
 		if !filepath.IsAbs(mediaPath) {
 			mediaPath = filepath.Join(xdgPath, mediaPath)
