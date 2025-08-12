@@ -6,13 +6,14 @@
 package style
 
 import (
+	"strconv"
 	"strings"
 )
 
 type Style struct {
 	Name            string
 	Fontname        string
-	Fontsize        string
+	Fontsize        uint64
 	PrimaryColour   string
 	SecondaryColour string
 	OutlineColour   string
@@ -40,10 +41,14 @@ func Parse(style string) (*Style, error) {
 	if len(r) != 23 {
 		return nil, ErrMalformedLine
 	}
+	fontsize, err := strconv.ParseUint(r[2], 10, 64)
+	if err != nil {
+		return nil, err
+	}
 	s := &Style{
 		Name:            r[0],
 		Fontname:        r[1],
-		Fontsize:        r[2],
+		Fontsize:        fontsize,
 		PrimaryColour:   r[3],
 		SecondaryColour: r[4],
 		OutlineColour:   r[5],

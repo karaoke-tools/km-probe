@@ -35,6 +35,7 @@ var defaultProbes = []probe.NewProbeFunc{
 	probe.NewCredits,
 	probe.NewVowelMacron,
 	probe.NewUnknownMediaContent,
+	probe.NewGiantFont,
 }
 
 var defaultAnalysers = []analyser.NewAnalyserFunc{
