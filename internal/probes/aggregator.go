@@ -54,7 +54,7 @@ func FromKaraJson(ctx context.Context, basedir string, karaJson *karajson.KaraJs
 			Reports:    make(map[string]report.Report),
 			Analysis:   make(map[string]report.Report),
 		}
-		for _, probe := range availableProbes() {
+		for _, probe := range AvailableProbes() {
 			aggregator.Probes = append(aggregator.Probes, probe(data))
 		}
 		for _, a := range defaultAnalysers {

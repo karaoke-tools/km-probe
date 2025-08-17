@@ -51,6 +51,16 @@ func main() {
 					return nil
 				},
 			},
+			{
+				Name:  "list-probes",
+				Usage: "info about available probes",
+				Action: func(ctx *cli.Context) error {
+					if err := app.NewListProbes().Run(ctx.Context); err != nil {
+						logrus.WithError(err).Fatal("Error while running, exiting…")
+					}
+					return nil
+				},
+			},
 		},
 	}
 	if err := app.RunContext(ctx, os.Args); err != nil {

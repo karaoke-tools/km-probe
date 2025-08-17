@@ -12,7 +12,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/probe/system"
 )
 
-func availableProbes() []probe.NewProbeFunc {
+func AvailableProbes() []probe.NewProbeFunc {
 	a := make([]probe.NewProbeFunc, 0)
 	a = append(a, system.Probes()...)
 	a = append(a, karamoe.Probes()...)
