@@ -29,10 +29,10 @@ var defaultProbes = []probe.NewProbeFunc{
 	probe.NewMediaWarningAudioOnly,              // media warning but this is an audio only kara
 	probe.NewLyricsWarningNoLinguisticalContent, //  lyrics warning, but there is no linguistical content
 	probe.NewDoubleYearGroup,                    // multiple year groups tags
-	probe.NewWrongTsuSeparation,                 // `t|su` separation is not correct
+	probe.NewWrongTsuSeparation,                 // `t|su` separation is not correct (jpn only)
 	probe.NewLongTagOnShortMedia,                // "long" tag should only be applied automatically
 	probe.NewAudioOnlyWithVideoContainer,        // audio only tag, but not an audio only media
-	probe.NewAudioOnlyWithFamilies,              // both audio only tag and media content tag at the same time
+	probe.NewAudioOnlyWithFamilies,              // media content tag includes both audio only tag and other tags at the same time
 	probe.NewAltVersionWithoutParent,            // version tag, but there is no parent song
 	probe.NewMusicVideoCreditless,               // MV with a creditless tag
 	probe.NewVowelMacron,                        // ā, ē, ō, ī, ū in lyrics file
