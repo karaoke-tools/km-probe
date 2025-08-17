@@ -155,7 +155,7 @@ func (s *Setup) Run(ctx context.Context) error {
 							}
 						}
 						a, err := probes.FromKaraJson(ctx, repo.BaseDir, karaJson, nil, nil)
-						if errors.Is(err, karadata.ErrNoLyrics) {
+						if errors.Is(err, karadata.ErrNoMedias) {
 							// skip
 							wg.Done()
 							return

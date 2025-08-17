@@ -26,7 +26,12 @@ func NewStyleBlackBorder(karaData *karadata.KaraData) Probe {
 }
 
 func (p *StyleBlackBorder) Run(ctx context.Context) (report.Report, error) {
-	for _, line := range p.karaData.Lyrics.Styles {
+	if len(p.karaData.Lyrics) == 0 {
+		return report.Skip("no lyrics"), nil
+	}
+
+	// TODO: update this when multi-track drifting is released
+	for _, line := range p.karaData.Lyrics[0].Styles {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()

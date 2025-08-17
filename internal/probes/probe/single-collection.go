@@ -25,7 +25,7 @@ func NewSingleCollection(karaData *karadata.KaraData) Probe {
 
 func (p *SingleCollection) Run(ctx context.Context) (report.Report, error) {
 	if len(p.karaData.KaraJson.Data.Tags.Collections) != 1 {
-		return report.Fail(severity.Critical, "choos the right collection according to rules"), nil
+		return report.Fail(severity.Critical, "choose the right collection according to rules"), nil
 	}
 	return report.Pass(), nil
 }

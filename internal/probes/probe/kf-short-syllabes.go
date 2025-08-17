@@ -27,8 +27,13 @@ func NewKfShortSyllabes(karaData *karadata.KaraData) Probe {
 }
 
 func (p *KfShortSyllabes) Run(ctx context.Context) (report.Report, error) {
+	if len(p.karaData.Lyrics) == 0 {
+		return report.Skip("no lyrics"), nil
+	}
+
 	warning := false
-	for _, line := range p.karaData.Lyrics.Events {
+	// TODO: update this when multi-track drifting is released
+	for _, line := range p.karaData.Lyrics[0].Events {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()

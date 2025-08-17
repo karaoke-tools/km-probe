@@ -11,6 +11,7 @@ import (
 
 var (
 	// langs (only a subset of all languages)
-	JPN = uuid.Must(uuid.FromString("4dcf9614-7914-42aa-99f4-dbce2e059133"))
-	ENG = uuid.Must(uuid.FromString("de5eda1c-5fb3-46a6-9606-d4554fc5a1d6"))
+	JPN = uuid.Must(uuid.FromString("4dcf9614-7914-42aa-99f4-dbce2e059133")) // japanese
+	ENG = uuid.Must(uuid.FromString("de5eda1c-5fb3-46a6-9606-d4554fc5a1d6")) // english
+	ZXX = uuid.Must(uuid.FromString("51e68bf8-01ab-4210-8e1f-26cbf2bd68be")) // no linguistic content
 )

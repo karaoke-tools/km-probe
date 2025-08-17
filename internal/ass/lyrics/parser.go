@@ -113,7 +113,7 @@ func NewLine(text string) Line {
 }
 
 func (l Line) StripTags() string {
-	r := make([]string, len(l.TagsSplit)/2)
+	r := make([]string, 0, len(l.TagsSplit)/2)
 	for _, e := range l.TagsSplit {
 		if !strings.HasPrefix(e, "{") {
 			r = append(r, e)

@@ -24,7 +24,12 @@ func NewResolution(karaData *karadata.KaraData) Probe {
 }
 
 func (p *Resolution) Run(ctx context.Context) (report.Report, error) {
-	if p.karaData.Lyrics.ScriptInfo.PlayResX == 0 && p.karaData.Lyrics.ScriptInfo.PlayResY == 0 {
+	if len(p.karaData.Lyrics) == 0 {
+		return report.Skip("no lyrics"), nil
+	}
+
+	// TODO: update this when multi-track drifting is released
+	if p.karaData.Lyrics[0].ScriptInfo.PlayResX == 0 && p.karaData.Lyrics[0].ScriptInfo.PlayResY == 0 {
 		return report.Pass(), nil
 	}
 	return report.Fail(severity.Critical, "update resolution to be 0×0 (and check style size)"), nil

@@ -29,6 +29,9 @@ func NewSpaceBeforeDoublePunctuation(karaData *karadata.KaraData) Probe {
 }
 
 func (p *SpaceBeforeDoublePunctuation) Run(ctx context.Context) (report.Report, error) {
+	if len(p.karaData.Lyrics) == 0 {
+		return report.Skip("no lyrics"), nil
+	}
 	// we only check if language is full english, full japanese, or jpn+eng
 	if res, err := p.karaData.KaraJson.HasOnlyLanguagesFrom(ctx, []uuid.UUID{language.JPN, language.ENG}); err != nil {
 		return report.Abort(), err
@@ -36,7 +39,8 @@ func (p *SpaceBeforeDoublePunctuation) Run(ctx context.Context) (report.Report, 
 		return report.Skip("non english/japanese language"), nil
 	}
 
-	for _, line := range p.karaData.Lyrics.Events {
+	// TODO: update this when multi-track drifting is released
+	for _, line := range p.karaData.Lyrics[0].Events {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()

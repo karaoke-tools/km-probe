@@ -35,9 +35,14 @@ const (
 )
 
 func (p *FullKf) Run(ctx context.Context) (report.Report, error) {
+	if len(p.karaData.Lyrics) == 0 {
+		return report.Skip("no lyrics"), nil
+	}
+
 	kf_count := 0
 	k_count := 0
-	for _, line := range p.karaData.Lyrics.Events {
+	// TODO: update this when multi-track drifting is released
+	for _, line := range p.karaData.Lyrics[0].Events {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()

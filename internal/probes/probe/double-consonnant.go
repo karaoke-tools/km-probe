@@ -45,6 +45,9 @@ var doubleConsonnants = []string{
 }
 
 func (p *DoubleConsonnant) Run(ctx context.Context) (report.Report, error) {
+	if len(p.karaData.Lyrics) == 0 {
+		return report.Skip("no lyrics"), nil
+	}
 	// we only check if language is full jpn romaji
 	if slices.Contains(p.karaData.KaraJson.Data.Tags.Collections, collection.Kana) {
 		return report.Skip("kana version"), nil
@@ -55,7 +58,8 @@ func (p *DoubleConsonnant) Run(ctx context.Context) (report.Report, error) {
 		return report.Skip("not a japanese only version"), nil
 	}
 
-	for _, line := range p.karaData.Lyrics.Events {
+	// TODO: update this when multi-track drifting is released
+	for _, line := range p.karaData.Lyrics[0].Events {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()

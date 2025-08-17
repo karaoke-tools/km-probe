@@ -24,7 +24,12 @@ func NewScaledBorderAndShadow(karaData *karadata.KaraData) Probe {
 }
 
 func (p *ScaledBorderAndShadow) Run(ctx context.Context) (report.Report, error) {
-	if p.karaData.Lyrics.ScriptInfo.ScaledBorderAndShadow {
+	if len(p.karaData.Lyrics) == 0 {
+		return report.Skip("no lyrics"), nil
+	}
+
+	// TODO: update this when multi-track drifting is released
+	if p.karaData.Lyrics[0].ScriptInfo.ScaledBorderAndShadow {
 		return report.Pass(), nil
 	}
 	return report.Fail(severity.Critical, "check the \"Scale border and shadow\" box"), nil

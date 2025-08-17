@@ -37,6 +37,8 @@ var defaultProbes = []probe.NewProbeFunc{
 	probe.NewUnknownMediaContent,
 	probe.NewGiantFont,
 	probe.NewFullKf,
+	probe.NewNoLyrics,
+	probe.NewLyricsWarningNoLinguisticalContent,
 }
 
 var defaultAnalysers = []analyser.NewAnalyserFunc{

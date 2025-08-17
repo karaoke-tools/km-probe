@@ -28,11 +28,16 @@ func NewStyleSingleWhite(karaData *karadata.KaraData) Probe {
 }
 
 func (p *StyleSingleWhite) Run(ctx context.Context) (report.Report, error) {
+	if len(p.karaData.Lyrics) == 0 {
+		return report.Skip("no lyrics"), nil
+	}
 	if slices.Contains(p.karaData.KaraJson.Data.Tags.Misc, misc.GroupSinging) {
 		return report.Skip("group singing karaoke: secondary color can be non white"), nil
 	}
+
 	nb_styles := 0
-	for _, line := range p.karaData.Lyrics.Styles {
+	// TODO: update this when multi-track drifting is released
+	for _, line := range p.karaData.Lyrics[0].Styles {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()
@@ -46,7 +51,8 @@ func (p *StyleSingleWhite) Run(ctx context.Context) (report.Report, error) {
 			}
 		}
 	}
-	for _, line := range p.karaData.Lyrics.Styles {
+	// TODO: update this when multi-track drifting is released
+	for _, line := range p.karaData.Lyrics[0].Styles {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()

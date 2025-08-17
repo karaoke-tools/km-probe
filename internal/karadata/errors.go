@@ -10,5 +10,5 @@ import (
 )
 
 var (
-	ErrNoLyrics = errors.New("No lyrics")
+	ErrNoMedias = errors.New("No medias")
 )
