@@ -11,14 +11,12 @@ import (
 	"errors"
 	"io/fs"
 	"os"
-	"os/user"
 	"path/filepath"
 	"strings"
 	"sync"
 
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson"
-	"github.com/louisroyer/km-probe/internal/kmconfig"
 	"github.com/louisroyer/km-probe/internal/probes"
 
 	"github.com/gofrs/uuid"
@@ -38,6 +36,7 @@ func NewSetup() *Setup {
 }
 
 func (s *Setup) Run(ctx context.Context, id string) error {
+	// parse uuid
 	if id != "" {
 		if u, err := uuid.FromString(id); err != nil {
 			logrus.WithError(err).WithFields(logrus.Fields{
@@ -48,23 +47,18 @@ func (s *Setup) Run(ctx context.Context, id string) error {
 			s.uuid = u
 		}
 	}
-	xdgDataHome, ok := os.LookupEnv("XDG_DATA_HOME")
-	if !ok {
-		usr, err := user.Current()
-		if err != nil {
-			return err
-		}
-		xdgDataHome = filepath.Join(usr.HomeDir, ".local/share")
+	kmConfig, err := loadConf()
+	if err != nil {
+		return err
 	}
-	xdgPath := filepath.Join(xdgDataHome, "karaokemugen-app/app/")
-	kmConfig, err := kmconfig.ParseConf(filepath.Join(xdgPath, "config.yml"))
+	kmDataPath, err := kmDataPath()
 	if err != nil {
 		return err
 	}
 	for _, v := range kmConfig.System.Repositories {
 		baseDir := v.BaseDir
 		if !filepath.IsAbs(baseDir) {
-			baseDir = filepath.Join(xdgPath, baseDir)
+			baseDir = filepath.Join(kmDataPath, baseDir)
 		}
 		if _, err := os.Stat(baseDir); errors.Is(err, fs.ErrNotExist) {
 			logrus.WithFields(logrus.Fields{
@@ -73,9 +67,9 @@ func (s *Setup) Run(ctx context.Context, id string) error {
 			}).Error("Repository is configured with a base directory that doesn't exist")
 			continue
 		}
-		mediaPath := v.Path.Medias[0] // TODO: why is it an array?
+		mediaPath := v.Path.Medias[0] // TODO: multi-track drifting
 		if !filepath.IsAbs(mediaPath) {
-			mediaPath = filepath.Join(xdgPath, mediaPath)
+			mediaPath = filepath.Join(kmDataPath, mediaPath)
 		}
 		s.Repositories = append(s.Repositories, Repository{
 			Name:      v.Name,

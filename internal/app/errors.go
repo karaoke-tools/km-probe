@@ -10,5 +10,7 @@ import (
 )
 
 var (
-	ErrKaraokeNotFound = errors.New("Karaoke not found")
+	ErrConfigNotFound         = errors.New("KM configuration file not found")
+	ErrDataRepositoryNotFound = errors.New("KM data repository not found")
+	ErrKaraokeNotFound        = errors.New("Karaoke not found")
 )
