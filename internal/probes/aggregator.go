@@ -36,7 +36,7 @@ type Aggregator struct {
 	Analysis      map[string]report.Report   `json:"analysis"`
 }
 
-func FromKaraJson(ctx context.Context, basedir string, karaJson *karajson.KaraJson, probes *[]probe.NewProbeFunc, analysers *[]analyser.NewAnalyserFunc) (*Aggregator, error) {
+func FromKaraJson(ctx context.Context, basedir string, karaJson *karajson.KaraJson) (*Aggregator, error) {
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
@@ -54,16 +54,10 @@ func FromKaraJson(ctx context.Context, basedir string, karaJson *karajson.KaraJs
 			Reports:    make(map[string]report.Report),
 			Analysis:   make(map[string]report.Report),
 		}
-		if probes == nil {
-			probes = &defaultProbes
-		}
-		for _, probe := range *probes {
+		for _, probe := range availableProbes() {
 			aggregator.Probes = append(aggregator.Probes, probe(data))
 		}
-		if analysers == nil {
-			analysers = &defaultAnalysers
-		}
-		for _, a := range *analysers {
+		for _, a := range defaultAnalysers {
 			aggregator.AnalyserFuncs = append(aggregator.AnalyserFuncs, a)
 		}
 		return &aggregator, nil

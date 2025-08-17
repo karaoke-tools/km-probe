@@ -8,37 +8,15 @@ package probes
 import (
 	"github.com/louisroyer/km-probe/internal/probes/analyser"
 	"github.com/louisroyer/km-probe/internal/probes/probe"
+	"github.com/louisroyer/km-probe/internal/probes/probe/karamoe"
+	"github.com/louisroyer/km-probe/internal/probes/probe/system"
 )
 
-var defaultProbes = []probe.NewProbeFunc{
-	probe.NewLiveDownload,
-	probe.NewCredits,
-	probe.NewGiantFont,
-	probe.NewAutomation,                         // missing automation script
-	probe.NewDoubleConsonant,                    // double consonant in same k-tag (jpn only)
-	probe.NewEolPunctuation,                     // non-significant punctuation at end-of-lines
-	probe.NewSpaceBeforeDoublePunctuation,       // space before double punctuation (jpn/eng only)
-	probe.NewResolution,                         // resolution not 0×0
-	probe.NewScaledBorderAndShadow,              // scaled border and shadow not enabled
-	probe.NewSingleCollection,                   // multiple collections
-	probe.NewStyleBlackBorder,                   // non-black borders
-	probe.NewStyleScale,                         // style with scaling parameter
-	probe.NewStyleSingleWhite,                   // unfilled color is not white (only if single style)
-	probe.NewOffVocalWithoutParent,              // off vocal but no parent
-	probe.NewKfShortSyllabes,                    // kf on very short syllabes
-	probe.NewMediaWarningAudioOnly,              // media warning but this is an audio only kara
-	probe.NewLyricsWarningNoLinguisticalContent, //  lyrics warning, but there is no linguistical content
-	probe.NewDoubleYearGroup,                    // multiple year groups tags
-	probe.NewWrongTsuSeparation,                 // `t|su` separation is not correct (jpn only)
-	probe.NewLongTagOnShortMedia,                // "long" tag should only be applied automatically
-	probe.NewAudioOnlyWithVideoContainer,        // audio only tag, but not an audio only media
-	probe.NewAudioOnlyWithFamilies,              // media content tag includes both audio only tag and other tags at the same time
-	probe.NewAltVersionWithoutParent,            // version tag, but there is no parent song
-	probe.NewMusicVideoCreditless,               // MV with a creditless tag
-	probe.NewVowelMacron,                        // ā, ē, ō, ī, ū in lyrics file
-	probe.NewUnknownMediaContent,                // missing content tag
-	probe.NewFullKf,                             // lyrics with a lot of kf
-	probe.NewNoLyrics,                           // missing lyrics file
+func availableProbes() []probe.NewProbeFunc {
+	a := make([]probe.NewProbeFunc, 0)
+	a = append(a, system.Probes()...)
+	a = append(a, karamoe.Probes()...)
+	return a
 }
 
 var defaultAnalysers = []analyser.NewAnalyserFunc{

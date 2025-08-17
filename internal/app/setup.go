@@ -154,7 +154,7 @@ func (s *Setup) Run(ctx context.Context) error {
 								return
 							}
 						}
-						a, err := probes.FromKaraJson(ctx, repo.BaseDir, karaJson, nil, nil)
+						a, err := probes.FromKaraJson(ctx, repo.BaseDir, karaJson)
 						if errors.Is(err, karadata.ErrNoMedias) {
 							// skip
 							wg.Done()

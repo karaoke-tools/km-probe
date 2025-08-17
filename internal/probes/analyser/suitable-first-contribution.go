@@ -18,14 +18,14 @@ type SuitableFirstContribution struct {
 
 func NewSuitableFirstContribution(r map[string]report.Report) Analyser {
 	return &SuitableFirstContribution{
-		newAnalyser("suitable-first-contribution", r),
+		newAnalyser("kara-moe.suitable-first-contribution", r),
 	}
 }
 func (a *SuitableFirstContribution) Run(ctx context.Context) (report.Report, error) {
 	critical := []string{
-		"live-download",
-		"resolution",
-		"automation",
+		"kara-moe.live-download",
+		"system.resolution",
+		"system.automation",
 	}
 	for _, c := range critical {
 		if r, ok := a.reports[c]; !ok {
@@ -37,10 +37,10 @@ func (a *SuitableFirstContribution) Run(ctx context.Context) (report.Report, err
 
 	scoring := [][]string{
 		// style issues
-		[]string{"style-single-white", "style-black-border"}, // minor issues
-		[]string{"resolution"},                               // can imply re-splitting some parts
+		[]string{"kara-moe.style-single-white", "system.style-black-border"}, // minor issues
+		[]string{"system.resolution"},                                        // can imply re-splitting some parts
 		// lyrics issues
-		[]string{"double-consonant"},
+		[]string{"kara-moe.double-consonant"},
 	}
 
 	badness := 0
