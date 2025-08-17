@@ -7,14 +7,14 @@ package karajson
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"time"
 
 	"github.com/gofrs/uuid"
 )
 
 func FromFile(path string) (*KaraJson, error) {
-	content, err := ioutil.ReadFile(path)
+	content, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}

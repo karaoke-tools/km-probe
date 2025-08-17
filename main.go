@@ -27,8 +27,15 @@ func main() {
 		Authors: []*cli.Author{
 			{Name: "Louis Royer"},
 		},
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:     "uuid",
+				Usage:    "UUID of a karaoke to probe",
+				Required: false,
+			},
+		},
 		Action: func(ctx *cli.Context) error {
-			if err := app.NewSetup().Run(ctx.Context); err != nil {
+			if err := app.NewSetup().Run(ctx.Context, ctx.String("uuid")); err != nil {
 				logrus.WithError(err).Fatal("Error while running, exiting…")
 			}
 			return nil

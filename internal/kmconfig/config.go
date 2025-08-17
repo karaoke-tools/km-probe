@@ -6,7 +6,7 @@
 package kmconfig
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"gopkg.in/yaml.v3"
@@ -43,7 +43,7 @@ func ParseConf(file string) (*KmConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	yamlFile, err := ioutil.ReadFile(path)
+	yamlFile, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}

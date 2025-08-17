@@ -21,11 +21,13 @@ import (
 	"github.com/louisroyer/km-probe/internal/kmconfig"
 	"github.com/louisroyer/km-probe/internal/probes"
 
+	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 )
 
 type Setup struct {
 	Repositories []Repository
+	uuid         uuid.UUID
 }
 
 func NewSetup() *Setup {
@@ -35,7 +37,17 @@ func NewSetup() *Setup {
 	return &setup
 }
 
-func (s *Setup) Run(ctx context.Context) error {
+func (s *Setup) Run(ctx context.Context, id string) error {
+	if id != "" {
+		if u, err := uuid.FromString(id); err != nil {
+			logrus.WithError(err).WithFields(logrus.Fields{
+				"uuid-argument": id,
+			}).Error("Could not parse uuid")
+			return err
+		} else {
+			s.uuid = u
+		}
+	}
 	xdgDataHome, ok := os.LookupEnv("XDG_DATA_HOME")
 	if !ok {
 		usr, err := user.Current()
@@ -71,7 +83,63 @@ func (s *Setup) Run(ctx context.Context) error {
 			MediaPath: mediaPath,
 		})
 	}
+	if s.uuid.IsNil() {
+		return s.RunAll(ctx)
+	}
+	return s.RunSingle(ctx)
+}
 
+func (s *Setup) RunSingle(ctx context.Context) error {
+	encoder := json.NewEncoder(os.Stdout)
+	encoder.SetIndent("", "  ")
+	for _, repo := range s.Repositories {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			fp := filepath.Join(repo.BaseDir, "karaokes", s.uuid.String()+".kara.json")
+			karaJson, err := karajson.FromFile(fp)
+			if err == nil {
+				a, err := probes.FromKaraJson(ctx, repo.BaseDir, karaJson)
+				if errors.Is(err, karadata.ErrNoMedias) {
+					return err
+				} else if err != nil {
+					logrus.WithError(err).WithFields(logrus.Fields{
+						"filename": fp,
+					}).Error("Could not create probe aggregator")
+					return err
+				}
+				if err := a.Run(ctx); err != nil {
+					logrus.WithError(err).WithFields(logrus.Fields{
+						"filename": fp,
+					}).Error("Probe aggregator failure")
+					return err
+				}
+				if err := encoder.Encode(a); err != nil {
+					logrus.WithError(err).Error("Error while encoding json")
+				}
+				return nil
+			} else if errors.Is(err, fs.ErrNotExist) {
+				continue
+			} else {
+				logrus.WithError(err).WithFields(logrus.Fields{
+					"filename": fp,
+				}).Error("Could not parse karajson")
+				return err
+			}
+
+		}
+	}
+	err := ErrKaraokeNotFound
+	logrus.WithFields(logrus.Fields{
+		"uuid": s.uuid,
+	}).WithError(err).Error("Karaoke not found")
+	return err
+
+	return nil
+}
+
+func (s *Setup) RunAll(ctx context.Context) error {
 	encoder := json.NewEncoder(os.Stdout)
 	encoder.SetIndent("", "  ")
 	ch := make(chan *probes.Aggregator)
