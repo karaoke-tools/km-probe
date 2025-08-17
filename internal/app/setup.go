@@ -135,8 +135,6 @@ func (s *Setup) RunSingle(ctx context.Context) error {
 		"uuid": s.uuid,
 	}).WithError(err).Error("Karaoke not found")
 	return err
-
-	return nil
 }
 
 func (s *Setup) RunAll(ctx context.Context) error {
