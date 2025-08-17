@@ -20,17 +20,17 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-type DoubleConsonnant struct {
+type DoubleConsonant struct {
 	baseProbe
 }
 
-func NewDoubleConsonnant(karaData *karadata.KaraData) Probe {
-	return &DoubleConsonnant{
-		newBaseProbe("double-consonnant", karaData),
+func NewDoubleConsonant(karaData *karadata.KaraData) Probe {
+	return &DoubleConsonant{
+		newBaseProbe("double-consonant", karaData),
 	}
 }
 
-var doubleConsonnants = []string{
+var doubleConsonants = []string{
 	"kk",
 	"gg",
 	"ss",
@@ -44,7 +44,7 @@ var doubleConsonnants = []string{
 	"rr",
 }
 
-func (p *DoubleConsonnant) Run(ctx context.Context) (report.Report, error) {
+func (p *DoubleConsonant) Run(ctx context.Context) (report.Report, error) {
 	if len(p.karaData.Lyrics) == 0 {
 		return report.Skip("no lyrics"), nil
 	}
@@ -73,10 +73,10 @@ func (p *DoubleConsonnant) Run(ctx context.Context) (report.Report, error) {
 					default:
 						if !strings.HasPrefix(syll, "{") {
 							if !strings.HasSuffix(save, " ") { // this is not a new word
-								for _, double := range doubleConsonnants {
+								for _, double := range doubleConsonants {
 									if strings.HasPrefix(syll, double) {
 										return report.Fail(severity.Critical,
-											"check for double consonnants: "+
+											"check for double consonants: "+
 												"there is at least an uncorrectly splitted `"+
 												syll+"`"), nil
 									}

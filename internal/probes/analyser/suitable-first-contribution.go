@@ -40,7 +40,7 @@ func (a *SuitableFirstContribution) Run(ctx context.Context) (report.Report, err
 		[]string{"style-single-white", "style-black-border"}, // minor issues
 		[]string{"resolution"},                               // can imply re-splitting some parts
 		// lyrics issues
-		[]string{"double-consonnant"},
+		[]string{"double-consonant"},
 	}
 
 	badness := 0

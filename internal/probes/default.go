@@ -15,10 +15,10 @@ var defaultProbes = []probe.NewProbeFunc{
 	probe.NewCredits,
 	probe.NewGiantFont,
 	probe.NewAutomation,                         // missing automation script
-	probe.NewDoubleConsonnant,                   // double consonnant in same k-tag (jpn only)
+	probe.NewDoubleConsonant,                    // double consonant in same k-tag (jpn only)
 	probe.NewEolPunctuation,                     // non-significant punctuation at end-of-lines
 	probe.NewSpaceBeforeDoublePunctuation,       // space before double punctuation (jpn/eng only)
-	probe.NewResolution,                         // resolusion not 0×0
+	probe.NewResolution,                         // resolution not 0×0
 	probe.NewScaledBorderAndShadow,              // scaled border and shadow not enabled
 	probe.NewSingleCollection,                   // multiple collections
 	probe.NewStyleBlackBorder,                   // non-black borders
