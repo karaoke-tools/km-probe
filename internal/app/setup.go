@@ -51,26 +51,25 @@ func (s *Setup) Run(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	kmDataPath, err := kmDataPath()
-	if err != nil {
-		return err
-	}
 	for _, v := range kmConfig.System.Repositories {
-		baseDir := v.BaseDir
-		if !filepath.IsAbs(baseDir) {
-			baseDir = filepath.Join(kmDataPath, baseDir)
-		}
-		if _, err := os.Stat(baseDir); errors.Is(err, fs.ErrNotExist) {
+		baseDir, err := searchKmDataDirPath(v.BaseDir)
+		if err != nil {
 			logrus.WithFields(logrus.Fields{
 				"name":     v.Name,
-				"base-dir": baseDir,
+				"base-dir": v.BaseDir,
 			}).Error("Repository is configured with a base directory that doesn't exist")
 			continue
 		}
-		mediaPath := v.Path.Medias[0] // TODO: multi-track drifting
-		if !filepath.IsAbs(mediaPath) {
-			mediaPath = filepath.Join(kmDataPath, mediaPath)
+
+		mediaPath, err := searchKmDataDirPath(v.Path.Medias[0]) // TODO: multi-track drifting
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"name":      v.Name,
+				"media-dir": v.Path.Medias[0],
+			}).Error("Repository is configured with a media directory that doesn't exist")
+			continue
 		}
+
 		s.Repositories = append(s.Repositories, Repository{
 			Name:      v.Name,
 			BaseDir:   baseDir,

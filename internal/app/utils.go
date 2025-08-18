@@ -6,75 +6,72 @@
 package app
 
 import (
+	"errors"
+	"io/fs"
 	"os"
 	"path/filepath"
 
 	"github.com/louisroyer/km-probe/internal/kmconfig"
+
+	"github.com/adrg/xdg"
 )
 
 var subpaths = []string{"karaokemugen-app", "karaokemugen-server", "km-server"}
 
-func kmDataPath() (string, error) {
-	kmDataPaths, err := xdgDataPaths()
-	if err != nil {
-		return "", err
-	}
-	// fallback on `..`
-	// yes, this is very weird, but I don't judge you
-	// it will make sense if you run it in
-	// the exact same way km-server documentation says
-	// (i.e. from the kmserver git repository)
-	kmDataPaths = append(kmDataPaths, "..")
-	for _, s := range subpaths {
-		for _, p := range kmDataPaths {
-			path := filepath.Join(p, s, "app/")
-			if _, err := os.Stat(path); err == nil {
-				return path, nil
-			}
+const configpath = "app/config.yml"
+
+func searchKmDataDirPath(baseDir string) (string, error) {
+	if filepath.IsAbs(baseDir) {
+		if _, err := os.Stat(baseDir); errors.Is(err, fs.ErrNotExist) {
+			return baseDir, ErrDataRepositoryNotFound
 		}
+		return baseDir, nil
+	}
+
+	for _, s := range subpaths {
+		path, err := xdg.SearchDataFile(filepath.Join(s, "app", baseDir))
+		if err == nil {
+			return path, nil
+		}
+	}
+	// fallback (if this is run from a kmserver git repository)
+	path := filepath.Join("app", baseDir)
+	if _, err := os.Stat(path); err == nil {
+		return path, nil
 	}
 	return "", ErrDataRepositoryNotFound
 }
 
-func kmConfigPath() (string, error) {
-	kmConfPaths := make([]string, 0, 6)
-	// 1. load config from "historical" KM config-file path (`XDG_DATA_HOME`/`XDG_DATA_DIRS`)
-	xdgData, err := xdgDataPaths()
-	if err != nil {
-		return "", err
-	}
-	kmConfPaths = append(kmConfPaths, xdgData...)
-	// 2. maybe we are in the future, and now KM is "really" following
-	// XDG spec for the config-file path (`XDG_CONFIG_HOME`/`XDG_CONFIG_DIRS`)?
-	xdgConfig, err := xdgConfigPaths()
-	if err != nil {
-		return "", err
-	}
-	kmConfPaths = append(kmConfPaths, xdgConfig...)
-
-	// fallback on `..`
-	// yes, this is very weird, but I don't judge you
-	// it will make sense if you run it in
-	// the exact same way km-server documentation says
-	// (i.e. from the kmserver git repository)
-	kmConfPaths = append(kmConfPaths, "..")
+func searchKmConfigFilePath() (string, error) {
+	// Search on XDG basedir compliant paths for config
+	// (just in case KM start to be compliant)
 	for _, s := range subpaths {
-		for _, p := range kmConfPaths {
-			path := filepath.Join(p, s, "app/")
-			if _, err := os.Stat(path); err == nil {
-				return path, nil
-			}
+		path, err := xdg.SearchConfigFile(filepath.Join(s, configpath))
+		if err == nil {
+			return path, nil
 		}
+	}
+	// Search paths really used by KM
+	for _, s := range subpaths {
+		path, err := xdg.SearchDataFile(filepath.Join(s, configpath))
+		if err == nil {
+			return path, nil
+		}
+	}
+	// fallback (if this is run from a kmserver git repository)
+	path := configpath
+	if _, err := os.Stat(path); err == nil {
+		return path, nil
 	}
 	return "", ErrConfigNotFound
 }
 
 func loadConf() (*kmconfig.KmConfig, error) {
-	path, err := kmConfigPath()
+	path, err := searchKmConfigFilePath()
 	if err != nil {
 		return nil, err
 	}
-	if kmConfig, err := kmconfig.ParseConf(filepath.Join(path, "config.yml")); err == nil {
+	if kmConfig, err := kmconfig.ParseConf(path); err == nil {
 		return kmConfig, nil
 	}
 	return nil, ErrConfigNotFound
