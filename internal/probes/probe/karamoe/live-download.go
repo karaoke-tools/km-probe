@@ -15,6 +15,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/probe"
 	"github.com/louisroyer/km-probe/internal/probes/probe/karamoe/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 
 	"github.com/gofrs/uuid"
 )
@@ -28,6 +29,7 @@ func NewLiveDownload(karaData *karadata.KaraData) probe.Probe {
 		baseprobe.New(
 			"live-download",
 			"is hardsub available?",
+			cond.Never{},
 			karaData),
 	}
 }

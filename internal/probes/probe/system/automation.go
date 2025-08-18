@@ -14,6 +14,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/probe/system/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 )
 
 type Automation struct {
@@ -24,15 +25,12 @@ func NewAutomation(karaData *karadata.KaraData) probe.Probe {
 	return &Automation{
 		baseprobe.New("automation",
 			"missing automation script",
+			cond.NoLyrics{},
 			karaData),
 	}
 }
 
 func (p *Automation) Run(ctx context.Context) (report.Report, error) {
-	if len(p.KaraData.Lyrics) == 0 {
-		return report.Skip("no lyrics"), nil
-	}
-
 	// TODO: update this when multi-track drifting is released
 	for _, line := range p.KaraData.Lyrics[0].Events {
 		select {

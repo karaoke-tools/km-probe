@@ -7,16 +7,17 @@ package karamoe
 
 import (
 	"context"
-	"slices"
 
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson/karamoe/misc"
 	"github.com/louisroyer/km-probe/internal/karajson/karamoe/origin"
 	"github.com/louisroyer/km-probe/internal/karajson/karamoe/songtype"
+	"github.com/louisroyer/km-probe/internal/karajson/tag"
 	"github.com/louisroyer/km-probe/internal/probes/probe"
 	"github.com/louisroyer/km-probe/internal/probes/probe/karamoe/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 
 	"github.com/gofrs/uuid"
 )
@@ -33,35 +34,32 @@ var possibleCreditlessOrigin = []uuid.UUID{
 	origin.TVSeries,
 }
 
-func isOriginCreditlessCompatible(o uuid.UUID) bool {
-	return slices.Contains(possibleCreditlessOrigin, o)
-}
-
-func isOPED(st uuid.UUID) bool {
-	return slices.Contains([]uuid.UUID{songtype.OP, songtype.ED}, st)
-}
-
 func NewCredits(karaData *karadata.KaraData) probe.Probe {
 	return &Credits{
 		baseprobe.New(
 			"credits",
 			"can a creditless version be found?",
+			cond.Any{
+				cond.HasAnyTagFrom{
+					TagType: tag.Misc,
+					Tags:    []uuid.UUID{misc.Creditless},
+					Msg:     "is a creditless version",
+				},
+				cond.HasNoTagFrom{
+					TagType: tag.Songtypes,
+					Tags:    []uuid.UUID{songtype.OP, songtype.ED},
+					Msg:     "songtype is not OP/ED",
+				},
+				cond.HasNoTagFrom{
+					TagType: tag.Origins,
+					Tags:    possibleCreditlessOrigin,
+					Msg:     "origin not compatible with creditless",
+				},
+			},
 			karaData),
 	}
 }
 
 func (p *Credits) Run(ctx context.Context) (report.Report, error) {
-	if slices.Contains(p.KaraData.KaraJson.Data.Tags.Misc, misc.Creditless) {
-		return report.Pass(), nil
-	}
-	if !slices.ContainsFunc(p.KaraData.KaraJson.Data.Tags.Origins, isOriginCreditlessCompatible) {
-		return report.Skip("origin not compatible with creditless"), nil
-	}
-	if !slices.ContainsFunc(p.KaraData.KaraJson.Data.Tags.Songtypes, isOPED) {
-		return report.Skip("songtype is not OP/ED"), nil
-	}
-	if slices.Contains(p.KaraData.KaraJson.Data.Tags.Songtypes, songtype.AUDIO) {
-		return report.Skip("audio only cannot be creditless"), nil
-	}
 	return report.Fail(severity.Info, "if the media is already creditless, add the `Creditless`; if a creditless version exists (and is relevant!! see <https://kara.moe/playlist/quand-le-staff-fait-parti-du-generique> for counter-examples), update the media and add the tag"), nil
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/probe/system/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 )
 
 type SingleCollection struct {
@@ -23,6 +24,7 @@ func NewSingleCollection(karaData *karadata.KaraData) probe.Probe {
 	return &SingleCollection{
 		baseprobe.New("single-collection",
 			"multiple collections for a single karaoke",
+			cond.Never{},
 			karaData),
 	}
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/probe/system/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 )
 
 type ScaledBorderAndShadow struct {
@@ -23,15 +24,12 @@ func NewScaledBorderAndShadow(karaData *karadata.KaraData) probe.Probe {
 	return &ScaledBorderAndShadow{
 		baseprobe.New("scaled-border-and-shadow",
 			"scaled border and shadow not enabled",
+			cond.NoLyrics{},
 			karaData),
 	}
 }
 
 func (p *ScaledBorderAndShadow) Run(ctx context.Context) (report.Report, error) {
-	if len(p.KaraData.Lyrics) == 0 {
-		return report.Skip("no lyrics"), nil
-	}
-
 	// TODO: update this when multi-track drifting is released
 	if p.KaraData.Lyrics[0].ScriptInfo.ScaledBorderAndShadow {
 		return report.Pass(), nil

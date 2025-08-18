@@ -3,20 +3,24 @@
 // found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-package baseprobe
+package cond
 
 import (
+	"context"
+
 	"github.com/louisroyer/km-probe/internal/karadata"
-	"github.com/louisroyer/km-probe/internal/probes/probe/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/skip"
 )
 
-type BaseProbe struct {
-	baseprobe.BaseProbe
-}
+type Any []skip.Condition
 
-func New(name string, desc string, skipCond skip.Condition, karaData *karadata.KaraData) BaseProbe {
-	return BaseProbe{
-		baseprobe.New("system", name, desc, skipCond, karaData),
+func (a Any) Result(ctx context.Context, k *karadata.KaraData) (bool, string, error) {
+	for _, c := range a {
+		if ok, msg, err := c.Result(ctx, k); err != nil {
+			return true, "", err
+		} else if ok {
+			return ok, msg, nil
+		}
 	}
+	return false, "", nil
 }

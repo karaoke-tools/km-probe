@@ -15,6 +15,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/probe/karamoe/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 )
 
 type LongTagOnShortMedia struct {
@@ -25,14 +26,12 @@ func NewLongTagOnShortMedia(karaData *karadata.KaraData) probe.Probe {
 	return &LongTagOnShortMedia{
 		baseprobe.New("long-tag-on-short-media",
 			"long tag added manually",
+			cond.GreaterMediaDuration{Duration: 300},
 			karaData),
 	}
 }
 
 func (p *LongTagOnShortMedia) Run(ctx context.Context) (report.Report, error) {
-	if p.KaraData.KaraJson.Medias[0].Duration > 300 {
-		return report.Skip("media over 300s"), nil
-	}
 	if slices.Contains(p.KaraData.KaraJson.Data.Tags.Misc, misc.Long) {
 		return report.Fail(severity.Critical, "remove long tag"), nil
 	}

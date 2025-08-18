@@ -8,14 +8,15 @@ package baseprobe
 import (
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/probes/probe/baseprobe"
+	"github.com/louisroyer/km-probe/internal/probes/skip"
 )
 
 type BaseProbe struct {
 	baseprobe.BaseProbe
 }
 
-func New(name string, desc string, karaData *karadata.KaraData) BaseProbe {
+func New(name string, desc string, skipCond skip.Condition, karaData *karadata.KaraData) BaseProbe {
 	return BaseProbe{
-		baseprobe.New("kara-moe", name, desc, karaData),
+		baseprobe.New("kara-moe", name, desc, skipCond, karaData),
 	}
 }

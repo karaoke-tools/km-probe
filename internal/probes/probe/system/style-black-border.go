@@ -15,6 +15,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/probe/system/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 )
 
 type StyleBlackBorder struct {
@@ -25,15 +26,12 @@ func NewStyleBlackBorder(karaData *karadata.KaraData) probe.Probe {
 	return &StyleBlackBorder{
 		baseprobe.New("style-black-border",
 			"detects non-black border",
+			cond.NoLyrics{},
 			karaData),
 	}
 }
 
 func (p *StyleBlackBorder) Run(ctx context.Context) (report.Report, error) {
-	if len(p.KaraData.Lyrics) == 0 {
-		return report.Skip("no lyrics"), nil
-	}
-
 	// TODO: update this when multi-track drifting is released
 	for _, line := range p.KaraData.Lyrics[0].Styles {
 		select {

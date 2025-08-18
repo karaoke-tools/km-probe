@@ -15,6 +15,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/probe/system/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 )
 
 type UnknownMediaContent struct {
@@ -25,6 +26,7 @@ func NewUnknownMediaContent(KaraData *karadata.KaraData) probe.Probe {
 	return &UnknownMediaContent{
 		baseprobe.New("unknown-media-content",
 			"missing content tag",
+			cond.Never{},
 			KaraData),
 	}
 }

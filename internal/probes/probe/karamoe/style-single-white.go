@@ -7,16 +7,19 @@ package karamoe
 
 import (
 	"context"
-	"slices"
 	"strings"
 
 	"github.com/louisroyer/km-probe/internal/ass/style"
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson/karamoe/misc"
+	"github.com/louisroyer/km-probe/internal/karajson/tag"
 	"github.com/louisroyer/km-probe/internal/probes/probe"
 	"github.com/louisroyer/km-probe/internal/probes/probe/karamoe/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
+
+	"github.com/gofrs/uuid"
 )
 
 type StyleSingleWhite struct {
@@ -27,18 +30,19 @@ func NewStyleSingleWhite(karaData *karadata.KaraData) probe.Probe {
 	return &StyleSingleWhite{
 		baseprobe.New("style-single-white",
 			"unfilled color is not white (only if single style)",
+			cond.Any{
+				cond.NoLyrics{},
+				cond.HasNoTagFrom{
+					TagType: tag.Misc,
+					Tags:    []uuid.UUID{misc.GroupSinging},
+					Msg:     "group singing karaoke",
+				},
+			},
 			karaData),
 	}
 }
 
 func (p *StyleSingleWhite) Run(ctx context.Context) (report.Report, error) {
-	if len(p.KaraData.Lyrics) == 0 {
-		return report.Skip("no lyrics"), nil
-	}
-	if slices.Contains(p.KaraData.KaraJson.Data.Tags.Misc, misc.GroupSinging) {
-		return report.Skip("group singing karaoke: secondary color can be non white"), nil
-	}
-
 	nb_styles := 0
 	// TODO: update this when multi-track drifting is released
 	for _, line := range p.KaraData.Lyrics[0].Styles {

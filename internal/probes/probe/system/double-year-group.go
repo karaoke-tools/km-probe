@@ -15,6 +15,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/probe/system/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 
 	"github.com/gofrs/uuid"
 )
@@ -27,6 +28,7 @@ func NewDoubleYearGroup(karaData *karadata.KaraData) probe.Probe {
 	return &DoubleYearGroup{
 		baseprobe.New("double-year-group",
 			"double-year-group",
+			cond.Never{},
 			karaData),
 	}
 }

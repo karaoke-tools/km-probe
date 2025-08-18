@@ -15,6 +15,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/probe/system/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 )
 
 type FullKf struct {
@@ -25,6 +26,7 @@ func NewFullKf(karaData *karadata.KaraData) probe.Probe {
 	return &FullKf{
 		baseprobe.New("full-kf",
 			"lyrics with a lot of kf",
+			cond.NoLyrics{},
 			karaData),
 	}
 }
@@ -39,10 +41,6 @@ const (
 )
 
 func (p *FullKf) Run(ctx context.Context) (report.Report, error) {
-	if len(p.KaraData.Lyrics) == 0 {
-		return report.Skip("no lyrics"), nil
-	}
-
 	kf_count := 0
 	k_count := 0
 	// TODO: update this when multi-track drifting is released

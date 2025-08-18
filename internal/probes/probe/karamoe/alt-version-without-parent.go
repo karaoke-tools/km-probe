@@ -11,10 +11,12 @@ import (
 
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson/karamoe/version"
+	"github.com/louisroyer/km-probe/internal/karajson/tag"
 	"github.com/louisroyer/km-probe/internal/probes/probe"
 	"github.com/louisroyer/km-probe/internal/probes/probe/karamoe/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 
 	"github.com/gofrs/uuid"
 )
@@ -41,17 +43,18 @@ func NewAltVersionWithoutParent(karaData *karadata.KaraData) probe.Probe {
 		baseprobe.New(
 			"alt-version-without-parent",
 			"version tag, but there is no parent song",
+			cond.Any{
+				cond.HasParent{},
+				cond.HasEmptyTagtype{
+					TagType: tag.Versions,
+					Msg:     "not an alt version",
+				},
+			},
 			karaData),
 	}
 }
 
 func (p *AltVersionWithoutParent) Run(ctx context.Context) (report.Report, error) {
-	if len(p.KaraData.KaraJson.Data.Parents) > 0 {
-		return report.Skip("has a parent"), nil
-	}
-	if len(p.KaraData.KaraJson.Data.Tags.Versions) == 0 {
-		return report.Skip("not an alt version"), nil
-	}
 	if slices.ContainsFunc(p.KaraData.KaraJson.Data.Tags.Versions, isVersionWithoutParentCritical) {
 		return report.Fail(severity.Critical, "check if a potential parent exists, or if the version tag is relevant"), nil
 	}

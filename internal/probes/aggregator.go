@@ -83,6 +83,21 @@ func (a *Aggregator) Run(ctx context.Context) error {
 				return ctx.Err()
 			default:
 				go func(ctx context.Context, p probe.Probe, ch chan<- reportWithName) {
+					if s, msg, err := p.PreRun(ctx); err != nil {
+						select {
+						case <-ctx.Done():
+							return
+						case ch <- reportWithName{name: p.Name(), r: report.Abort()}:
+							return
+						}
+					} else if s {
+						select {
+						case <-ctx.Done():
+							return
+						case ch <- reportWithName{name: p.Name(), r: report.Skip(msg)}:
+							return
+						}
+					}
 					if r, err := p.Run(ctx); err == nil {
 						select {
 						case <-ctx.Done():

@@ -7,14 +7,17 @@ package system
 
 import (
 	"context"
-	"slices"
 
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson/system/version"
+	"github.com/louisroyer/km-probe/internal/karajson/tag"
 	"github.com/louisroyer/km-probe/internal/probes/probe"
 	"github.com/louisroyer/km-probe/internal/probes/probe/system/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
+
+	"github.com/gofrs/uuid"
 )
 
 type OffVocalWithoutParent struct {
@@ -24,15 +27,17 @@ type OffVocalWithoutParent struct {
 func NewOffVocalWithoutParent(karaData *karadata.KaraData) probe.Probe {
 	return &OffVocalWithoutParent{
 		baseprobe.New("off-vocal-without-parent",
-			"off vocal but no parent", karaData),
+			"off vocal but no parent",
+			cond.HasNoTagFrom{
+				TagType: tag.Versions,
+				Tags:    []uuid.UUID{version.OffVocal},
+				Msg:     "not an off vocal",
+			},
+			karaData),
 	}
 }
 
 func (p *OffVocalWithoutParent) Run(ctx context.Context) (report.Report, error) {
-	if !slices.Contains(p.KaraData.KaraJson.Data.Tags.Versions, version.OffVocal) {
-		return report.Skip("not an off vocal"), nil
-	}
-
 	if len(p.KaraData.KaraJson.Data.Parents) == 0 {
 		return report.Fail(severity.Critical, "add the right parent"), nil
 	}

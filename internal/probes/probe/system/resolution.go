@@ -13,6 +13,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/probe/system/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 )
 
 type Resolution struct {
@@ -23,15 +24,12 @@ func NewResolution(karaData *karadata.KaraData) probe.Probe {
 	return &Resolution{
 		baseprobe.New("resolution",
 			"resolution not set to 0×0",
+			cond.NoLyrics{},
 			karaData),
 	}
 }
 
 func (p *Resolution) Run(ctx context.Context) (report.Report, error) {
-	if len(p.KaraData.Lyrics) == 0 {
-		return report.Skip("no lyrics"), nil
-	}
-
 	// TODO: update this when multi-track drifting is released
 	if p.KaraData.Lyrics[0].ScriptInfo.PlayResX == 0 && p.KaraData.Lyrics[0].ScriptInfo.PlayResY == 0 {
 		return report.Pass(), nil

@@ -16,6 +16,7 @@ type NewProbeFunc func(*karadata.KaraData) Probe
 
 type Probe interface {
 	Name() string
+	PreRun(ctx context.Context) (bool, string, error)
 	Run(ctx context.Context) (report.Report, error)
 	Description() string
 }

@@ -12,10 +12,12 @@ import (
 	"github.com/louisroyer/km-probe/internal/ass/lyrics"
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson/system/language"
+	"github.com/louisroyer/km-probe/internal/karajson/tag"
 	"github.com/louisroyer/km-probe/internal/probes/probe"
 	"github.com/louisroyer/km-probe/internal/probes/probe/system/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 
 	"github.com/gofrs/uuid"
 )
@@ -28,21 +30,19 @@ func NewSpaceBeforeDoublePunctuation(karaData *karadata.KaraData) probe.Probe {
 	return &SpaceBeforeDoublePunctuation{
 		baseprobe.New("space-before-double-punctuation",
 			"space before double punctuation (JPN/ENG only)",
+			cond.Any{
+				cond.NoLyrics{},
+				cond.HasTagsNotFrom{
+					TagType: tag.Langs,
+					Tags:    []uuid.UUID{language.JPN, language.ENG},
+					Msg:     "non english/japanese language",
+				},
+			},
 			karaData),
 	}
 }
 
 func (p *SpaceBeforeDoublePunctuation) Run(ctx context.Context) (report.Report, error) {
-	if len(p.KaraData.Lyrics) == 0 {
-		return report.Skip("no lyrics"), nil
-	}
-	// we only check if language is full english, full japanese, or jpn+eng
-	if res, err := p.KaraData.KaraJson.HasOnlyLanguagesFrom(ctx, []uuid.UUID{language.JPN, language.ENG}); err != nil {
-		return report.Abort(), err
-	} else if !res {
-		return report.Skip("non english/japanese language"), nil
-	}
-
 	// TODO: update this when multi-track drifting is released
 	for _, line := range p.KaraData.Lyrics[0].Events {
 		select {

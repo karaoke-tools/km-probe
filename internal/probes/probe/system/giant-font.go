@@ -15,6 +15,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/probe/system/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 )
 
 type GiantFont struct {
@@ -25,6 +26,7 @@ func NewGiantFont(karaData *karadata.KaraData) probe.Probe {
 	return &GiantFont{
 		baseprobe.New("giant-font",
 			"fonts that have unusual big size",
+			cond.NoLyrics{},
 			karaData),
 	}
 }
@@ -35,10 +37,6 @@ const (
 )
 
 func (p *GiantFont) Run(ctx context.Context) (report.Report, error) {
-	if len(p.KaraData.Lyrics) == 0 {
-		return report.Skip("no lyrics"), nil
-	}
-
 	warn := false
 	// TODO: update this when multi-track drifting is released
 	for _, line := range p.KaraData.Lyrics[0].Styles {

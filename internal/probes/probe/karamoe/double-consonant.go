@@ -7,17 +7,18 @@ package karamoe
 
 import (
 	"context"
-	"slices"
 	"strings"
 
 	"github.com/louisroyer/km-probe/internal/ass/lyrics"
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson/karamoe/collection"
 	"github.com/louisroyer/km-probe/internal/karajson/system/language"
+	"github.com/louisroyer/km-probe/internal/karajson/tag"
 	"github.com/louisroyer/km-probe/internal/probes/probe"
 	"github.com/louisroyer/km-probe/internal/probes/probe/karamoe/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 
 	"github.com/gofrs/uuid"
 )
@@ -31,6 +32,19 @@ func NewDoubleConsonant(karaData *karadata.KaraData) probe.Probe {
 		baseprobe.New(
 			"double-consonant",
 			"double consonant in same k-tag (JPN romaji only)",
+			cond.Any{
+				cond.NoLyrics{},
+				cond.HasAnyTagFrom{
+					TagType: tag.Collections,
+					Tags:    []uuid.UUID{collection.Kana},
+					Msg:     "kana karaoke",
+				},
+				cond.HasTagsNotFrom{
+					TagType: tag.Langs,
+					Tags:    []uuid.UUID{language.JPN},
+					Msg:     "not a japanese only version",
+				},
+			},
 			karaData),
 	}
 }
@@ -50,21 +64,6 @@ var doubleConsonants = []string{
 }
 
 func (p *DoubleConsonant) Run(ctx context.Context) (report.Report, error) {
-	if len(p.KaraData.Lyrics) == 0 {
-		return report.Skip("no lyrics"), nil
-	}
-	// we only check if language is full jpn romaji
-	if slices.Contains(p.KaraData.KaraJson.Data.Tags.Collections, collection.Kana) {
-		// TODO: with multi-track drifting, maybe we will have a way to detect kana versions
-		// with System tags? so we could put this as system probe…
-		return report.Skip("kana karaoke"), nil
-	}
-	if res, err := p.KaraData.KaraJson.HasOnlyLanguagesFrom(ctx, []uuid.UUID{language.JPN}); err != nil {
-		return report.Abort(), err
-	} else if !res {
-		return report.Skip("not a japanese only version"), nil
-	}
-
 	// TODO: update this when multi-track drifting is released
 	for _, line := range p.KaraData.Lyrics[0].Events {
 		select {

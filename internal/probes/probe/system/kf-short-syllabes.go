@@ -16,6 +16,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/probe/system/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 )
 
 type KfShortSyllabes struct {
@@ -26,15 +27,12 @@ func NewKfShortSyllabes(karaData *karadata.KaraData) probe.Probe {
 	return &KfShortSyllabes{
 		baseprobe.New("kf-short-syllabes",
 			"kf on very short syllabes",
+			cond.NoLyrics{},
 			karaData),
 	}
 }
 
 func (p *KfShortSyllabes) Run(ctx context.Context) (report.Report, error) {
-	if len(p.KaraData.Lyrics) == 0 {
-		return report.Skip("no lyrics"), nil
-	}
-
 	warning := false
 	// TODO: update this when multi-track drifting is released
 	for _, line := range p.KaraData.Lyrics[0].Events {
