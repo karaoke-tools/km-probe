@@ -13,7 +13,6 @@ import (
 func Probes() []probe.NewProbeFunc {
 	return []probe.NewProbeFunc{
 		NewAudioOnlyWithFamilies,
-		NewAudioOnlyWithVideoContainer,
 		NewAutomation,
 		NewDoubleYearGroup,
 		NewEolPunctuation,
@@ -31,5 +30,6 @@ func Probes() []probe.NewProbeFunc {
 		NewStyleBlackBorder,
 		NewStyleScale,
 		NewUnknownMediaContent,
+		NewVideoContainerWithAudioOnlyTag,
 	}
 }

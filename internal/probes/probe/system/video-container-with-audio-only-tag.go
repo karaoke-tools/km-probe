@@ -18,20 +18,20 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 )
 
-type AudioOnlyWithVideoContainer struct {
+type VideoContainerWithAudioOnlyTag struct {
 	baseprobe.BaseProbe
 }
 
-func NewAudioOnlyWithVideoContainer(karaData *karadata.KaraData) probe.Probe {
-	return &AudioOnlyWithVideoContainer{
-		baseprobe.New("audio-only-with-video-container",
-			"audio only tag, but not an audio only media",
-			cond.HasVideoExtension{},
+func NewVideoContainerWithAudioOnlyTag(karaData *karadata.KaraData) probe.Probe {
+	return &VideoContainerWithAudioOnlyTag{
+		baseprobe.New("video-container-with-audio-only-tag",
+			"video container, but audio only tag",
+			cond.HasNotVideoExtension{},
 			karaData),
 	}
 }
 
-func (p *AudioOnlyWithVideoContainer) Run(ctx context.Context) (report.Report, error) {
+func (p *VideoContainerWithAudioOnlyTag) Run(ctx context.Context) (report.Report, error) {
 	if slices.Contains(p.KaraData.KaraJson.Data.Tags.Songtypes, songtype.AudioOnly) {
 		return report.Fail(severity.Critical,
 				"if this is a still image replace media with an audio container, "+

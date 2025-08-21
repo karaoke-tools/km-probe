@@ -13,9 +13,9 @@ import (
 	"github.com/louisroyer/km-probe/internal/karadata"
 )
 
-type HasVideoExtension struct{}
+type HasNotVideoExtension struct{}
 
-func (h HasVideoExtension) Result(ctx context.Context, k *karadata.KaraData) (bool, string, error) {
+func (h HasNotVideoExtension) Result(ctx context.Context, k *karadata.KaraData) (bool, string, error) {
 	// TODO: multi-track drifting
 	filename := k.KaraJson.Medias[0].Filename
 	startExt := strings.LastIndexByte(filename, '.')
