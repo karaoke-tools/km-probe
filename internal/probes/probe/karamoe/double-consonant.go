@@ -71,7 +71,7 @@ func (p *DoubleConsonant) Run(ctx context.Context) (report.Report, error) {
 			return report.Abort(), ctx.Err()
 		default:
 			if (line.Type != lyrics.Format) && (!strings.HasPrefix(line.Effect, "template")) {
-				save := ""
+				save := " " // must end with a space to consider the first word of the line as a new word
 				for _, syll := range line.Text.TagsSplit {
 					select {
 					case <-ctx.Done():
