@@ -21,6 +21,7 @@ func Probes() []probe.NewProbeFunc {
 		NewKfShortSyllabes,
 		NewLyricsWarningZXX,
 		NewMediaWarningAudioOnly,
+		NewMultilingualWithOtherLang,
 		NewNoLyrics,
 		NewOffVocalWithoutParent,
 		NewResolution,
@@ -29,6 +30,7 @@ func Probes() []probe.NewProbeFunc {
 		NewSpaceBeforeDoublePunctuation,
 		NewStyleBlackBorder,
 		NewStyleScale,
+		NewTooManyLangTags,
 		NewUnknownMediaContent,
 		NewVideoContainerWithAudioOnlyTag,
 	}
