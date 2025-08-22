@@ -12,6 +12,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/ass/style"
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson/karamoe/misc"
+	"github.com/louisroyer/km-probe/internal/karajson/system/language"
 	"github.com/louisroyer/km-probe/internal/karajson/tag"
 	"github.com/louisroyer/km-probe/internal/probes/probe"
 	"github.com/louisroyer/km-probe/internal/probes/probe/karamoe/baseprobe"
@@ -36,6 +37,16 @@ func NewStyleSingleWhite(karaData *karadata.KaraData) probe.Probe {
 					TagType: tag.Misc,
 					Tags:    []uuid.UUID{misc.GroupSinging},
 					Msg:     "group singing karaoke",
+				},
+				cond.HasMoreTagsThan{
+					TagType: tag.Langs,
+					Number:  1,
+					Msg:     "is multilingual karaoke", // we can use one color by language
+				},
+				cond.HasAnyTagFrom{
+					TagType: tag.Langs,
+					Tags:    []uuid.UUID{language.MUL},
+					Msg:     "is multilingual karaoke",
 				},
 			},
 			karaData),
