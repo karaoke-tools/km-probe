@@ -13,6 +13,7 @@ import (
 func Probes() []probe.NewProbeFunc {
 	return []probe.NewProbeFunc{
 		NewAltVersionWithoutParent,
+		NewAudioOnlyCreditless,
 		NewCredits,
 		NewDoubleConsonant,
 		NewLiveDownload,

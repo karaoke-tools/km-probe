@@ -45,6 +45,11 @@ func NewCredits(karaData *karadata.KaraData) probe.Probe {
 					Tags:    []uuid.UUID{misc.Creditless},
 					Msg:     "is a creditless version",
 				},
+				cond.HasAnyTagFrom{
+					TagType: tag.Songtypes,
+					Tags:    []uuid.UUID{songtype.AUDIO},
+					Msg:     "has audio only tag",
+				},
 				cond.HasNoTagFrom{
 					TagType: tag.Songtypes,
 					Tags:    []uuid.UUID{songtype.OP, songtype.ED},
