@@ -161,10 +161,10 @@ func (s *Setup) RunAll(ctx context.Context) error {
 			case <-ctx.Done():
 				return
 			case a := <-ch:
-				wg.Done()
 				if err := encoder.Encode(a); err != nil {
 					logrus.WithError(err).Error("Error while encoding json")
 				}
+				wg.Done()
 			}
 		}
 	}(printCtx, ch)
