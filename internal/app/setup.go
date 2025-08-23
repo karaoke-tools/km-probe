@@ -186,7 +186,6 @@ func runOnFile(ctx context.Context, repo *Repository, p string, printer *Printer
 			}).Error("Could not create karadata")
 			return err
 		}
-		return err
 	}
 	aggregator := printer.Aggregator()
 	aggregator.Reset(repo.BaseDir, karaJson)
