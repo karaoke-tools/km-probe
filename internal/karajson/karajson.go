@@ -6,6 +6,7 @@
 package karajson
 
 import (
+	"context"
 	"encoding/json"
 	"os"
 	"time"
@@ -13,7 +14,12 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-func FromFile(path string) (*KaraJson, error) {
+func FromFile(ctx context.Context, path string) (*KaraJson, error) {
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	default:
+	}
 	content, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err

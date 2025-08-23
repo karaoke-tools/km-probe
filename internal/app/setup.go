@@ -7,15 +7,13 @@ package app
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"io/fs"
-	"os"
 	"path/filepath"
-	"strings"
-	"sync"
 
-	"github.com/louisroyer/km-probe/internal/karadata"
+	// TODO: use go 1.25, <https://github.com/louisroyer/km-probe/issues/16>
+	"github.com/louisroyer/km-probe/internal/backport/sync"
+
 	"github.com/louisroyer/km-probe/internal/karajson"
 	"github.com/louisroyer/km-probe/internal/probes"
 
@@ -82,184 +80,121 @@ func (s *Setup) Run(ctx context.Context, id string) error {
 	return s.RunSingle(ctx)
 }
 
-func (s *Setup) RunSingle(ctx context.Context) error {
-	encoder := json.NewEncoder(os.Stdout)
-	encoder.SetIndent("", "  ")
+func (s *Setup) RunSingle(ctx context.Context) (err error) {
+	printer := NewPrinter()
+
+	// found flag: it is set to true by any goroutine if a file is found
+	// this is safe for concurrent use because when the value is updated, it is always to `true`
+	found := false
+
+	wg := sync.WaitGroup{}
+	defer func() {
+		wg.Wait()
+		if !found {
+			// `err` is a named return value: this allow us to modify it inside the defer
+			err = ErrKaraokeNotFound
+			logrus.WithFields(logrus.Fields{
+				"uuid": s.uuid,
+			}).WithError(err).Error("Karaoke not found")
+		}
+	}()
+
 	for _, repo := range s.Repositories {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
-			fp := filepath.Join(repo.BaseDir, "karaokes", s.uuid.String()+".kara.json")
-			karaJson, err := karajson.FromFile(fp)
-			if err == nil {
-				a, err := probes.FromKaraJson(ctx, repo.BaseDir, karaJson)
-				if errors.Is(err, karadata.ErrNoMedias) {
-					return err
-				} else if err != nil {
-					logrus.WithError(err).WithFields(logrus.Fields{
-						"filename": fp,
-					}).Error("Could not create probe aggregator")
-					return err
+			wg.Go(func() {
+				fp := filepath.Join(repo.BaseDir, "karaokes", s.uuid.String()+".kara.json")
+				err := runOnFile(ctx, &repo, fp, printer)
+				if err == nil || !errors.Is(err, fs.ErrNotExist) {
+					found = true
 				}
-				if err := a.Run(ctx); err != nil {
-					logrus.WithError(err).WithFields(logrus.Fields{
-						"filename": fp,
-					}).Error("Probe aggregator failure")
-					return err
-				}
-				if err := encoder.Encode(a); err != nil {
-					logrus.WithError(err).Error("Error while encoding json")
-				}
-				return nil
-			} else if errors.Is(err, fs.ErrNotExist) {
-				continue
-			} else {
-				logrus.WithError(err).WithFields(logrus.Fields{
-					"filename": fp,
-				}).Error("Could not parse karajson")
-				return err
-			}
-
+			})
 		}
 	}
-	err := ErrKaraokeNotFound
-	logrus.WithFields(logrus.Fields{
-		"uuid": s.uuid,
-	}).WithError(err).Error("Karaoke not found")
-	return err
+	return nil
 }
 
+// Run on all karaokes of all repositories
 func (s *Setup) RunAll(ctx context.Context) error {
-	encoder := json.NewEncoder(os.Stdout)
-	encoder.SetIndent("", "  ")
-	ch := make(chan *probes.Aggregator)
-
-	printCtx, cancelPrint := context.WithCancel(ctx)
-	defer cancelPrint()
-	generateCtx, cancelGenerate := context.WithCancel(ctx)
-	defer cancelGenerate()
-
+	printer := NewPrinter()
 	wg := sync.WaitGroup{}
-	defer func() {
-		// waiting in a gorouting to avoid waiting forever
-		// if ctx is Done after entering defer
-		ctxWait, cancel := context.WithCancel(ctx)
-		go func(cancel context.CancelFunc) {
-			wg.Wait()
-			cancel()
-		}(cancel)
+	defer wg.Wait()
+	wgRepos := sync.WaitGroup{}
+	defer wgRepos.Wait()
+	for _, repo := range s.Repositories {
 		select {
 		case <-ctx.Done():
-		case <-ctxWait.Done():
+			return ctx.Err()
+		default:
+			wgRepos.Go(func() {
+				repo.WalkKaraokes(ctx,
+					func(ctx context.Context, r *Repository, p string) error {
+						wg.Go(func() { runOnFile(ctx, r, p, printer) })
+						return nil
+					},
+				)
+			})
 		}
-	}()
+	}
+	return nil
+}
 
-	go func(ctx context.Context, ch <-chan *probes.Aggregator) {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case a := <-ch:
-				if err := encoder.Encode(a); err != nil {
-					logrus.WithError(err).Error("Error while encoding json")
-				}
-				wg.Done()
+// Parse the karaoke, run probes, and display result
+// p is the filepath to the .kara.json file
+func runOnFile(ctx context.Context, repo *Repository, p string, printer *Printer) error {
+	karaJson, err := karajson.FromFile(ctx, p)
+	if err != nil {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			if !errors.Is(err, fs.ErrNotExist) {
+				logrus.WithError(err).WithFields(logrus.Fields{
+					"repository": repo.Name,
+					"filepath":   p,
+				}).Error("Could not parse karajson")
 			}
+			return err
 		}
-	}(printCtx, ch)
-
-	if err := func(ctx context.Context) error {
-		for _, repo := range s.Repositories {
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			default:
-				err := filepath.WalkDir(filepath.Join(repo.BaseDir, "karaokes"), func(p string, d fs.DirEntry, err error) error {
-					select {
-					case <-ctx.Done():
-						return filepath.SkipDir
-					default:
-						if err != nil {
-							return err
-						}
-						if d.IsDir() {
-							if p == filepath.Join(repo.BaseDir, "karaokes") {
-								return nil
-							}
-							return filepath.SkipDir
-						}
-						if !strings.HasSuffix(d.Name(), ".kara.json") {
-							return nil
-						}
-					}
-					go func(ctx context.Context, p string) {
-						select {
-						case <-ctx.Done():
-							return
-						default:
-							wg.Add(1)
-						}
-						karaJson, err := karajson.FromFile(p)
-						if err != nil {
-							select {
-							case <-ctx.Done():
-								return
-							default:
-								wg.Done()
-								logrus.WithError(err).WithFields(logrus.Fields{
-									"filename": p,
-								}).Error("Could not parse karajson")
-								return
-							}
-						}
-						a, err := probes.FromKaraJson(ctx, repo.BaseDir, karaJson)
-						if errors.Is(err, karadata.ErrNoMedias) {
-							// skip
-							wg.Done()
-							return
-						} else if err != nil {
-							select {
-							case <-ctx.Done():
-								return
-							default:
-								wg.Done()
-								logrus.WithError(errors.Join(errors.New(d.Name()), err)).WithFields(logrus.Fields{
-									"filename": p,
-								}).Error("Could not create probe aggregator")
-								return
-							}
-						}
-						if err := a.Run(ctx); err != nil {
-							select {
-							case <-ctx.Done():
-								return
-							default:
-								wg.Done()
-								logrus.WithError(err).WithFields(logrus.Fields{
-									"filename": p,
-								}).Error("Probe aggregator failure")
-								return
-							}
-						} else {
-							select {
-							case <-ctx.Done():
-								return
-							case ch <- a:
-								return
-							}
-						}
-					}(ctx, p)
-					return nil
-				})
-				if err != nil {
-					return err
-				}
-			}
+	}
+	a, err := probes.FromKaraJson(ctx, repo.BaseDir, karaJson)
+	if err != nil {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			logrus.WithError(err).WithFields(logrus.Fields{
+				"repository": repo.Name,
+				"filepath":   p,
+			}).Error("Could not create probe aggregator")
+			return err
 		}
-		return nil
-	}(generateCtx); err != nil {
-		return err
+	}
+	if err := a.Run(ctx); err != nil {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			logrus.WithError(err).WithFields(logrus.Fields{
+				"repository": repo.Name,
+				"filepath":   p,
+			}).Error("Probe aggregator failure")
+			return err
+		}
+	}
+	if err := printer.Encode(ctx, a); err != nil {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			logrus.WithError(err).WithFields(logrus.Fields{
+				"repository": repo.Name,
+				"filepath":   p,
+			}).Error("Could not print aggregator result")
+			return err
+		}
 	}
 	return nil
 }
