@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/louisroyer/km-probe/internal/ass/style"
+	"github.com/louisroyer/km-probe/internal/ass/style/colour"
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/probes/probe"
 	"github.com/louisroyer/km-probe/internal/probes/probe/system/baseprobe"
@@ -43,7 +44,7 @@ func (p *StyleBlackBorder) Run(ctx context.Context) (report.Report, error) {
 				if err != nil {
 					return report.Abort(), err
 				}
-				if s.OutlineColour != "&H00000000" {
+				if s.OutlineColour != colour.Black {
 					// border color must be black
 					return report.Fail(severity.Warning, "outline must be black (cannot this probe can only check if this is pure black, nuances of black be be okay"), nil
 				}

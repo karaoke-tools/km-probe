@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/louisroyer/km-probe/internal/ass/style"
+	"github.com/louisroyer/km-probe/internal/ass/style/colour"
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson/karamoe/misc"
 	"github.com/louisroyer/km-probe/internal/karajson/system/language"
@@ -81,7 +82,7 @@ func (p *StyleSingleWhite) Run(ctx context.Context) (report.Report, error) {
 				if err != nil {
 					return report.Abort(), err
 				}
-				if s.SecondaryColour == "&H00FFFFFF" {
+				if s.SecondaryColour == colour.White {
 					// secondary color must be white if single style karaoke
 					return report.Pass(), nil
 				}

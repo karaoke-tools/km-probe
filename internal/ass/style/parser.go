@@ -8,16 +8,18 @@ package style
 import (
 	"strconv"
 	"strings"
+
+	"github.com/louisroyer/km-probe/internal/ass/style/colour"
 )
 
 type Style struct {
 	Name            string
 	Fontname        string
 	Fontsize        uint64
-	PrimaryColour   string
-	SecondaryColour string
-	OutlineColour   string
-	BackColour      string
+	PrimaryColour   colour.Colour
+	SecondaryColour colour.Colour
+	OutlineColour   colour.Colour
+	BackColour      colour.Colour
 	Bold            string
 	Italic          string
 	Underline       string
@@ -45,14 +47,30 @@ func Parse(style string) (*Style, error) {
 	if err != nil {
 		return nil, err
 	}
+	primaryColour, err := colour.FromString(r[3])
+	if err != nil {
+		return nil, err
+	}
+	secondaryColour, err := colour.FromString(r[4])
+	if err != nil {
+		return nil, err
+	}
+	outlineColour, err := colour.FromString(r[5])
+	if err != nil {
+		return nil, err
+	}
+	backColour, err := colour.FromString(r[6])
+	if err != nil {
+		return nil, err
+	}
 	s := &Style{
 		Name:            r[0],
 		Fontname:        r[1],
 		Fontsize:        fontsize,
-		PrimaryColour:   r[3],
-		SecondaryColour: r[4],
-		OutlineColour:   r[5],
-		BackColour:      r[6],
+		PrimaryColour:   primaryColour,
+		SecondaryColour: secondaryColour,
+		OutlineColour:   outlineColour,
+		BackColour:      backColour,
 		Bold:            r[7],
 		Italic:          r[8],
 		Underline:       r[9],
