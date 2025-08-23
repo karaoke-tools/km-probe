@@ -9,13 +9,15 @@ import (
 	"context"
 	"encoding/json"
 	"os"
+	"sync"
 
 	"github.com/louisroyer/km-probe/internal/probes"
 )
 
 type Printer struct {
-	e     *json.Encoder
-	ready chan struct{}
+	e              *json.Encoder
+	ready          chan struct{}
+	aggregatorPool sync.Pool
 }
 
 func NewPrinter() *Printer {
@@ -26,6 +28,11 @@ func NewPrinter() *Printer {
 	return &Printer{
 		e:     encoder,
 		ready: ready,
+		aggregatorPool: sync.Pool{
+			New: func() any {
+				return probes.NewAggregator()
+			},
+		},
 	}
 }
 
@@ -39,10 +46,15 @@ func (p *Printer) Encode(ctx context.Context, a *probes.Aggregator) error {
 		return ctx.Err()
 	case <-p.ready:
 		defer p.setReady()
+		defer p.aggregatorPool.Put(a)
 		if err := p.e.Encode(a); err != nil {
 			return err
 		}
 	}
 	return nil
 
+}
+
+func (p *Printer) Aggregator() *probes.Aggregator {
+	return p.aggregatorPool.Get().(*probes.Aggregator)
 }

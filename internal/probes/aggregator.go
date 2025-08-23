@@ -36,24 +36,26 @@ type Aggregator struct {
 	Analysis      map[string]report.Report   `json:"analysis"`
 }
 
-func FromKaraJson(ctx context.Context, basedir string, karaJson *karajson.KaraJson) (*Aggregator, error) {
-	select {
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	default:
-		aggregator := Aggregator{
-			Songname:   karaJson.Data.Songname,
-			Kid:        karaJson.Data.Kid,
-			CreatedAt:  karaJson.Data.CreatedAt,
-			ModifiedAt: karaJson.Data.ModifiedAt,
-			Year:       karaJson.Data.Year,
-			Reports:    make(map[string]report.Report),
-			Analysis:   make(map[string]report.Report),
-		}
-		aggregator.Probes = AvailableProbes()
-		aggregator.AnalyserFuncs = defaultAnalysers
-		return &aggregator, nil
+func NewAggregator() *Aggregator {
+	return &Aggregator{
+		Reports:       make(map[string]report.Report),
+		Analysis:      make(map[string]report.Report),
+		Probes:        AvailableProbes(),
+		AnalyserFuncs: defaultAnalysers,
 	}
+}
+
+func (a *Aggregator) Reset(basedir string, karaJson *karajson.KaraJson) {
+	clear(a.Reports)
+	clear(a.Analysis)
+	if karaJson == nil {
+		return
+	}
+	a.Songname = karaJson.Data.Songname
+	a.Kid = karaJson.Data.Kid
+	a.CreatedAt = karaJson.Data.CreatedAt
+	a.ModifiedAt = karaJson.Data.ModifiedAt
+	a.Year = karaJson.Data.Year
 }
 
 type reportWithName struct {

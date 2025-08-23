@@ -16,7 +16,6 @@ import (
 
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson"
-	"github.com/louisroyer/km-probe/internal/probes"
 
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
@@ -174,20 +173,9 @@ func runOnFile(ctx context.Context, repo *Repository, p string, printer *Printer
 		}
 		return err
 	}
-	a, err := probes.FromKaraJson(ctx, repo.BaseDir, karaJson)
-	if err != nil {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		default:
-			logrus.WithError(err).WithFields(logrus.Fields{
-				"repository": repo.Name,
-				"filepath":   p,
-			}).Error("Could not create probe aggregator")
-			return err
-		}
-	}
-	if err := a.Run(ctx, karaData); err != nil {
+	aggregator := printer.Aggregator()
+	aggregator.Reset(repo.BaseDir, karaJson)
+	if err := aggregator.Run(ctx, karaData); err != nil {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -199,7 +187,7 @@ func runOnFile(ctx context.Context, repo *Repository, p string, printer *Printer
 			return err
 		}
 	}
-	if err := printer.Encode(ctx, a); err != nil {
+	if err := printer.Encode(ctx, aggregator); err != nil {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
