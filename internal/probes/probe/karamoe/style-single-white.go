@@ -33,10 +33,10 @@ func NewStyleSingleWhite(karaData *karadata.KaraData) probe.Probe {
 			"unfilled color is not white (only if single style)",
 			cond.Any{
 				cond.NoLyrics{},
-				cond.HasNoTagFrom{
+				cond.HasAnyTagFrom{
 					TagType: tag.Misc,
 					Tags:    []uuid.UUID{misc.GroupSinging},
-					Msg:     "group singing karaoke",
+					Msg:     "group singing karaoke", // we can use one color by voice
 				},
 				cond.HasMoreTagsThan{
 					TagType: tag.Langs,
@@ -46,7 +46,7 @@ func NewStyleSingleWhite(karaData *karadata.KaraData) probe.Probe {
 				cond.HasAnyTagFrom{
 					TagType: tag.Langs,
 					Tags:    []uuid.UUID{language.MUL},
-					Msg:     "is multilingual karaoke",
+					Msg:     "is multilingual karaoke", // we can use one color by language
 				},
 			},
 			karaData),
