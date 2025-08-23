@@ -116,6 +116,16 @@ func (s *Setup) RunSingle(ctx context.Context) (err error) {
 	return nil
 }
 
+// Maximum number of karaokes processed simultaneously.
+// It is not useful to increase this number
+// because we are bound by the speed of the json encoder.
+// Increasing the number of worker will consume more memory
+// because we cannot recycle structures when they are still used;
+// making the work of the garbage collector more difficult,
+// which will slow down everything, and may make the interface irresponsible
+// for enough time to be noticable (~1s).
+const MAX_WORKERS = 0xFF
+
 // Run on all karaokes of all repositories
 func (s *Setup) RunAll(ctx context.Context) error {
 	printer := NewPrinter()
@@ -123,6 +133,7 @@ func (s *Setup) RunAll(ctx context.Context) error {
 	defer wg.Wait()
 	wgRepos := sync.WaitGroup{}
 	defer wgRepos.Wait()
+	workers := make(chan struct{}, MAX_WORKERS) // maximum number of simultaneous workers
 	for _, repo := range s.Repositories {
 		select {
 		case <-ctx.Done():
@@ -131,7 +142,11 @@ func (s *Setup) RunAll(ctx context.Context) error {
 			wgRepos.Go(func() {
 				repo.WalkKaraokes(ctx,
 					func(ctx context.Context, r *Repository, p string) error {
-						wg.Go(func() { runOnFile(ctx, r, p, printer) })
+						workers <- struct{}{}
+						wg.Go(func() {
+							runOnFile(ctx, r, p, printer)
+							<-workers
+						})
 						return nil
 					},
 				)
