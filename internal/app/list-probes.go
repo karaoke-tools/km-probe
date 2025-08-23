@@ -25,13 +25,30 @@ type prb struct {
 	desc string
 }
 
-func (p prb) Println(namelen int, b *strings.Builder) {
+const (
+	AnsiUnderline = "\033[4m"
+	AnsiReset     = "\033[0m"
+)
+
+func (p prb) Println(namelen int, b *strings.Builder, underline bool) {
+	if underline {
+		b.WriteString(AnsiUnderline)
+	}
 	b.WriteString(p.name)
+	if underline {
+		b.WriteString(AnsiReset)
+	}
 	for _ = range namelen - len(p.name) {
 		b.WriteString(" ")
 	}
 	b.WriteString("\t")
+	if underline {
+		b.WriteString(AnsiUnderline)
+	}
 	b.WriteString(p.desc)
+	if underline {
+		b.WriteString(AnsiReset)
+	}
 	fmt.Println(b.String())
 	b.Reset()
 }
@@ -48,10 +65,10 @@ func (l *ListProbes) Run(ctx context.Context) error {
 		}
 	}
 	b := strings.Builder{}
-	header.Println(namelen, &b)
+	header.Println(namelen, &b, true)
 
 	for _, item := range list {
-		item.Println(namelen, &b)
+		item.Println(namelen, &b, false)
 	}
 	return nil
 }
