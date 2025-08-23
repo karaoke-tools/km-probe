@@ -7,6 +7,7 @@ package report
 
 import (
 	"encoding/json"
+	"sync"
 
 	"github.com/louisroyer/km-probe/internal/probes/report/result"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
@@ -19,6 +20,7 @@ type Report interface {
 	Severity() severity.Severity
 	Message() string
 	json.Marshaler
+	Delete()
 }
 
 func (r *report) MarshalJSON() ([]byte, error) {
@@ -36,60 +38,82 @@ func (r *report) MarshalJSON() ([]byte, error) {
 }
 
 type report struct {
-	status   status.Status
-	result   result.Result
-	message  string
-	severity severity.Severity
+	recycleAfterUse bool
+	status          status.Status
+	result          result.Result
+	message         string
+	severity        severity.Severity
+}
+
+// `pass` has no custom information, and can be reused
+// without re-allocation or cleaning
+var pass = report{
+	status:   status.Completed,
+	severity: severity.Info,
+	result:   result.Passed,
+}
+
+var reportPool = sync.Pool{
+	New: func() any {
+		return &report{
+			recycleAfterUse: true,
+		}
+	},
+}
+
+func (r *report) Delete() {
+	if !r.recycleAfterUse {
+		return
+	}
+	r.severity = severity.Unknown
+	r.status = status.Unknown
+	r.result = result.Unknown
+	r.message = ""
+	reportPool.Put(r)
 }
 
 // When the issue is not detected
 func Pass() *report {
-	return &report{
-		status:   status.Completed,
-		severity: severity.Info,
-		result:   result.Passed,
-	}
+	return &pass
 }
 
 // When the issue is detected
 func Fail(severity severity.Severity, message string) *report {
-	return &report{
-		severity: severity,
-		message:  message, // indicate what action must be done
-		status:   status.Completed,
-		result:   result.Failed,
-	}
+	r := reportPool.Get().(*report)
+	r.severity = severity
+	r.message = message // indicate what action must be done
+	r.status = status.Completed
+	r.result = result.Failed
+	return r
 }
 
 // When the test is only to display some infos
 func Info(v bool) *report {
-	var r result.Result
+	r := reportPool.Get().(*report)
+	r.status = status.Info
+	r.severity = severity.Info
 	if v {
-		r = result.Passed
+		r.result = result.Passed
 	} else {
-		r = result.Failed
+		r.result = result.Failed
 	}
-	return &report{
-		status:   status.Info,
-		result:   r,
-		severity: severity.Info,
-	}
+	return r
 }
 
 // When test has been canceled
 func Abort() *report {
-	return &report{
-		status: status.Aborted,
-	}
+	r := reportPool.Get().(*report)
+	r.status = status.Aborted
+	return r
 }
 
 // When the test is not relevant
 func Skip(message string) *report {
-	return &report{
-		status:   status.Skipped,
-		severity: severity.Info,
-		message:  message, // indicate why the test has been skipped
-	}
+	r := reportPool.Get().(*report)
+	r.status = status.Skipped
+	r.severity = severity.Info
+	r.message = message // indicate why the test has been skipped
+	return r
 }
 
 func (r *report) Status() status.Status {

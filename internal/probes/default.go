@@ -12,11 +12,17 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/probe/system"
 )
 
-func AvailableProbes() []probe.Probe {
+var availableProbes = genAvailableProbes()
+
+func genAvailableProbes() []probe.Probe {
 	a := make([]probe.Probe, 0)
 	a = append(a, system.Probes()...)
 	a = append(a, karamoe.Probes()...)
 	return a
+}
+
+func AvailableProbes() []probe.Probe {
+	return availableProbes
 }
 
 var defaultAnalysers = []analyser.NewAnalyserFunc{

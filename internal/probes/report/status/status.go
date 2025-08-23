@@ -8,7 +8,8 @@ package status
 type Status int
 
 const (
-	Completed Status = iota
+	Unknown Status = iota
+	Completed
 	Info
 	Aborted
 	Skipped

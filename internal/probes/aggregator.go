@@ -46,6 +46,14 @@ func NewAggregator() *Aggregator {
 }
 
 func (a *Aggregator) Reset(basedir string, karaJson *karajson.KaraJson) {
+	// recycle reports & analysis memory
+	for _, v := range a.Reports {
+		v.Delete()
+	}
+	for _, v := range a.Analysis {
+		v.Delete()
+	}
+	// empty the map
 	clear(a.Reports)
 	clear(a.Analysis)
 	if karaJson == nil {
