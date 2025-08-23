@@ -27,7 +27,7 @@ type VowelMacron struct {
 	baseprobe.BaseProbe
 }
 
-func NewVowelMacron(karaData *karadata.KaraData) probe.Probe {
+func NewVowelMacron() probe.Probe {
 	return &VowelMacron{
 		baseprobe.New("vowel-macron",
 			"ā, ē, ō, ī, ū in lyrics file (JPN romaji only)",
@@ -44,13 +44,13 @@ func NewVowelMacron(karaData *karadata.KaraData) probe.Probe {
 					Msg:     "not a japanese only karaoke",
 				},
 			},
-			karaData),
+		),
 	}
 }
 
-func (p *VowelMacron) Run(ctx context.Context) (report.Report, error) {
+func (p VowelMacron) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	// TODO: update this when multi-track drifting is released
-	for _, line := range p.KaraData.Lyrics[0].Events {
+	for _, line := range KaraData.Lyrics[0].Events {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()

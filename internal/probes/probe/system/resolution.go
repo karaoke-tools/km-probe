@@ -20,18 +20,18 @@ type Resolution struct {
 	baseprobe.BaseProbe
 }
 
-func NewResolution(karaData *karadata.KaraData) probe.Probe {
+func NewResolution() probe.Probe {
 	return &Resolution{
 		baseprobe.New("resolution",
 			"resolution not set to 0×0",
 			cond.NoLyrics{},
-			karaData),
+		),
 	}
 }
 
-func (p *Resolution) Run(ctx context.Context) (report.Report, error) {
+func (p Resolution) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	// TODO: update this when multi-track drifting is released
-	if p.KaraData.Lyrics[0].ScriptInfo.PlayResX == 0 && p.KaraData.Lyrics[0].ScriptInfo.PlayResY == 0 {
+	if KaraData.Lyrics[0].ScriptInfo.PlayResX == 0 && KaraData.Lyrics[0].ScriptInfo.PlayResY == 0 {
 		return report.Pass(), nil
 	}
 	return report.Fail(severity.Critical, "update resolution to be 0×0 (and check style size)"), nil

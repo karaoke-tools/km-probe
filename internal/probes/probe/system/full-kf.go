@@ -22,12 +22,12 @@ type FullKf struct {
 	baseprobe.BaseProbe
 }
 
-func NewFullKf(karaData *karadata.KaraData) probe.Probe {
+func NewFullKf() probe.Probe {
 	return &FullKf{
 		baseprobe.New("full-kf",
 			"lyrics with a lot of kf",
 			cond.NoLyrics{},
-			karaData),
+		),
 	}
 }
 
@@ -40,11 +40,11 @@ const (
 	FULL_KF_WARNING_RATIO_K  = 3 // 1/4 of tags are \kf
 )
 
-func (p *FullKf) Run(ctx context.Context) (report.Report, error) {
+func (p FullKf) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	kf_count := 0
 	k_count := 0
 	// TODO: update this when multi-track drifting is released
-	for _, line := range p.KaraData.Lyrics[0].Events {
+	for _, line := range KaraData.Lyrics[0].Events {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()

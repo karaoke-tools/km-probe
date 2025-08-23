@@ -25,7 +25,7 @@ type AudioOnlyCreditless struct {
 	baseprobe.BaseProbe
 }
 
-func NewAudioOnlyCreditless(karaData *karadata.KaraData) probe.Probe {
+func NewAudioOnlyCreditless() probe.Probe {
 	return &AudioOnlyCreditless{
 		baseprobe.New(
 			"audio-only-creditless",
@@ -42,10 +42,10 @@ func NewAudioOnlyCreditless(karaData *karadata.KaraData) probe.Probe {
 					Msg:     "song is not tagged as creditless",
 				},
 			},
-			karaData),
+		),
 	}
 }
 
-func (p *AudioOnlyCreditless) Run(ctx context.Context) (report.Report, error) {
+func (p AudioOnlyCreditless) Run(ctx context.Context, karaData *karadata.KaraData) (report.Report, error) {
 	return report.Fail(severity.Critical, "remove the creditless tag, or update the media content"), nil
 }

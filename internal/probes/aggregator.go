@@ -41,25 +41,17 @@ func FromKaraJson(ctx context.Context, basedir string, karaJson *karajson.KaraJs
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	default:
-		data, err := karadata.FromKaraJson(ctx, basedir, karaJson)
-		if err != nil {
-			return nil, err
-		}
 		aggregator := Aggregator{
-			Songname:   data.KaraJson.Data.Songname,
-			Kid:        data.KaraJson.Data.Kid,
-			CreatedAt:  data.KaraJson.Data.CreatedAt,
-			ModifiedAt: data.KaraJson.Data.ModifiedAt,
-			Year:       data.KaraJson.Data.Year,
+			Songname:   karaJson.Data.Songname,
+			Kid:        karaJson.Data.Kid,
+			CreatedAt:  karaJson.Data.CreatedAt,
+			ModifiedAt: karaJson.Data.ModifiedAt,
+			Year:       karaJson.Data.Year,
 			Reports:    make(map[string]report.Report),
 			Analysis:   make(map[string]report.Report),
 		}
-		for _, probe := range AvailableProbes() {
-			aggregator.Probes = append(aggregator.Probes, probe(data))
-		}
-		for _, a := range defaultAnalysers {
-			aggregator.AnalyserFuncs = append(aggregator.AnalyserFuncs, a)
-		}
+		aggregator.Probes = AvailableProbes()
+		aggregator.AnalyserFuncs = defaultAnalysers
 		return &aggregator, nil
 	}
 }
@@ -69,7 +61,7 @@ type reportWithName struct {
 	r    report.Report
 }
 
-func (a *Aggregator) Run(ctx context.Context) error {
+func (a *Aggregator) Run(ctx context.Context, KaraData *karadata.KaraData) error {
 	select {
 	// if a.Probes is empty, context would not be checked otherwise
 	case <-ctx.Done():
@@ -83,7 +75,7 @@ func (a *Aggregator) Run(ctx context.Context) error {
 				return ctx.Err()
 			default:
 				go func(ctx context.Context, p probe.Probe, ch chan<- reportWithName) {
-					if s, msg, err := p.PreRun(ctx); err != nil {
+					if s, msg, err := p.PreRun(ctx, KaraData); err != nil {
 						select {
 						case <-ctx.Done():
 							return
@@ -98,7 +90,7 @@ func (a *Aggregator) Run(ctx context.Context) error {
 							return
 						}
 					}
-					if r, err := p.Run(ctx); err == nil {
+					if r, err := p.Run(ctx, KaraData); err == nil {
 						select {
 						case <-ctx.Done():
 							return

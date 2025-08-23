@@ -41,8 +41,7 @@ func (l *ListProbes) Run(ctx context.Context) error {
 	header := prb{name: "Name", desc: "Description"}
 	namelen := len(header.name)
 	for _, pf := range probes.AvailableProbes() {
-		p := pf(nil)
-		item := prb{name: p.Name(), desc: p.Description()}
+		item := prb{name: pf.Name(), desc: pf.Description()}
 		list = append(list, item)
 		if len(item.name) > namelen {
 			namelen = len(item.name)

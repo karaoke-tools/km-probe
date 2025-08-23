@@ -29,7 +29,7 @@ type WrongTsuSeparation struct {
 
 // In japanese, `つ` should be timed as a single syllabe: `tsu`.
 // For example, `ひとつ`(`hitotsu`) should be timed as `hi|to|tsu` and not as `hi|tot|su`.
-func NewWrongTsuSeparation(karaData *karadata.KaraData) probe.Probe {
+func NewWrongTsuSeparation() probe.Probe {
 	return &WrongTsuSeparation{
 		baseprobe.New("wrong-tsu-separation",
 			"`t|su` separation is not correct (JPN romaji only)",
@@ -46,13 +46,13 @@ func NewWrongTsuSeparation(karaData *karadata.KaraData) probe.Probe {
 					Msg:     "not a japanese only karaoke",
 				},
 			},
-			karaData),
+		),
 	}
 }
 
-func (p *WrongTsuSeparation) Run(ctx context.Context) (report.Report, error) {
+func (p WrongTsuSeparation) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	// TODO: update this when multi-track drifting is released
-	for _, line := range p.KaraData.Lyrics[0].Events {
+	for _, line := range KaraData.Lyrics[0].Events {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()

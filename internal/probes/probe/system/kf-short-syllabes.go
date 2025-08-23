@@ -23,19 +23,19 @@ type KfShortSyllabes struct {
 	baseprobe.BaseProbe
 }
 
-func NewKfShortSyllabes(karaData *karadata.KaraData) probe.Probe {
+func NewKfShortSyllabes() probe.Probe {
 	return &KfShortSyllabes{
 		baseprobe.New("kf-short-syllabes",
 			"kf on very short syllabes",
 			cond.NoLyrics{},
-			karaData),
+		),
 	}
 }
 
-func (p *KfShortSyllabes) Run(ctx context.Context) (report.Report, error) {
+func (p KfShortSyllabes) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	warning := false
 	// TODO: update this when multi-track drifting is released
-	for _, line := range p.KaraData.Lyrics[0].Events {
+	for _, line := range KaraData.Lyrics[0].Events {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()

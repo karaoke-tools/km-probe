@@ -10,17 +10,17 @@ import (
 )
 
 // Available probes
-func Probes() []probe.NewProbeFunc {
-	return []probe.NewProbeFunc{
-		NewAltVersionWithoutParent,
-		NewAudioOnlyCreditless,
-		NewCredits,
-		NewDoubleConsonant,
-		NewLiveDownload,
-		NewLongTagOnShortMedia,
-		NewMusicVideoCreditless,
-		NewStyleSingleWhite,
-		NewVowelMacron,
-		NewWrongTsuSeparation,
+func Probes() []probe.Probe {
+	return []probe.Probe{
+		NewAltVersionWithoutParent(),
+		NewAudioOnlyCreditless(),
+		NewCredits(),
+		NewDoubleConsonant(),
+		NewLiveDownload(),
+		NewLongTagOnShortMedia(),
+		NewMusicVideoCreditless(),
+		NewStyleSingleWhite(),
+		NewVowelMacron(),
+		NewWrongTsuSeparation(),
 	}
 }

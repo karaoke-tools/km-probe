@@ -21,18 +21,18 @@ type Automation struct {
 	baseprobe.BaseProbe
 }
 
-func NewAutomation(karaData *karadata.KaraData) probe.Probe {
+func NewAutomation() probe.Probe {
 	return &Automation{
 		baseprobe.New("automation",
 			"missing automation script",
 			cond.NoLyrics{},
-			karaData),
+		),
 	}
 }
 
-func (p *Automation) Run(ctx context.Context) (report.Report, error) {
+func (p Automation) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	// TODO: update this when multi-track drifting is released
-	for _, line := range p.KaraData.Lyrics[0].Events {
+	for _, line := range KaraData.Lyrics[0].Events {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()

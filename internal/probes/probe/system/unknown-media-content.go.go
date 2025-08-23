@@ -22,20 +22,20 @@ type UnknownMediaContent struct {
 	baseprobe.BaseProbe
 }
 
-func NewUnknownMediaContent(KaraData *karadata.KaraData) probe.Probe {
+func NewUnknownMediaContent() probe.Probe {
 	return &UnknownMediaContent{
 		baseprobe.New("unknown-media-content",
 			"missing content tag",
 			cond.Never{},
-			KaraData),
+		),
 	}
 }
 
-func (p *UnknownMediaContent) Run(ctx context.Context) (report.Report, error) {
-	if len(p.KaraData.KaraJson.Data.Tags.Families) > 0 {
+func (p UnknownMediaContent) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+	if len(KaraData.KaraJson.Data.Tags.Families) > 0 {
 		return report.Pass(), nil
 	}
-	if slices.Contains(p.KaraData.KaraJson.Data.Tags.Songtypes, songtype.AudioOnly) {
+	if slices.Contains(KaraData.KaraJson.Data.Tags.Songtypes, songtype.AudioOnly) {
 		return report.Pass(), nil
 	}
 	return report.Fail(severity.Critical, "indicate the media content type (animation, real, audio only)"), nil

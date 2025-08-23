@@ -12,11 +12,9 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/report"
 )
 
-type NewProbeFunc func(*karadata.KaraData) Probe
-
 type Probe interface {
 	Name() string
-	PreRun(ctx context.Context) (bool, string, error)
-	Run(ctx context.Context) (report.Report, error)
+	PreRun(ctx context.Context, KaraData *karadata.KaraData) (bool, string, error)
+	Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error)
 	Description() string
 }

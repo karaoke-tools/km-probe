@@ -34,7 +34,7 @@ var possibleCreditlessOrigin = []uuid.UUID{
 	origin.TVSeries,
 }
 
-func NewCredits(karaData *karadata.KaraData) probe.Probe {
+func NewCredits() probe.Probe {
 	return &Credits{
 		baseprobe.New(
 			"credits",
@@ -61,10 +61,10 @@ func NewCredits(karaData *karadata.KaraData) probe.Probe {
 					Msg:     "origin not compatible with creditless",
 				},
 			},
-			karaData),
+		),
 	}
 }
 
-func (p *Credits) Run(ctx context.Context) (report.Report, error) {
+func (p Credits) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	return report.Fail(severity.Info, "if the media is already creditless, add the `Creditless`; if a creditless version exists (and is relevant!! see <https://kara.moe/playlist/quand-le-staff-fait-parti-du-generique> for counter-examples), update the media and add the tag"), nil
 }

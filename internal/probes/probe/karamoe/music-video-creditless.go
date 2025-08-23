@@ -26,7 +26,7 @@ type MusicVideoCreditless struct {
 	baseprobe.BaseProbe
 }
 
-func NewMusicVideoCreditless(karaData *karadata.KaraData) probe.Probe {
+func NewMusicVideoCreditless() probe.Probe {
 	return &MusicVideoCreditless{
 		baseprobe.New(
 			"music-video-creditless",
@@ -39,12 +39,12 @@ func NewMusicVideoCreditless(karaData *karadata.KaraData) probe.Probe {
 					Msg:     "not a music video",
 				},
 			},
-			karaData),
+		),
 	}
 }
 
-func (p *MusicVideoCreditless) Run(ctx context.Context) (report.Report, error) {
-	if slices.Contains(p.KaraData.KaraJson.Data.Tags.Misc, misc.Creditless) {
+func (p MusicVideoCreditless) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+	if slices.Contains(KaraData.KaraJson.Data.Tags.Misc, misc.Creditless) {
 		return report.Fail(severity.Critical, "music videos cannot be creditless, remove this tag"), nil
 	}
 

@@ -21,7 +21,7 @@ type TooManyLangTags struct {
 	baseprobe.BaseProbe
 }
 
-func NewTooManyLangTags(karaData *karadata.KaraData) probe.Probe {
+func NewTooManyLangTags() probe.Probe {
 	return &TooManyLangTags{
 		baseprobe.New("too-many-lang-tags",
 			"if more than 2 langs tags, replace them with multilingual tag",
@@ -30,10 +30,10 @@ func NewTooManyLangTags(karaData *karadata.KaraData) probe.Probe {
 				Number:  3,
 				Msg:     "has not more than 2 lang tags",
 			},
-			karaData),
+		),
 	}
 }
 
-func (p *TooManyLangTags) Run(ctx context.Context) (report.Report, error) {
+func (p TooManyLangTags) Run(ctx context.Context, karaData *karadata.KaraData) (report.Report, error) {
 	return report.Fail(severity.Critical, "replace lang tags with \"multilingual\""), nil
 }

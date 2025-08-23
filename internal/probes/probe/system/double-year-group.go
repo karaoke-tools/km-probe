@@ -24,12 +24,12 @@ type DoubleYearGroup struct {
 	baseprobe.BaseProbe
 }
 
-func NewDoubleYearGroup(karaData *karadata.KaraData) probe.Probe {
+func NewDoubleYearGroup() probe.Probe {
 	return &DoubleYearGroup{
 		baseprobe.New("double-year-group",
 			"double-year-group",
 			cond.Never{},
-			karaData),
+		),
 	}
 }
 
@@ -46,12 +46,12 @@ var yearsGroup []uuid.UUID = []uuid.UUID{
 	year.Y2020,
 }
 
-func (p *DoubleYearGroup) Run(ctx context.Context) (report.Report, error) {
-	if len(p.KaraData.KaraJson.Data.Tags.Groups) < 2 {
+func (p DoubleYearGroup) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+	if len(KaraData.KaraJson.Data.Tags.Groups) < 2 {
 		return report.Pass(), nil
 	}
 	ok := false
-	for _, group := range p.KaraData.KaraJson.Data.Tags.Groups {
+	for _, group := range KaraData.KaraJson.Data.Tags.Groups {
 		if found := slices.Contains(yearsGroup, group); found && ok {
 			return report.Fail(severity.Critical, "remove all years group and save to apply (let years hooks do their job)"), nil
 		} else if found {

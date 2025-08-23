@@ -24,7 +24,7 @@ type AudioOnlyWithFamilies struct {
 	baseprobe.BaseProbe
 }
 
-func NewAudioOnlyWithFamilies(karaData *karadata.KaraData) probe.Probe {
+func NewAudioOnlyWithFamilies() probe.Probe {
 	return &AudioOnlyWithFamilies{
 		baseprobe.New("audio-only-with-families",
 			"media content tag including both audio only tag and other tags at the same time",
@@ -33,12 +33,12 @@ func NewAudioOnlyWithFamilies(karaData *karadata.KaraData) probe.Probe {
 				Tags:    []uuid.UUID{songtype.AudioOnly},
 				Msg:     "not an audio only",
 			},
-			karaData),
+		),
 	}
 }
 
-func (p *AudioOnlyWithFamilies) Run(ctx context.Context) (report.Report, error) {
-	if len(p.KaraData.KaraJson.Data.Tags.Families) > 0 {
+func (p AudioOnlyWithFamilies) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+	if len(KaraData.KaraJson.Data.Tags.Families) > 0 {
 		return report.Fail(severity.Critical, "an audio only media cannot have a content type (family)"), nil
 	}
 	return report.Pass(), nil

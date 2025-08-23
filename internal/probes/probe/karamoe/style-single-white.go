@@ -28,7 +28,7 @@ type StyleSingleWhite struct {
 	baseprobe.BaseProbe
 }
 
-func NewStyleSingleWhite(karaData *karadata.KaraData) probe.Probe {
+func NewStyleSingleWhite() probe.Probe {
 	return &StyleSingleWhite{
 		baseprobe.New("style-single-white",
 			"unfilled color is not white (only if single style)",
@@ -50,14 +50,14 @@ func NewStyleSingleWhite(karaData *karadata.KaraData) probe.Probe {
 					Msg:     "is multilingual karaoke", // we can use one color by language
 				},
 			},
-			karaData),
+		),
 	}
 }
 
-func (p *StyleSingleWhite) Run(ctx context.Context) (report.Report, error) {
+func (p StyleSingleWhite) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	nb_styles := 0
 	// TODO: update this when multi-track drifting is released
-	for _, line := range p.KaraData.Lyrics[0].Styles {
+	for _, line := range KaraData.Lyrics[0].Styles {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()
@@ -72,7 +72,7 @@ func (p *StyleSingleWhite) Run(ctx context.Context) (report.Report, error) {
 		}
 	}
 	// TODO: update this when multi-track drifting is released
-	for _, line := range p.KaraData.Lyrics[0].Styles {
+	for _, line := range KaraData.Lyrics[0].Styles {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()

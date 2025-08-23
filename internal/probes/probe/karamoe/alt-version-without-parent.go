@@ -38,7 +38,7 @@ func isVersionWithoutParentCritical(versionType uuid.UUID) bool {
 	return slices.Contains(versionsWithoutParentCritical, versionType)
 }
 
-func NewAltVersionWithoutParent(karaData *karadata.KaraData) probe.Probe {
+func NewAltVersionWithoutParent() probe.Probe {
 	return &AltVersionWithoutParent{
 		baseprobe.New(
 			"alt-version-without-parent",
@@ -50,12 +50,12 @@ func NewAltVersionWithoutParent(karaData *karadata.KaraData) probe.Probe {
 					Msg:     "not an alt version",
 				},
 			},
-			karaData),
+		),
 	}
 }
 
-func (p *AltVersionWithoutParent) Run(ctx context.Context) (report.Report, error) {
-	if slices.ContainsFunc(p.KaraData.KaraJson.Data.Tags.Versions, isVersionWithoutParentCritical) {
+func (p AltVersionWithoutParent) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+	if slices.ContainsFunc(KaraData.KaraJson.Data.Tags.Versions, isVersionWithoutParentCritical) {
 		return report.Fail(severity.Critical, "check if a potential parent exists, or if the version tag is relevant"), nil
 	}
 	return report.Pass(), nil

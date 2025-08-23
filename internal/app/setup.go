@@ -14,6 +14,7 @@ import (
 	// TODO: use go 1.25, <https://github.com/louisroyer/km-probe/issues/16>
 	"github.com/louisroyer/km-probe/internal/backport/sync"
 
+	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson"
 	"github.com/louisroyer/km-probe/internal/probes"
 
@@ -159,6 +160,20 @@ func runOnFile(ctx context.Context, repo *Repository, p string, printer *Printer
 			return err
 		}
 	}
+	karaData, err := karadata.FromKaraJson(ctx, repo.BaseDir, karaJson)
+	if err != nil {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			logrus.WithError(err).WithFields(logrus.Fields{
+				"repository": repo.Name,
+				"filepath":   p,
+			}).Error("Could not create karadata")
+			return err
+		}
+		return err
+	}
 	a, err := probes.FromKaraJson(ctx, repo.BaseDir, karaJson)
 	if err != nil {
 		select {
@@ -172,7 +187,7 @@ func runOnFile(ctx context.Context, repo *Repository, p string, printer *Printer
 			return err
 		}
 	}
-	if err := a.Run(ctx); err != nil {
+	if err := a.Run(ctx, karaData); err != nil {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()

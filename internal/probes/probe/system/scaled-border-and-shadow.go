@@ -20,18 +20,18 @@ type ScaledBorderAndShadow struct {
 	baseprobe.BaseProbe
 }
 
-func NewScaledBorderAndShadow(karaData *karadata.KaraData) probe.Probe {
+func NewScaledBorderAndShadow() probe.Probe {
 	return &ScaledBorderAndShadow{
 		baseprobe.New("scaled-border-and-shadow",
 			"scaled border and shadow not enabled",
 			cond.NoLyrics{},
-			karaData),
+		),
 	}
 }
 
-func (p *ScaledBorderAndShadow) Run(ctx context.Context) (report.Report, error) {
+func (p ScaledBorderAndShadow) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	// TODO: update this when multi-track drifting is released
-	if p.KaraData.Lyrics[0].ScriptInfo.ScaledBorderAndShadow {
+	if KaraData.Lyrics[0].ScriptInfo.ScaledBorderAndShadow {
 		return report.Pass(), nil
 	}
 	return report.Fail(severity.Critical, "check the \"Scale border and shadow\" box"), nil

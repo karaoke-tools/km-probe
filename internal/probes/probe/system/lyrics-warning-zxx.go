@@ -26,7 +26,7 @@ type LyricsWarningZXX struct {
 	baseprobe.BaseProbe
 }
 
-func NewLyricsWarningZXX(karaData *karadata.KaraData) probe.Probe {
+func NewLyricsWarningZXX() probe.Probe {
 	return &LyricsWarningZXX{
 		baseprobe.New("lyrics-warning-zxx",
 			"lyrics warning, but there is no linguistical content",
@@ -35,12 +35,12 @@ func NewLyricsWarningZXX(karaData *karadata.KaraData) probe.Probe {
 				Tags:    []uuid.UUID{warning.R18Lyrics},
 				Msg:     "no lyrics-warning tag",
 			},
-			karaData),
+		),
 	}
 }
 
-func (p *LyricsWarningZXX) Run(ctx context.Context) (report.Report, error) {
-	if slices.Contains(p.KaraData.KaraJson.Data.Tags.Langs, language.ZXX) {
+func (p LyricsWarningZXX) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+	if slices.Contains(KaraData.KaraJson.Data.Tags.Langs, language.ZXX) {
 		return report.Fail(severity.Critical, "check if lyrics warning is relevant, and if the Langs field is set"), nil
 	}
 	return report.Pass(), nil

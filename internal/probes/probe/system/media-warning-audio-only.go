@@ -26,7 +26,7 @@ type MediaWarningAudioOnly struct {
 	baseprobe.BaseProbe
 }
 
-func NewMediaWarningAudioOnly(karaData *karadata.KaraData) probe.Probe {
+func NewMediaWarningAudioOnly() probe.Probe {
 	return &MediaWarningAudioOnly{
 		baseprobe.New("media-warning-audio-only",
 			"media warning but this is an audio only kara",
@@ -35,7 +35,7 @@ func NewMediaWarningAudioOnly(karaData *karadata.KaraData) probe.Probe {
 				Tags:    []uuid.UUID{songtype.AudioOnly},
 				Msg:     "not an audio only",
 			},
-			karaData),
+		),
 	}
 }
 
@@ -46,9 +46,9 @@ var mediaWarnings []uuid.UUID = []uuid.UUID{
 	warning.Epilepsy,
 }
 
-func (p *MediaWarningAudioOnly) Run(ctx context.Context) (report.Report, error) {
+func (p MediaWarningAudioOnly) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	for _, w := range mediaWarnings {
-		if slices.Contains(p.KaraData.KaraJson.Data.Tags.Warnings, w) {
+		if slices.Contains(KaraData.KaraJson.Data.Tags.Warnings, w) {
 			return report.Fail(severity.Critical, "check warning tags (maybe a R18-media should be changed to R18-lyrics, maybe a tag should be removed)"), nil
 		}
 	}

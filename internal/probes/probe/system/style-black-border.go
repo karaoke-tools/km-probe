@@ -23,18 +23,18 @@ type StyleBlackBorder struct {
 	baseprobe.BaseProbe
 }
 
-func NewStyleBlackBorder(karaData *karadata.KaraData) probe.Probe {
+func NewStyleBlackBorder() probe.Probe {
 	return &StyleBlackBorder{
 		baseprobe.New("style-black-border",
 			"detects non-black border",
 			cond.NoLyrics{},
-			karaData),
+		),
 	}
 }
 
-func (p *StyleBlackBorder) Run(ctx context.Context) (report.Report, error) {
+func (p StyleBlackBorder) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	// TODO: update this when multi-track drifting is released
-	for _, line := range p.KaraData.Lyrics[0].Styles {
+	for _, line := range KaraData.Lyrics[0].Styles {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()

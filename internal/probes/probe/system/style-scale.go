@@ -22,18 +22,18 @@ type StyleScale struct {
 	baseprobe.BaseProbe
 }
 
-func NewStyleScale(karaData *karadata.KaraData) probe.Probe {
+func NewStyleScale() probe.Probe {
 	return &StyleScale{
 		baseprobe.New("style-scale",
 			"style with scaling parameter",
 			cond.NoLyrics{},
-			karaData),
+		),
 	}
 }
 
-func (p *StyleScale) Run(ctx context.Context) (report.Report, error) {
+func (p StyleScale) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	// TODO: update this when multi-track drifting is released
-	for _, line := range p.KaraData.Lyrics[0].Styles {
+	for _, line := range KaraData.Lyrics[0].Styles {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()

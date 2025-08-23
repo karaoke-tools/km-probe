@@ -20,17 +20,17 @@ type SingleCollection struct {
 	baseprobe.BaseProbe
 }
 
-func NewSingleCollection(karaData *karadata.KaraData) probe.Probe {
+func NewSingleCollection() probe.Probe {
 	return &SingleCollection{
 		baseprobe.New("single-collection",
 			"multiple collections for a single karaoke",
 			cond.Never{},
-			karaData),
+		),
 	}
 }
 
-func (p *SingleCollection) Run(ctx context.Context) (report.Report, error) {
-	if len(p.KaraData.KaraJson.Data.Tags.Collections) != 1 {
+func (p SingleCollection) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+	if len(KaraData.KaraJson.Data.Tags.Collections) != 1 {
 		return report.Fail(severity.Critical, "choose the right collection according to rules"), nil
 	}
 	return report.Pass(), nil

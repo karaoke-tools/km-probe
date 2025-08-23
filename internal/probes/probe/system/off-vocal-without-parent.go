@@ -24,7 +24,7 @@ type OffVocalWithoutParent struct {
 	baseprobe.BaseProbe
 }
 
-func NewOffVocalWithoutParent(karaData *karadata.KaraData) probe.Probe {
+func NewOffVocalWithoutParent() probe.Probe {
 	return &OffVocalWithoutParent{
 		baseprobe.New("off-vocal-without-parent",
 			"off vocal but no parent",
@@ -33,12 +33,12 @@ func NewOffVocalWithoutParent(karaData *karadata.KaraData) probe.Probe {
 				Tags:    []uuid.UUID{version.OffVocal},
 				Msg:     "not an off vocal",
 			},
-			karaData),
+		),
 	}
 }
 
-func (p *OffVocalWithoutParent) Run(ctx context.Context) (report.Report, error) {
-	if len(p.KaraData.KaraJson.Data.Parents) == 0 {
+func (p OffVocalWithoutParent) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+	if len(KaraData.KaraJson.Data.Parents) == 0 {
 		return report.Fail(severity.Critical, "add the right parent"), nil
 	}
 

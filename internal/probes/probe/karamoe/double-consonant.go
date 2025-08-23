@@ -27,7 +27,7 @@ type DoubleConsonant struct {
 	baseprobe.BaseProbe
 }
 
-func NewDoubleConsonant(karaData *karadata.KaraData) probe.Probe {
+func NewDoubleConsonant() probe.Probe {
 	return &DoubleConsonant{
 		baseprobe.New(
 			"double-consonant",
@@ -45,7 +45,7 @@ func NewDoubleConsonant(karaData *karadata.KaraData) probe.Probe {
 					Msg:     "not a japanese only version",
 				},
 			},
-			karaData),
+		),
 	}
 }
 
@@ -63,9 +63,9 @@ var doubleConsonants = []string{
 	"rr",
 }
 
-func (p *DoubleConsonant) Run(ctx context.Context) (report.Report, error) {
+func (p DoubleConsonant) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	// TODO: update this when multi-track drifting is released
-	for _, line := range p.KaraData.Lyrics[0].Events {
+	for _, line := range KaraData.Lyrics[0].Events {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()

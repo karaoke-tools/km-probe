@@ -26,7 +26,7 @@ type SpaceBeforeDoublePunctuation struct {
 	baseprobe.BaseProbe
 }
 
-func NewSpaceBeforeDoublePunctuation(karaData *karadata.KaraData) probe.Probe {
+func NewSpaceBeforeDoublePunctuation() probe.Probe {
 	return &SpaceBeforeDoublePunctuation{
 		baseprobe.New("space-before-double-punctuation",
 			"space before double punctuation (JPN/ENG only)",
@@ -38,13 +38,13 @@ func NewSpaceBeforeDoublePunctuation(karaData *karadata.KaraData) probe.Probe {
 					Msg:     "non english/japanese language",
 				},
 			},
-			karaData),
+		),
 	}
 }
 
-func (p *SpaceBeforeDoublePunctuation) Run(ctx context.Context) (report.Report, error) {
+func (p SpaceBeforeDoublePunctuation) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	// TODO: update this when multi-track drifting is released
-	for _, line := range p.KaraData.Lyrics[0].Events {
+	for _, line := range KaraData.Lyrics[0].Events {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()

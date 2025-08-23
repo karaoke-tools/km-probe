@@ -24,13 +24,13 @@ type LiveDownload struct {
 	baseprobe.BaseProbe
 }
 
-func NewLiveDownload(karaData *karadata.KaraData) probe.Probe {
+func NewLiveDownload() probe.Probe {
 	return &LiveDownload{
 		baseprobe.New(
 			"live-download",
 			"is hardsub available?",
 			cond.Never{},
-			karaData),
+		),
 	}
 }
 
@@ -47,11 +47,11 @@ func isNoLiveDownloadCollection(collection uuid.UUID) bool {
 
 // Checking each tag may be long when probing the full repository.
 // This function only check for hardcoded collections and "unavailable" tag.
-func (p *LiveDownload) Run(ctx context.Context) (report.Report, error) {
-	if slices.Contains(p.KaraData.KaraJson.Data.Tags.Misc, misc.Unavailable) {
+func (p LiveDownload) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+	if slices.Contains(KaraData.KaraJson.Data.Tags.Misc, misc.Unavailable) {
 		return report.Info(false), nil
 	}
-	if slices.ContainsFunc(p.KaraData.KaraJson.Data.Tags.Collections, isNoLiveDownloadCollection) {
+	if slices.ContainsFunc(KaraData.KaraJson.Data.Tags.Collections, isNoLiveDownloadCollection) {
 		return report.Info(false), nil
 	}
 	return report.Info(true), nil

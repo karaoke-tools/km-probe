@@ -10,28 +10,28 @@ import (
 )
 
 // Available probes
-func Probes() []probe.NewProbeFunc {
-	return []probe.NewProbeFunc{
-		NewAudioOnlyWithFamilies,
-		NewAutomation,
-		NewDoubleYearGroup,
-		NewEolPunctuation,
-		NewFullKf,
-		NewGiantFont,
-		NewKfShortSyllabes,
-		NewLyricsWarningZXX,
-		NewMediaWarningAudioOnly,
-		NewMultilingualWithOtherLang,
-		NewNoLyrics,
-		NewOffVocalWithoutParent,
-		NewResolution,
-		NewScaledBorderAndShadow,
-		NewSingleCollection,
-		NewSpaceBeforeDoublePunctuation,
-		NewStyleBlackBorder,
-		NewStyleScale,
-		NewTooManyLangTags,
-		NewUnknownMediaContent,
-		NewVideoContainerWithAudioOnlyTag,
+func Probes() []probe.Probe {
+	return []probe.Probe{
+		NewAudioOnlyWithFamilies(),
+		NewAutomation(),
+		NewDoubleYearGroup(),
+		NewEolPunctuation(),
+		NewFullKf(),
+		NewGiantFont(),
+		NewKfShortSyllabes(),
+		NewLyricsWarningZXX(),
+		NewMediaWarningAudioOnly(),
+		NewMultilingualWithOtherLang(),
+		NewNoLyrics(),
+		NewOffVocalWithoutParent(),
+		NewResolution(),
+		NewScaledBorderAndShadow(),
+		NewSingleCollection(),
+		NewSpaceBeforeDoublePunctuation(),
+		NewStyleBlackBorder(),
+		NewStyleScale(),
+		NewTooManyLangTags(),
+		NewUnknownMediaContent(),
+		NewVideoContainerWithAudioOnlyTag(),
 	}
 }

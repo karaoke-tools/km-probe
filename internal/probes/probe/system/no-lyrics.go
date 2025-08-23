@@ -24,17 +24,17 @@ type NoLyrics struct {
 	baseprobe.BaseProbe
 }
 
-func NewNoLyrics(karaData *karadata.KaraData) probe.Probe {
+func NewNoLyrics() probe.Probe {
 	return &NoLyrics{
 		baseprobe.New("no-lyrics",
 			"missing lyrics file",
 			cond.HasLyrics{},
-			karaData),
+		),
 	}
 }
 
-func (p *NoLyrics) Run(ctx context.Context) (report.Report, error) {
-	if res := p.KaraData.KaraJson.HasAnyTagFrom(tag.Langs, []uuid.UUID{language.ZXX}); !res {
+func (p NoLyrics) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+	if res := KaraData.KaraJson.HasAnyTagFrom(tag.Langs, []uuid.UUID{language.ZXX}); !res {
 		return report.Fail(severity.Critical, "no lyrics file, but the media is supposed to have has linguistic content"), nil
 	}
 	return report.Pass(), nil // no linguistical content

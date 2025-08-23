@@ -22,17 +22,17 @@ type LongTagOnShortMedia struct {
 	baseprobe.BaseProbe
 }
 
-func NewLongTagOnShortMedia(karaData *karadata.KaraData) probe.Probe {
+func NewLongTagOnShortMedia() probe.Probe {
 	return &LongTagOnShortMedia{
 		baseprobe.New("long-tag-on-short-media",
 			"long tag added manually",
 			cond.GreaterMediaDuration{Duration: 300},
-			karaData),
+		),
 	}
 }
 
-func (p *LongTagOnShortMedia) Run(ctx context.Context) (report.Report, error) {
-	if slices.Contains(p.KaraData.KaraJson.Data.Tags.Misc, misc.Long) {
+func (p LongTagOnShortMedia) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+	if slices.Contains(KaraData.KaraJson.Data.Tags.Misc, misc.Long) {
 		return report.Fail(severity.Critical, "remove long tag"), nil
 	}
 	return report.Pass(), nil

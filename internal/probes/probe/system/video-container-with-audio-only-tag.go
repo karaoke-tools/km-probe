@@ -22,17 +22,17 @@ type VideoContainerWithAudioOnlyTag struct {
 	baseprobe.BaseProbe
 }
 
-func NewVideoContainerWithAudioOnlyTag(karaData *karadata.KaraData) probe.Probe {
+func NewVideoContainerWithAudioOnlyTag() probe.Probe {
 	return &VideoContainerWithAudioOnlyTag{
 		baseprobe.New("video-container-with-audio-only-tag",
 			"video container, but audio only tag",
 			cond.HasNotVideoExtension{},
-			karaData),
+		),
 	}
 }
 
-func (p *VideoContainerWithAudioOnlyTag) Run(ctx context.Context) (report.Report, error) {
-	if slices.Contains(p.KaraData.KaraJson.Data.Tags.Songtypes, songtype.AudioOnly) {
+func (p VideoContainerWithAudioOnlyTag) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+	if slices.Contains(KaraData.KaraJson.Data.Tags.Songtypes, songtype.AudioOnly) {
 		return report.Fail(severity.Critical,
 				"if this is a still image replace media with an audio container, "+
 					"otherwise replace audio only tag with add appropriate family tag"),

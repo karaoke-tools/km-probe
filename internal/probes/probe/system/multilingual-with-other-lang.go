@@ -24,7 +24,7 @@ type MultilingualWithOtherLang struct {
 	baseprobe.BaseProbe
 }
 
-func NewMultilingualWithOtherLang(karaData *karadata.KaraData) probe.Probe {
+func NewMultilingualWithOtherLang() probe.Probe {
 	return &MultilingualWithOtherLang{
 		baseprobe.New("multilingual-with-other-lang",
 			"if multilingual tag is applied, no other lang tag should be present",
@@ -40,10 +40,10 @@ func NewMultilingualWithOtherLang(karaData *karadata.KaraData) probe.Probe {
 					Msg:     "has not multilingual tag",
 				},
 			},
-			karaData),
+		),
 	}
 }
 
-func (p *MultilingualWithOtherLang) Run(ctx context.Context) (report.Report, error) {
+func (p MultilingualWithOtherLang) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	return report.Fail(severity.Critical, "check languages tags"), nil
 }
