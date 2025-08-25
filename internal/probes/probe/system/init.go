@@ -19,6 +19,7 @@ func Probes() []probe.Probe {
 		NewFullKf(),
 		NewGiantFont(),
 		NewKfShortSyllabes(),
+		NewKTimed(),
 		NewLyricsWarningZXX(),
 		NewMediaWarningAudioOnly(),
 		NewMultilingualWithOtherLang(),

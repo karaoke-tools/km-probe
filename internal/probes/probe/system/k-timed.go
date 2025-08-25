@@ -18,20 +18,20 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 )
 
-type EolPunctuation struct {
+type KTimed struct {
 	baseprobe.BaseProbe
 }
 
-func NewEolPunctuation() probe.Probe {
-	return &EolPunctuation{
-		baseprobe.New("eol-punctuation",
-			"non-significant punctuation at end-of-lines",
+func NewKTimed() probe.Probe {
+	return &KTimed{
+		baseprobe.New("k-timed",
+			"there is at least one k-tag in the lyrics file",
 			cond.NoLyrics{},
 		),
 	}
 }
 
-func (p EolPunctuation) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+func (p KTimed) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	// TODO: update this when multi-track drifting is released
 	for _, line := range KaraData.Lyrics[0].Events {
 		select {
@@ -39,15 +39,11 @@ func (p EolPunctuation) Run(ctx context.Context, KaraData *karadata.KaraData) (r
 			return report.Abort(), ctx.Err()
 		default:
 			if (line.Type != lyrics.Format) && (!(line.Type == lyrics.Comment && strings.HasPrefix(line.Effect, "template"))) {
-				l := line.Text.StripTags()
-				if strings.HasSuffix(l, ".") || strings.HasSuffix(l, ",") {
-					if strings.HasSuffix(l, "...") {
-						continue
-					}
-					return report.Fail(severity.Critical, "remove useless punctuation (`.` or `,`) at end of line"), nil
+				if len(line.Text.TagsSplit) > 1 {
+					return report.Pass(), nil
 				}
 			}
 		}
 	}
-	return report.Pass(), nil
+	return report.Fail(severity.Critical, "karaoke must not simply be line-timed, they must be syllabe-timed"), nil
 }

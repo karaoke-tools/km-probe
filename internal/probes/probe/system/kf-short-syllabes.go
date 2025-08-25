@@ -40,7 +40,7 @@ func (p KfShortSyllabes) Run(ctx context.Context, KaraData *karadata.KaraData) (
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()
 		default:
-			if (line.Type != lyrics.Format) && (!strings.HasPrefix(line.Effect, "template")) {
+			if (line.Type != lyrics.Format) && (!(line.Type == lyrics.Comment && strings.HasPrefix(line.Effect, "template"))) {
 				for _, l := range line.Text.KfLen() {
 					select {
 					case <-ctx.Done():

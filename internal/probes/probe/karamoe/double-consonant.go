@@ -70,7 +70,7 @@ func (p DoubleConsonant) Run(ctx context.Context, KaraData *karadata.KaraData) (
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()
 		default:
-			if (line.Type != lyrics.Format) && (!strings.HasPrefix(line.Effect, "template")) {
+			if (line.Type != lyrics.Format) && (!(line.Type == lyrics.Comment && strings.HasPrefix(line.Effect, "template"))) {
 				save := " " // must end with a space to consider the first word of the line as a new word
 				for _, syll := range line.Text.TagsSplit {
 					select {
