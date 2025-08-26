@@ -7,8 +7,10 @@ package karamoe
 
 import (
 	"context"
+	"slices"
 	"strings"
 
+	"github.com/louisroyer/km-probe/internal/ass/lyrics"
 	"github.com/louisroyer/km-probe/internal/ass/style"
 	"github.com/louisroyer/km-probe/internal/ass/style/colour"
 	"github.com/louisroyer/km-probe/internal/karadata"
@@ -55,40 +57,90 @@ func NewStyleSingleWhite() probe.Probe {
 }
 
 func (p StyleSingleWhite) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
-	nb_styles := 0
+	nonWhiteChoirStyleCnt := 0 // detected choir: update secondary color (if non-group kara)
+	whiteChoirStyleCnt := 0    // detected choir: white secondary color
+	nonWhiteUnknownStyleCnt := 0
+	whiteUnknownStyleCnt := 0
+
+	// TODO: update this when multi-track drifting is released
+	styles := make([]string, 0, len(KaraData.Lyrics[0].Styles)-1)
+
+	// list of used styles
+	for _, line := range KaraData.Lyrics[0].Events {
+		select {
+		case <-ctx.Done():
+			return report.Abort(), ctx.Err()
+		default:
+			if line.Type != lyrics.Dialogue {
+				continue
+			}
+			if !slices.Contains(styles, line.Style) {
+				styles = append(styles, line.Style)
+			}
+			for _, style := range line.Styles() {
+				select {
+				case <-ctx.Done():
+					return report.Abort(), ctx.Err()
+				default:
+					if !slices.Contains(styles, style) {
+						styles = append(styles, style)
+					}
+				}
+			}
+		}
+
+	}
+
 	// TODO: update this when multi-track drifting is released
 	for _, line := range KaraData.Lyrics[0].Styles {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()
 		default:
-			if strings.HasPrefix(line, "Style: ") && !strings.Contains(line, "-furigana") {
-				nb_styles += 1
-				if nb_styles > 1 {
-					// for the moment, we focus on single style karaoke
-					return report.Fail(severity.Warning, "multiple styles: check if this is a group singing karaoke (and add the tag if it is), or invert choir style colors"), nil
+			if !strings.HasPrefix(line, "Style: ") {
+				// ignore format line
+				continue
+			}
+			s, err := style.Parse(strings.TrimPrefix(line, "Style: "))
+			if err != nil {
+				return report.Abort(), err
+			}
+			if !slices.Contains(styles, s.Name) {
+				// unused style
+				continue
+			}
+			choir := strings.Contains(strings.ToLower(s.Name), "choir")
+			if s.SecondaryColour == colour.White {
+				if choir {
+					whiteChoirStyleCnt += 1
+				} else {
+					whiteUnknownStyleCnt += 1
+				}
+			} else {
+				if choir {
+					nonWhiteChoirStyleCnt += 1
+				} else {
+					nonWhiteUnknownStyleCnt += 1
 				}
 			}
 		}
+	}
+	if nonWhiteUnknownStyleCnt == 1 {
+		return report.Fail(severity.Critical, "update style: secondary color must be white"), nil
+	}
+	if nonWhiteUnknownStyleCnt > 1 {
+		return report.Fail(severity.Critical, "if this is a group karaoke, add the \"group-singing\" tag; if this is a multi-lingual karaoke (with a color per language), add the missing lang tag; else make all secondary colors white"), nil
+	}
+	if nonWhiteChoirStyleCnt == 1 {
+		return report.Fail(severity.Warning, "consider updating the secondary color of the choir style to white"), nil
+	}
+	if whiteUnknownStyleCnt > 1 {
+		return report.Fail(severity.Warning, "found multiple styles with white as secondary color: should it be converted to group singing karaoke?"), nil
 	}
 	// TODO: update this when multi-track drifting is released
-	for _, line := range KaraData.Lyrics[0].Styles {
-		select {
-		case <-ctx.Done():
-			return report.Abort(), ctx.Err()
-		default:
-			if strings.HasPrefix(line, "Style: ") && !strings.Contains(line, "-furigana") {
-				s, err := style.Parse(strings.TrimPrefix(line, "Style: "))
-				if err != nil {
-					return report.Abort(), err
-				}
-				if s.SecondaryColour == colour.White {
-					// secondary color must be white if single style karaoke
-					return report.Pass(), nil
-				}
-				break
-			}
-		}
+	if len(styles) < (len(KaraData.Lyrics[0].Styles) - 1) {
+		return report.Fail(severity.Warning, "found some styles not used by Dialogue lines: make sure to enable the \"cleanup lyrics\" function in Karaoke Mugen (or maybe a style is used only by a Comment line?)"), nil
 	}
-	return report.Fail(severity.Critical, "update style: secondary color must be white"), nil
+
+	return report.Pass(), nil
 }

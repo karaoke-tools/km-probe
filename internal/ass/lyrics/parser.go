@@ -135,3 +135,17 @@ func (l Line) KfLen() []int {
 	}
 	return r
 }
+
+var re_style = regexp.MustCompile(`(?:\\)r(.*?)(?:\\|\})`)
+
+func (l *LyricsParser) Styles() []string {
+	r := make([]string, 1, 1)
+	r[0] = l.Style
+	for _, e := range l.Text.TagsSplit {
+		if f := re_kf_len.FindStringSubmatch(e); f != nil {
+			r = append(r, f[1])
+		}
+	}
+	return r
+
+}
