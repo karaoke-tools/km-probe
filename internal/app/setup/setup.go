@@ -6,6 +6,9 @@
 package setup
 
 import (
+	"os"
+
+	"github.com/mattn/go-isatty"
 	"github.com/urfave/cli/v2"
 )
 
@@ -18,32 +21,7 @@ type Setup struct {
 
 func FromCli(ctx *cli.Context) *Setup {
 	s := &Setup{}
-
-	// get value for hypelink
-	switch ctx.String("hyperlink") {
-	case "never":
-		s.Hyperlink = false
-	case "always":
-		s.Hyperlink = true
-	default: // auto
-		// if on your platform/terminal you see strange symbols
-		// please report this issue: https://github.com/louisroyer/km-probe/issues/new
-		// TODO: disable if not a terminal
-		s.Hyperlink = true
-	}
-
-	// get value for color, this enables the use of ansi codes
-	switch ctx.String("color") {
-	case "never":
-		s.Color = false
-	case "always":
-		s.Color = true
-	default: // auto
-		// if on your platform/terminal you see strange symbols
-		// please report this issue: https://github.com/louisroyer/km-probe/issues/new
-		// TODO: disable if not a terminal
-		s.Color = true
-	}
+	isTerminal := isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd())
 
 	// get value for json
 	switch ctx.String("output-format") {
@@ -52,9 +30,34 @@ func FromCli(ctx *cli.Context) *Setup {
 	case "json":
 		s.OutputJson = true
 	default:
-		// auto
-		// TODO: disable if it is a pipe
-		s.OutputJson = false
+		s.OutputJson = !isTerminal
 	}
+
+	// get value for color, this enables the use of ansi codes
+	switch ctx.String("color") {
+	case "never":
+		s.Color = false
+	case "always":
+		s.Color = true
+	default:
+		// by default, we display colors if this is not a json output
+		// note: colors are currently not supported with json output
+		s.Color = !s.OutputJson
+		if os.Getenv("NO_COLOR") != "" || os.Getenv("TERM") == "dumb" {
+			s.Color = false
+		}
+	}
+
+	// get value for hypelink
+	switch ctx.String("hyperlink") {
+	case "never":
+		s.Hyperlink = false
+	case "always":
+		s.Hyperlink = true
+	default:
+		// if there is color, there is no reason to not display hyperlinks by default
+		s.Hyperlink = s.Color
+	}
+
 	return s
 }

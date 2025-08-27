@@ -7,6 +7,7 @@ toolchain go1.23.5
 require (
 	github.com/adrg/xdg v0.5.3
 	github.com/gofrs/uuid v4.4.0+incompatible
+	github.com/mattn/go-isatty v0.0.20
 	github.com/sirupsen/logrus v1.9.3
 	github.com/urfave/cli/v2 v2.27.7
 	gopkg.in/yaml.v3 v3.0.1
