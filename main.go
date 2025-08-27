@@ -70,8 +70,9 @@ func main() {
 					return git.RunFromCli(ctx)
 				},
 				Flags: []cli.Flag{
-					&cli.StringFlag{
+					&cli.StringSliceFlag{
 						Name:     "repository",
+						Aliases:  []string{"repo"},
 						Usage:    "select only karaokes from this `REPOSITORY`",
 						Required: false,
 					},
@@ -86,13 +87,15 @@ func main() {
 					return karaokes.RunFromCli(ctx)
 				},
 				Flags: []cli.Flag{
-					&cli.StringFlag{
+					&cli.StringSliceFlag{
 						Name:     "uuid",
 						Usage:    "select only karaokes with this `UUID`",
 						Required: false,
-						Action:   cliargs.CheckUuid},
-					&cli.StringFlag{
+						Action:   cliargs.CheckUuids,
+					},
+					&cli.StringSliceFlag{
 						Name:     "repository",
+						Aliases:  []string{"repo"},
 						Usage:    "select only karaokes from this `REPOSITORY`",
 						Required: false,
 					},

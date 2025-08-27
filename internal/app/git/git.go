@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"path/filepath"
+	"slices"
 
 	// TODO: use go 1.25, <https://github.com/louisroyer/km-probe/issues/16>
 	"github.com/louisroyer/km-probe/internal/backport/sync"
@@ -36,7 +37,7 @@ func FromCli(ctx *cli.Context) (*GitSetup, error) {
 		return nil, err
 	}
 	for _, v := range kmConfig.System.Repositories {
-		if repo := ctx.String("repository"); repo != "" && repo != v.Name {
+		if len(ctx.StringSlice("repository")) != 0 && !slices.Contains(ctx.StringSlice("repository"), v.Name) {
 			// we can only probe in the configured repository
 			continue
 		}

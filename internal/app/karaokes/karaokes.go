@@ -7,6 +7,7 @@ package karaokes
 
 import (
 	"context"
+	"slices"
 
 	"github.com/louisroyer/km-probe/internal/app"
 	"github.com/louisroyer/km-probe/internal/app/setup"
@@ -19,24 +20,26 @@ import (
 type KaraokeSetup struct {
 	*setup.Setup
 	Repositories []app.Repository
-	Uuid         uuid.UUID
+	Uuids        []uuid.UUID
 }
 
 func FromCli(ctx *cli.Context) (*KaraokeSetup, error) {
 	s := &KaraokeSetup{
 		Setup:        setup.FromCli(ctx),
 		Repositories: make([]app.Repository, 0),
+		Uuids:        make([]uuid.UUID, 0),
 	}
 
 	// parse uuid
-	if enabledUuid := ctx.String("uuid"); enabledUuid != "" {
+	enabledUuids := ctx.StringSlice("uuid")
+	for _, enabledUuid := range enabledUuids {
 		if u, err := uuid.FromString(enabledUuid); err != nil {
 			logrus.WithError(err).WithFields(logrus.Fields{
 				"uuid-argument": enabledUuid,
 			}).Error("Could not parse uuid")
 			return nil, err
 		} else {
-			s.Uuid = u
+			s.Uuids = append(s.Uuids, u)
 		}
 	}
 
@@ -45,7 +48,7 @@ func FromCli(ctx *cli.Context) (*KaraokeSetup, error) {
 		return nil, err
 	}
 	for _, v := range kmConfig.System.Repositories {
-		if repo := ctx.String("repository"); repo != "" && repo != v.Name {
+		if len(ctx.StringSlice("repository")) != 0 && !slices.Contains(ctx.StringSlice("repository"), v.Name) {
 			// we can only probe in the configured repository
 			continue
 		}
@@ -73,6 +76,11 @@ func FromCli(ctx *cli.Context) (*KaraokeSetup, error) {
 			MediaPath: mediaPath,
 		})
 	}
+	if len(s.Repositories) == 0 {
+		logrus.WithFields(logrus.Fields{
+			"any-directories-from": ctx.StringSlice("repository"),
+		}).Error("No repository found with the given names")
+	}
 	return s, nil
 }
 
@@ -85,8 +93,8 @@ func RunFromCli(ctx *cli.Context) error {
 }
 
 func (s *KaraokeSetup) Run(ctx context.Context) error {
-	if s.Uuid.IsNil() {
+	if len(s.Uuids) == 0 {
 		return s.RunAll(ctx)
 	}
-	return s.RunSingle(ctx)
+	return s.RunByUuid(ctx)
 }

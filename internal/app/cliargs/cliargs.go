@@ -67,9 +67,11 @@ func CheckFormat(ctx *cli.Context, v string) error {
 }
 
 // Validate argument type "UUID"
-func CheckUuid(ctx *cli.Context, v string) error {
-	if !re_uuid.Match([]byte(v)) {
-		return ErrUuidArgumentInvalid
+func CheckUuids(ctx *cli.Context, v []string) error {
+	for _, u := range v {
+		if !re_uuid.Match([]byte(u)) {
+			return ErrUuidArgumentInvalid
+		}
 	}
 	return nil
 }

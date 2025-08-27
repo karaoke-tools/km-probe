@@ -19,7 +19,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (s *KaraokeSetup) RunSingle(ctx context.Context) (err error) {
+func (s *KaraokeSetup) RunByUuid(ctx context.Context) (err error) {
 	printer := app.NewPrinter()
 
 	// found flag: it is set to true by any goroutine if a file is found
@@ -33,8 +33,8 @@ func (s *KaraokeSetup) RunSingle(ctx context.Context) (err error) {
 			// `err` is a named return value: this allow us to modify it inside the defer
 			err = app.ErrKaraokeNotFound
 			logrus.WithFields(logrus.Fields{
-				"uuid": s.Uuid,
-			}).WithError(err).Error("Karaoke not found")
+				"any-uuids-from": s.Uuids,
+			}).WithError(err).Error("No karaoke found matching given criterias")
 		}
 	}()
 
@@ -43,13 +43,15 @@ func (s *KaraokeSetup) RunSingle(ctx context.Context) (err error) {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
-			wg.Go(func() {
-				fp := filepath.Join(repo.BaseDir, "karaokes", s.Uuid.String()+".kara.json")
-				err := app.RunOnFile(ctx, &repo, fp, printer)
-				if err == nil || !errors.Is(err, fs.ErrNotExist) {
-					found = true
-				}
-			})
+			for _, u := range s.Uuids {
+				wg.Go(func() {
+					fp := filepath.Join(repo.BaseDir, "karaokes", u.String()+".kara.json")
+					err := app.RunOnFile(ctx, &repo, fp, printer)
+					if err == nil || !errors.Is(err, fs.ErrNotExist) {
+						found = true
+					}
+				})
+			}
 		}
 	}
 	return nil
