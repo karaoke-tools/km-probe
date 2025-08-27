@@ -109,6 +109,6 @@ func main() {
 		},
 	}
 	if err := app.RunContext(ctx, os.Args); err != nil {
-		logrus.Fatal(err)
+		logrus.WithError(err).Fatal("Fatal error while running the application")
 	}
 }
