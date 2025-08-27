@@ -20,7 +20,7 @@ var subpaths = []string{"karaokemugen-app", "karaokemugen-server", "km-server"}
 
 const configpath = "app/config.yml"
 
-func searchKmDataDirPath(baseDir string) (string, error) {
+func SearchKmDataDirPath(baseDir string) (string, error) {
 	if filepath.IsAbs(baseDir) {
 		if _, err := os.Stat(baseDir); errors.Is(err, fs.ErrNotExist) {
 			return baseDir, ErrDataRepositoryNotFound
@@ -42,7 +42,7 @@ func searchKmDataDirPath(baseDir string) (string, error) {
 	return "", ErrDataRepositoryNotFound
 }
 
-func searchKmConfigFilePath() (string, error) {
+func SearchKmConfigFilePath() (string, error) {
 	// Search on XDG basedir compliant paths for config
 	// (just in case KM start to be compliant)
 	for _, s := range subpaths {
@@ -66,8 +66,8 @@ func searchKmConfigFilePath() (string, error) {
 	return "", ErrConfigNotFound
 }
 
-func loadConf() (*kmconfig.KmConfig, error) {
-	path, err := searchKmConfigFilePath()
+func LoadConf() (*kmconfig.KmConfig, error) {
+	path, err := SearchKmConfigFilePath()
 	if err != nil {
 		return nil, err
 	}

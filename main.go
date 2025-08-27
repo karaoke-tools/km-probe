@@ -13,8 +13,9 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/louisroyer/km-probe/internal/app"
 	"github.com/louisroyer/km-probe/internal/app/cliargs"
+	"github.com/louisroyer/km-probe/internal/app/info"
+	"github.com/louisroyer/km-probe/internal/app/karaokes"
 
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -71,7 +72,7 @@ func main() {
 				Usage:   "Probes all karaokes of all enabled repositories",
 				Before:  cliargs.CheckUnknownArgs,
 				Action: func(ctx *cli.Context) error {
-					if err := app.RunSetupFromCliArgs(ctx.Context, ctx.String("uuid"), ctx.String("repository")); err != nil {
+					if err := karaokes.RunFromCli(ctx); err != nil {
 						logrus.WithError(err).Fatal("Error while running, exiting…")
 					}
 					return nil
@@ -94,7 +95,7 @@ func main() {
 				Usage:  "Shows a list of available probes",
 				Before: cliargs.CheckUnknownArgs,
 				Action: func(ctx *cli.Context) error {
-					if err := app.NewListProbes().Run(ctx.Context); err != nil {
+					if err := info.RunFromCli(ctx); err != nil {
 						logrus.WithError(err).Fatal("Error while running, exiting…")
 					}
 					return nil

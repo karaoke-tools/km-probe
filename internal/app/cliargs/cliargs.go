@@ -17,7 +17,7 @@ import (
 // Arguments types
 var (
 	when   = []string{"auto", "always", "never"}
-	format = []string{"auto", "json"}
+	format = []string{"auto", "txt", "json"}
 )
 
 var (
