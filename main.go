@@ -64,7 +64,7 @@ func main() {
 		Commands: []*cli.Command{
 			{
 				Name:   "git",
-				Usage:  "[NOT IMPLEMENTED] Probes karaokes that has been modified locally and not yet committed to git",
+				Usage:  "Probes karaokes that has been modified locally and not yet committed to git",
 				Before: cliargs.CheckUnknownArgs,
 				Action: func(ctx *cli.Context) error {
 					return git.RunFromCli(ctx)
