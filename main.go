@@ -34,19 +34,19 @@ func main() {
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:   "output-format",
-				Usage:  strings.Join([]string{"[NOT IMPLEMENTED] configure output `FORMAT`; ", cliargs.DisplayFormat}, ""),
+				Usage:  strings.Join([]string{"configure output `FORMAT`; ", cliargs.DisplayFormat}, ""),
 				Value:  "auto",
 				Action: cliargs.CheckFormat,
 			},
 			&cli.StringFlag{
 				Name:   "color",
-				Usage:  strings.Join([]string{"[NOT IMPLEMENTED] colorize output `WHEN`; ", cliargs.DisplayWhen}, ""),
+				Usage:  strings.Join([]string{"colorize output `WHEN`; ", cliargs.DisplayWhen}, ""),
 				Value:  "auto",
 				Action: cliargs.CheckWhen,
 			},
 			&cli.StringFlag{
 				Name:   "hyperlink",
-				Usage:  strings.Join([]string{"[NOT IMPLEMENTED] create hyperlinks in output using OSC 8 escape sequence `WHEN`; only for non-json output; ", cliargs.DisplayWhen}, ""),
+				Usage:  strings.Join([]string{"create hyperlinks in output using OSC 8 escape sequence `WHEN`; only for non-json output; ", cliargs.DisplayWhen}, ""),
 				Value:  "auto",
 				Action: cliargs.CheckWhen,
 			},
@@ -85,7 +85,7 @@ func main() {
 						Action:   cliargs.CheckUuid},
 					&cli.StringFlag{
 						Name:     "repository",
-						Usage:    "[NOT IMPLEMENTED] select only karaokes from this `REPOSITORY`",
+						Usage:    "select only karaokes from this `REPOSITORY`",
 						Required: false,
 					},
 				},

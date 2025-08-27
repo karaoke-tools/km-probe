@@ -46,6 +46,7 @@ func FromCli(ctx *cli.Context) (*KaraokeSetup, error) {
 	}
 	for _, v := range kmConfig.System.Repositories {
 		if repo := ctx.String("repository"); repo != "" && repo != v.Name {
+			// we can only probe in the configured repository
 			continue
 		}
 		baseDir, err := app.SearchKmDataDirPath(v.BaseDir)
