@@ -14,6 +14,7 @@ import (
 	"syscall"
 
 	"github.com/louisroyer/km-probe/internal/app/cliargs"
+	"github.com/louisroyer/km-probe/internal/app/git"
 	"github.com/louisroyer/km-probe/internal/app/info"
 	"github.com/louisroyer/km-probe/internal/app/karaokes"
 
@@ -52,7 +53,6 @@ func main() {
 			},
 		},
 		Action: func(ctx *cli.Context) error {
-			logrus.Info(ctx.Args())
 			// XXX: workaround for https://github.com/urfave/cli/issues/1993
 			// this disables the completion when the argument is `--`, which is better than bugged values
 			if slices.Contains([]string{"--generate-bash-completion"}, ctx.Args().First()) {
@@ -63,8 +63,19 @@ func main() {
 		},
 		Commands: []*cli.Command{
 			{
-				Name:  "git",
-				Usage: "[NOT IMPLEMENTED] Probes karaokes that has been modified locally and not yet committed to git",
+				Name:   "git",
+				Usage:  "[NOT IMPLEMENTED] Probes karaokes that has been modified locally and not yet committed to git",
+				Before: cliargs.CheckUnknownArgs,
+				Action: func(ctx *cli.Context) error {
+					return git.RunFromCli(ctx)
+				},
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "repository",
+						Usage:    "select only karaokes from this `REPOSITORY`",
+						Required: false,
+					},
+				},
 			},
 			{
 				Name:    "karaokes",
@@ -72,10 +83,7 @@ func main() {
 				Usage:   "Probes all karaokes of all enabled repositories",
 				Before:  cliargs.CheckUnknownArgs,
 				Action: func(ctx *cli.Context) error {
-					if err := karaokes.RunFromCli(ctx); err != nil {
-						logrus.WithError(err).Fatal("Error while running, exiting…")
-					}
-					return nil
+					return karaokes.RunFromCli(ctx)
 				},
 				Flags: []cli.Flag{
 					&cli.StringFlag{
@@ -95,10 +103,7 @@ func main() {
 				Usage:  "Shows a list of available probes",
 				Before: cliargs.CheckUnknownArgs,
 				Action: func(ctx *cli.Context) error {
-					if err := info.RunFromCli(ctx); err != nil {
-						logrus.WithError(err).Fatal("Error while running, exiting…")
-					}
-					return nil
+					return info.RunFromCli(ctx)
 				},
 			},
 		},
