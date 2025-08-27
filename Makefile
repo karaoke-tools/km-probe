@@ -19,7 +19,7 @@ install:
 	$(INSTALL) bash-completion/completions/km-probe $(DESTDIR)$(BASHCOMPLETIONSDIR)/km-probe
 	@echo "================================="
 	@echo ">> Now run the following command:"
-	@echo -e "\tsource $(DESTDIR)$(BASHCOMPLETIONSDIR)/km-probe"
+	@echo "\tsource $(DESTDIR)$(BASHCOMPLETIONSDIR)/km-probe"
 	@echo "================================="
 uninstall:
 	$(RM) $(DESTDIR)$(bindir)/km-probe

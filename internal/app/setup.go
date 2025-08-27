@@ -24,6 +24,7 @@ import (
 type Setup struct {
 	Repositories []Repository
 	uuid         uuid.UUID
+	repository   string
 }
 
 func NewSetup() *Setup {
@@ -33,21 +34,23 @@ func NewSetup() *Setup {
 	return &setup
 }
 
-func (s *Setup) Run(ctx context.Context, id string) error {
+func SetupFromCliArgs(enabledUuid string, enabledRepository string) (*Setup, error) {
+	s := NewSetup()
+	s.repository = enabledRepository
 	// parse uuid
-	if id != "" {
-		if u, err := uuid.FromString(id); err != nil {
+	if enabledUuid != "" {
+		if u, err := uuid.FromString(enabledUuid); err != nil {
 			logrus.WithError(err).WithFields(logrus.Fields{
-				"uuid-argument": id,
+				"uuid-argument": enabledUuid,
 			}).Error("Could not parse uuid")
-			return err
+			return nil, err
 		} else {
 			s.uuid = u
 		}
 	}
 	kmConfig, err := loadConf()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	for _, v := range kmConfig.System.Repositories {
 		baseDir, err := searchKmDataDirPath(v.BaseDir)
@@ -74,6 +77,18 @@ func (s *Setup) Run(ctx context.Context, id string) error {
 			MediaPath: mediaPath,
 		})
 	}
+	return s, nil
+}
+
+func RunSetupFromCliArgs(ctx context.Context, enabledUuid string, enabledRepository string) error {
+	if s, err := SetupFromCliArgs(enabledUuid, enabledRepository); err != nil {
+		return err
+	} else {
+		return s.Run(ctx)
+	}
+}
+
+func (s *Setup) Run(ctx context.Context) error {
 	if s.uuid.IsNil() {
 		return s.RunAll(ctx)
 	}
