@@ -71,8 +71,7 @@ func main() {
 				},
 				Flags: []cli.Flag{
 					&cli.StringSliceFlag{
-						Name:     "repository",
-						Aliases:  []string{"repo"},
+						Name:     "repo",
 						Usage:    "select only karaokes from this `REPOSITORY`",
 						Required: false,
 					},
@@ -94,8 +93,7 @@ func main() {
 						Action:   cliargs.CheckUuids,
 					},
 					&cli.StringSliceFlag{
-						Name:     "repository",
-						Aliases:  []string{"repo"},
+						Name:     "repo",
 						Usage:    "select only karaokes from this `REPOSITORY`",
 						Required: false,
 					},

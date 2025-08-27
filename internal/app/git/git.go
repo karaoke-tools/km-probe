@@ -37,7 +37,7 @@ func FromCli(ctx *cli.Context) (*GitSetup, error) {
 		return nil, err
 	}
 	for _, v := range kmConfig.System.Repositories {
-		if len(ctx.StringSlice("repository")) != 0 && !slices.Contains(ctx.StringSlice("repository"), v.Name) {
+		if len(ctx.StringSlice("repo")) != 0 && !slices.Contains(ctx.StringSlice("repo"), v.Name) {
 			// we can only probe in the configured repository
 			continue
 		}
@@ -64,6 +64,11 @@ func FromCli(ctx *cli.Context) (*GitSetup, error) {
 			BaseDir:   baseDir,
 			MediaPath: mediaPath,
 		})
+	}
+	if len(s.Repositories) == 0 {
+		logrus.WithFields(logrus.Fields{
+			"any-directories-from": ctx.StringSlice("repo"),
+		}).Error("No repository found with the given names")
 	}
 	return s, nil
 }
