@@ -20,6 +20,7 @@ import (
 
 type Aggregator struct {
 	// Identification of the karaoke
+	Repository string      `json:"repository"`
 	Songname   string      `json:"songname"`
 	Kid        uuid.UUID   `json:"kid"`
 	CreatedAt  time.Time   `json:"created-at"`
@@ -48,6 +49,7 @@ func (a *Aggregator) Reset(basedir string, karaJson *karajson.KaraJson) {
 	if karaJson == nil {
 		return
 	}
+	a.Repository = karaJson.Data.Repository
 	a.Songname = karaJson.Data.Songname
 	a.Kid = karaJson.Data.Kid
 	a.CreatedAt = karaJson.Data.CreatedAt

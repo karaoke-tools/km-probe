@@ -10,6 +10,7 @@ import (
 	"errors"
 	"io/fs"
 	"path/filepath"
+	"sync/atomic"
 
 	// TODO: use go 1.25, <https://github.com/louisroyer/km-probe/issues/16>
 	"github.com/louisroyer/km-probe/internal/backport/sync"
@@ -28,33 +29,41 @@ func (s *KaraokeSetup) RunByUuid(ctx context.Context) (err error) {
 		pr = printer.NewTxtPrinter(s.Hyperlink, s.Color, s.BaseUri)
 	}
 
-	// found flag: it is set to true by any goroutine if a file is found
-	// this is safe for concurrent use because when the value is updated, it is always to `true`
-	found := false
+	nbFound := make([]atomic.Uint32, len(s.Uuids))
 
 	wg := sync.WaitGroup{}
 	defer func() {
 		wg.Wait()
-		if !found {
-			// `err` is a named return value: this allow us to modify it inside the defer
-			err = app.ErrKaraokeNotFound
-			logrus.WithFields(logrus.Fields{
-				"any-uuids-from": s.Uuids,
-			}).WithError(err).Error("No karaoke found matching given criterias")
+		for i, n := range nbFound {
+			if n.Load() == 0 {
+				// `err` is a named return value: this allow us to modify it inside the defer
+				err = app.ErrKaraokeNotFound
+				logrus.WithFields(logrus.Fields{
+					"uuid": s.Uuids[i],
+				}).WithError(err).Error("No karaoke not found with this UUID.")
+			} else if n.Load() > 1 {
+				logrus.WithFields(logrus.Fields{
+					"uuid":     s.Uuids[i],
+					"nb-found": n.Load(),
+				}).Error("Found multiple karaokes with this UUID (in multiple repositories).")
+			}
 		}
+
 	}()
 
-	for _, repo := range s.Repositories {
+	for i, u := range s.Uuids {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
-			for _, u := range s.Uuids {
+			for _, repo := range s.Repositories {
+				s.StartWork()
 				wg.Go(func() {
+					defer s.StopWork()
 					fp := filepath.Join(repo.BaseDir, "karaokes", u.String()+".kara.json")
 					err := app.RunOnFile(ctx, &repo, fp, pr)
 					if err == nil || !errors.Is(err, fs.ErrNotExist) {
-						found = true
+						nbFound[i].Add(1)
 					}
 				})
 			}

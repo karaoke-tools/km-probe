@@ -9,18 +9,55 @@ import (
 	"os"
 
 	"github.com/mattn/go-isatty"
+	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
+
+// Maximum number of karaokes processed simultaneously.
+// It is not useful to increase this number
+// because we are bound by the speed of the json encoder.
+// Increasing the number of worker will consume more memory
+// because we cannot recycle structures when they are still used;
+// making the work of the garbage collector more difficult,
+// which will slow down everything, and may make the interface irresponsible
+// for enough time to be noticable (~1s).
+const MAX_WORKERS = 0xFF
 
 type Setup struct {
 	// settings
 	Hyperlink  bool
 	Color      bool
 	OutputJson bool
+
+	// workers
+	workers     chan struct{}
+	withWorkers bool
+}
+
+// Use `StartWork` to wait for resources to become available before starting a goroutine.
+// Don't forget to use `StopWork` when the work is done.
+func (s *Setup) StartWork() {
+	if s.withWorkers {
+		s.workers <- struct{}{}
+	}
+}
+
+// Use `StopWork` when a work is done. You must have called `StartWork` before.
+func (s *Setup) StopWork() {
+	if s.withWorkers {
+		select {
+		case <-s.workers:
+		default:
+			logrus.Warning("Setup.StopWork() called but work has not been started using Setup.StartWork() before")
+		}
+	}
 }
 
 func FromCli(ctx *cli.Context) *Setup {
-	s := &Setup{}
+	s := &Setup{
+		withWorkers: true,
+		workers:     make(chan struct{}, MAX_WORKERS), // maximum number of simultaneous workers
+	}
 	isTerminal := isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd())
 
 	// get value for json

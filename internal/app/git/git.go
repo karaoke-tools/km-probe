@@ -86,16 +86,6 @@ func RunFromCli(ctx *cli.Context) error {
 	}
 }
 
-// Maximum number of karaokes processed simultaneously.
-// It is not useful to increase this number
-// because we are bound by the speed of the json encoder.
-// Increasing the number of worker will consume more memory
-// because we cannot recycle structures when they are still used;
-// making the work of the garbage collector more difficult,
-// which will slow down everything, and may make the interface irresponsible
-// for enough time to be noticable (~1s).
-const MAX_WORKERS = 0xFF
-
 func (s *GitSetup) Run(ctx context.Context) error {
 	var pr printer.Printer
 	if s.OutputJson {
@@ -141,7 +131,6 @@ func (s *GitSetup) Run(ctx context.Context) error {
 			}
 		}
 	}()
-	workers := make(chan struct{}, MAX_WORKERS) // maximum number of simultaneous workers
 	for _, repo := range s.Repositories {
 		select {
 		case <-ctx.Done():
@@ -175,10 +164,10 @@ func (s *GitSetup) Run(ctx context.Context) error {
 				}
 				for _, u := range kara {
 					p := filepath.Join(repo.BaseDir, "karaokes", u.String()+".kara.json")
-					workers <- struct{}{}
+					s.StartWork()
 					wg.Go(func() {
+						defer s.StopWork()
 						app.RunOnFile(ctx, &repo, p, pr)
-						<-workers
 					})
 				}
 			})
