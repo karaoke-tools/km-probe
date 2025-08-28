@@ -14,6 +14,9 @@ import (
 	"github.com/louisroyer/km-probe/internal/karajson"
 	"github.com/louisroyer/km-probe/internal/probes/probe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/result"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
+	"github.com/louisroyer/km-probe/internal/probes/report/status"
 
 	"github.com/gofrs/uuid"
 )
@@ -30,12 +33,14 @@ type Aggregator struct {
 	// They can be used to detect common mistakes.
 	Probes  []probe.Probe            `json:"-"`
 	Reports map[string]report.Report `json:"reports"`
+	Stats   *Stats                   `json:"statistics"`
 }
 
 func NewAggregator() *Aggregator {
 	return &Aggregator{
-		Reports: make(map[string]report.Report),
 		Probes:  AvailableProbes(),
+		Reports: make(map[string]report.Report),
+		Stats:   &Stats{},
 	}
 }
 
@@ -55,6 +60,7 @@ func (a *Aggregator) Reset(basedir string, karaJson *karajson.KaraJson) {
 	a.CreatedAt = karaJson.Data.CreatedAt
 	a.ModifiedAt = karaJson.Data.ModifiedAt
 	a.Year = karaJson.Data.Year
+	a.Stats.Reset()
 }
 
 type reportWithName struct {
@@ -117,6 +123,27 @@ func (a *Aggregator) Run(ctx context.Context, KaraData *karadata.KaraData) error
 				return ctx.Err()
 			case r := <-ch:
 				a.Reports[r.name] = r.r
+				switch r.r.Status() {
+				case status.Completed:
+					switch r.r.Result() {
+					case result.Passed:
+						a.Stats.Passed += 1
+					case result.Failed:
+						switch r.r.Severity() {
+						case severity.Info:
+							a.Stats.FailedInfo += 1
+						case severity.Warning:
+							a.Stats.FailedWarning += 1
+						case severity.Critical:
+							a.Stats.FailedCritical += 1
+						}
+					}
+				case status.Aborted:
+					a.Stats.Aborted += 1
+				case status.Skipped:
+					a.Stats.Skipped += 1
+				}
+
 			}
 		}
 		return nil

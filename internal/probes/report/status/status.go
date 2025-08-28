@@ -10,7 +10,6 @@ type Status int
 const (
 	Unknown Status = iota
 	Completed
-	Info
 	Aborted
 	Skipped
 )
@@ -19,8 +18,6 @@ func (s Status) String() string {
 	switch s {
 	case Completed:
 		return "completed"
-	case Info:
-		return "info"
 	case Aborted:
 		return "aborted"
 	case Skipped:

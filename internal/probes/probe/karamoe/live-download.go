@@ -15,6 +15,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/probes/probe"
 	"github.com/louisroyer/km-probe/internal/probes/probe/karamoe/baseprobe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
 
 	"github.com/gofrs/uuid"
@@ -49,10 +50,10 @@ func isNoLiveDownloadCollection(collection uuid.UUID) bool {
 // This function only check for hardcoded collections and "unavailable" tag.
 func (p LiveDownload) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	if slices.Contains(KaraData.KaraJson.Data.Tags.Misc, misc.Unavailable) {
-		return report.Info(false), nil
+		return report.Fail(severity.Info, "not available for live download"), nil
 	}
 	if slices.ContainsFunc(KaraData.KaraJson.Data.Tags.Collections, isNoLiveDownloadCollection) {
-		return report.Info(false), nil
+		return report.Fail(severity.Info, "not available for live download"), nil
 	}
-	return report.Info(true), nil
+	return report.Pass(), nil
 }
