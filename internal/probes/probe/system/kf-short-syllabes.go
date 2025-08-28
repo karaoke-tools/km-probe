@@ -48,8 +48,8 @@ func (p KfShortSyllabes) Run(ctx context.Context, KaraData *karadata.KaraData) (
 					default:
 						// I consider kf100 to be the optimal limit
 						// kf90 can also be okay sometimes
-						// but kf85 or lower is definitely bad
-						if l < 85 && l != 0 { // kf0 is the same as k0
+						// but kf75 or lower is definitely bad
+						if l < 75 && l != 0 { // kf0 is the same as k0
 							return report.Fail(severity.Critical, "remove very short \\kf (found a `"+strconv.Itoa(l)+"`)"), nil
 						} else if l < 90 && l != 0 {
 							warning = true

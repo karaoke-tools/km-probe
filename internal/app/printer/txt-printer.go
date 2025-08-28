@@ -13,6 +13,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/app/ansi"
 	"github.com/louisroyer/km-probe/internal/probes"
 	"github.com/louisroyer/km-probe/internal/probes/report/result"
+	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 	"github.com/louisroyer/km-probe/internal/probes/report/status"
 )
 
@@ -48,29 +49,64 @@ func (p *TxtPrinter) Encode(ctx context.Context, a *probes.Aggregator) error {
 }
 
 func (p *TxtPrinter) encodeAggregator(ctx context.Context, a *probes.Aggregator) error {
+
 	if p.Hyperlink {
 		u, err := url.JoinPath(p.BaseUri, a.Kid.String())
 		if err != nil {
 			return err
 		}
-		fmt.Println(ansi.Link(u, a.Songname+" ["+a.Kid.String()+"] ("+a.Repository+")"))
+		if p.Color {
+			if a.Stats.FailedCritical > 0 {
+				fmt.Printf(ansi.Red)
+			} else if a.Stats.FailedWarning > 0 {
+				fmt.Printf(ansi.Yellow)
+			} else if a.Stats.Passed > 0 {
+				fmt.Printf(ansi.Green)
+			} else {
+				fmt.Printf(ansi.Blue)
+			}
+		}
+		fmt.Printf("%s", ansi.Link(u, a.Songname+" ["+a.Kid.String()+"] ("+a.Repository+")"))
+		if p.Color {
+			fmt.Printf(ansi.Reset)
+		}
+		fmt.Printf("\n")
 	} else {
 		fmt.Println(a.Songname)
 	}
-	// TODO: build this to remove fields with 0 and add color of the title based on max severity
-	fmt.Printf("\tPassed: %d, Failed (critical): %d, Failed (warning): %d, Info: %d, Skipped: %d, Aborted: %d\n", a.Stats.Passed, a.Stats.FailedCritical, a.Stats.FailedWarning, a.Stats.FailedInfo, a.Stats.Skipped, a.Stats.Aborted)
+	// TODO: build this to remove fields with 0
+	fmt.Printf("Passed: %d, Failed (critical): %d, Failed (warning): %d, Info: %d, Skipped: %d, Aborted: %d\n", a.Stats.Passed, a.Stats.FailedCritical, a.Stats.FailedWarning, a.Stats.FailedInfo, a.Stats.Skipped, a.Stats.Aborted)
 	for k, r := range a.Reports {
 		if r.Status() != status.Completed || r.Result() != result.Failed {
 			continue
 		}
-		fmt.Printf("\t\t%s: %s\n", k, r.Result()) // TODO: alignment + add severity for failed
-		if msg := r.Message(); msg != "" {
-			fmt.Printf("\t\t\t%s\n", msg) // TODO: wrap around 120 col. (but don't split inside a word)
+		if p.Color {
+			switch r.Severity() {
+			case severity.Critical:
+				fmt.Printf(ansi.Red)
+			case severity.Warning:
+				fmt.Printf(ansi.Yellow)
+			case severity.Info:
+				fmt.Printf(ansi.Blue)
+			}
 		}
-		// TODO: color depending on severity
-		// TODO: optional message on 2nd line with alignment
-		// TODO: for info, display only the message or replace failed with "no"
+		fmt.Printf("\t%s: ", k) // TODO: alignment
+		if r.Result() == result.Failed {
+			if r.Severity() != severity.Info {
+				fmt.Printf("%s [%s]", r.Result(), r.Severity())
+			} else {
+				fmt.Printf("no")
+			}
+		}
+
+		if p.Color {
+			fmt.Printf(ansi.Reset)
+		}
+		fmt.Printf("\n")
+		if msg := r.Message(); msg != "" {
+			fmt.Printf("\t\t%s\n", msg) // TODO: wrap around 120 col. (but don't split inside a word)
+		}
 	}
-	fmt.Println("") // empty line to separate aggregators
+	fmt.Printf("\n") // empty line to separate aggregators
 	return nil
 }
