@@ -22,7 +22,7 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-type Credits struct {
+type Creditless struct {
 	baseprobe.BaseProbe
 }
 
@@ -34,10 +34,10 @@ var possibleCreditlessOrigin = []uuid.UUID{
 	origin.TVSeries,
 }
 
-func NewCredits() probe.Probe {
-	return &Credits{
+func NewCreditless() probe.Probe {
+	return &Creditless{
 		baseprobe.New(
-			"credits",
+			"creditless",
 			"can a creditless version be found?",
 			cond.Any{
 				cond.HasAnyTagFrom{
@@ -65,6 +65,6 @@ func NewCredits() probe.Probe {
 	}
 }
 
-func (p Credits) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+func (p Creditless) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	return report.Fail(severity.Info, "if the media is already creditless, add the `Creditless`; if a creditless version exists (and is relevant!! see <https://kara.moe/playlist/quand-le-staff-fait-parti-du-generique> for counter-examples), update the media and add the tag"), nil
 }
