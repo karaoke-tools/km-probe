@@ -21,7 +21,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (s *KaraokeSetup) RunByUuid(ctx context.Context) (err error) {
+func (s *KaraokeSetup) RunByUuid(ctx context.Context) error {
 	var pr printer.Printer
 	if s.OutputJson {
 		pr = printer.NewJsonPrinter()
@@ -36,16 +36,14 @@ func (s *KaraokeSetup) RunByUuid(ctx context.Context) (err error) {
 		wg.Wait()
 		for i, n := range nbFound {
 			if n.Load() == 0 {
-				// `err` is a named return value: this allow us to modify it inside the defer
-				err = app.ErrKaraokeNotFound
 				logrus.WithFields(logrus.Fields{
 					"uuid": s.Uuids[i],
-				}).WithError(err).Error("No karaoke not found with this UUID.")
+				}).WithError(app.ErrKaraokeNotFound).Error("No karaoke not found with this UUID.")
 			} else if n.Load() > 1 {
 				logrus.WithFields(logrus.Fields{
 					"uuid":     s.Uuids[i],
 					"nb-found": n.Load(),
-				}).Error("Found multiple karaokes with this UUID (in multiple repositories).")
+				}).WithError(app.ErrDuplicateKaraoke).Error("Found multiple karaokes with this UUID (in multiple repositories).")
 			}
 		}
 
