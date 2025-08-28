@@ -108,14 +108,27 @@ func (s *GitSetup) Run(ctx context.Context) error {
 	defer func() {
 		wgRepos.Wait()
 		if nbNotGit.Load() == uint32(len(s.Repositories)) {
-			logrus.WithError(ErrNotAGitRepo).Error("None of your repositories are git repositories.")
+			logrus.WithFields(logrus.Fields{
+				"num-repositories-not-git": len(s.Repositories),
+			}).WithError(ErrNotAGitRepo).Error("None of your repositories are git repositories.")
 			return
 		}
 		if !modified {
-			if nbHasErr.Load() == 0 {
-				logrus.Info("All repositories are clean. No karaoke to probe.")
-			} else if nbHasErr.Load() < uint32(len(s.Repositories)) {
-				logrus.Info("All other repositories are clean. No karaoke to probe.")
+			if nbHasErr.Load() == nbNotGit.Load() {
+				if uint32(len(s.Repositories))-nbNotGit.Load() == 1 {
+					logrus.WithFields(logrus.Fields{
+						"repository": s.Repositories[0].Name,
+					}).Info("Your git repository is clean. No karaoke to probe.")
+				} else {
+					logrus.WithFields(logrus.Fields{
+						"num-total-git-repositories": uint32(len(s.Repositories)) - nbNotGit.Load(),
+					}).Info("All git repositories are clean. No karaoke to probe.")
+				}
+			} else if nbHasErr.Load() < uint32(len(s.Repositories)) { // at least one repository is clean
+				logrus.WithFields(logrus.Fields{
+					"num-total-git-repositories":  uint32(len(s.Repositories)) - nbNotGit.Load(),
+					"num-failed-git-repositories": nbHasErr.Load() - nbNotGit.Load(),
+				}).Info("All other git repositories are clean. No karaoke to probe.")
 			}
 		}
 	}()
