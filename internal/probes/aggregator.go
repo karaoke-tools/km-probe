@@ -12,7 +12,6 @@ import (
 
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson"
-	"github.com/louisroyer/km-probe/internal/probes/analyser"
 	"github.com/louisroyer/km-probe/internal/probes/probe"
 	"github.com/louisroyer/km-probe/internal/probes/report"
 
@@ -30,18 +29,12 @@ type Aggregator struct {
 	// They can be used to detect common mistakes.
 	Probes  []probe.Probe            `json:"-"`
 	Reports map[string]report.Report `json:"reports"`
-	// `Analysis` give indirect features of the karaoke based on reports from probes.
-	// For example, "is it suitable to improve this karaoke as a first contribution?"
-	AnalyserFuncs []analyser.NewAnalyserFunc `json:"-"`
-	Analysis      map[string]report.Report   `json:"analysis"`
 }
 
 func NewAggregator() *Aggregator {
 	return &Aggregator{
-		Reports:       make(map[string]report.Report),
-		Analysis:      make(map[string]report.Report),
-		Probes:        AvailableProbes(),
-		AnalyserFuncs: defaultAnalysers,
+		Reports: make(map[string]report.Report),
+		Probes:  AvailableProbes(),
 	}
 }
 
@@ -50,12 +43,8 @@ func (a *Aggregator) Reset(basedir string, karaJson *karajson.KaraJson) {
 	for _, v := range a.Reports {
 		v.Delete()
 	}
-	for _, v := range a.Analysis {
-		v.Delete()
-	}
 	// empty the map
 	clear(a.Reports)
-	clear(a.Analysis)
 	if karaJson == nil {
 		return
 	}
@@ -128,41 +117,6 @@ func (a *Aggregator) Run(ctx context.Context, KaraData *karadata.KaraData) error
 				a.Reports[r.name] = r.r
 			}
 		}
-		// start analysers
-		for _, f := range a.AnalyserFuncs {
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			default:
-				go func(ctx context.Context, p analyser.Analyser, ch chan<- reportWithName) {
-					if r, err := p.Run(ctx); err == nil {
-						select {
-						case <-ctx.Done():
-							return
-						case ch <- reportWithName{name: p.Name(), r: r}:
-							return
-						}
-					} else {
-						select {
-						case <-ctx.Done():
-							return
-						case ch <- reportWithName{name: p.Name(), r: report.Abort()}:
-							return
-						}
-					}
-				}(ctx, f(a.Reports), ch)
-			}
-		}
-		// get analysis
-		for _, _ = range a.AnalyserFuncs {
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			case r := <-ch:
-				a.Analysis[r.name] = r.r
-			}
-		}
-
 		return nil
 	}
 }

@@ -6,7 +6,6 @@
 package probes
 
 import (
-	"github.com/louisroyer/km-probe/internal/probes/analyser"
 	"github.com/louisroyer/km-probe/internal/probes/probe"
 	"github.com/louisroyer/km-probe/internal/probes/probe/karamoe"
 	"github.com/louisroyer/km-probe/internal/probes/probe/system"
@@ -23,8 +22,4 @@ func genAvailableProbes() []probe.Probe {
 
 func AvailableProbes() []probe.Probe {
 	return availableProbes
-}
-
-var defaultAnalysers = []analyser.NewAnalyserFunc{
-	analyser.NewSuitableFirstContribution,
 }
