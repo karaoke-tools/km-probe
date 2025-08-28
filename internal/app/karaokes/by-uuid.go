@@ -34,15 +34,15 @@ func (s *KaraokeSetup) RunByUuid(ctx context.Context) error {
 	wg := sync.WaitGroup{}
 	defer func() {
 		wg.Wait()
-		for i, n := range nbFound {
-			if n.Load() == 0 {
+		for i := range nbFound { // do not copy atomic.Uint32
+			if nbFound[i].Load() == 0 {
 				logrus.WithFields(logrus.Fields{
 					"uuid": s.Uuids[i],
 				}).WithError(app.ErrKaraokeNotFound).Error("No karaoke not found with this UUID.")
-			} else if n.Load() > 1 {
+			} else if nbFound[i].Load() > 1 {
 				logrus.WithFields(logrus.Fields{
 					"uuid":     s.Uuids[i],
-					"nb-found": n.Load(),
+					"nb-found": nbFound[i].Load(),
 				}).WithError(app.ErrDuplicateKaraoke).Error("Found multiple karaokes with this UUID (in multiple repositories).")
 			}
 		}

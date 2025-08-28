@@ -137,8 +137,6 @@ func (s *GitSetup) Run(ctx context.Context) error {
 			return ctx.Err()
 		default:
 			wgRepos.Go(func() {
-				// parse git status
-				// for each modified kara
 				kara, err := GitModifiedKaras(ctx, repo.BaseDir)
 				if err != nil {
 					nbHasErr.Add(1)

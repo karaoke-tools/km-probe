@@ -17,7 +17,7 @@ type KmConfig struct {
 }
 
 type System struct {
-	FrontendPort int          `yaml:FrontendPort"`
+	FrontendPort int          `yaml:"FrontendPort"`
 	Repositories []Repository `yaml:"Repositories"`
 }
 
