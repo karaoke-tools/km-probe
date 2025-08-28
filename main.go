@@ -33,6 +33,7 @@ func main() {
 			{Name: "Louis Royer"},
 		},
 		Flags: []cli.Flag{
+			// TODO: urfave/cli/v3: make the flags below Persistent (to allow using them after commands)
 			&cli.StringFlag{
 				Name:   "output-format",
 				Usage:  strings.Join([]string{"configure output `FORMAT`; ", cliargs.DisplayFormat}, ""),
