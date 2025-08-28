@@ -8,6 +8,7 @@ package git
 import (
 	"context"
 	"errors"
+	"fmt"
 	"path/filepath"
 	"slices"
 	"sync/atomic"
@@ -16,6 +17,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/backport/sync"
 
 	"github.com/louisroyer/km-probe/internal/app"
+	"github.com/louisroyer/km-probe/internal/app/printer"
 	"github.com/louisroyer/km-probe/internal/app/setup"
 
 	"github.com/sirupsen/logrus"
@@ -25,6 +27,7 @@ import (
 type GitSetup struct {
 	*setup.Setup
 	Repositories []app.Repository
+	BaseUri      string
 }
 
 func FromCli(ctx *cli.Context) (*GitSetup, error) {
@@ -37,6 +40,7 @@ func FromCli(ctx *cli.Context) (*GitSetup, error) {
 	if err != nil {
 		return nil, err
 	}
+	s.BaseUri = fmt.Sprintf("http://localhost:%d/system/karas/", kmConfig.System.FrontendPort)
 	for _, v := range kmConfig.System.Repositories {
 		if len(ctx.StringSlice("repo")) != 0 && !slices.Contains(ctx.StringSlice("repo"), v.Name) {
 			// we can only probe in the configured repository
@@ -93,7 +97,12 @@ func RunFromCli(ctx *cli.Context) error {
 const MAX_WORKERS = 0xFF
 
 func (s *GitSetup) Run(ctx context.Context) error {
-	printer := app.NewPrinter()
+	var pr printer.Printer
+	if s.OutputJson {
+		pr = printer.NewJsonPrinter()
+	} else {
+		pr = printer.NewTxtPrinter(s.Hyperlink, s.Color, s.BaseUri)
+	}
 
 	// "modified" flag: it is set to true by any goroutine if a file is found
 	// this is safe for concurrent use because when the value is updated, it is always to `true`
@@ -168,7 +177,7 @@ func (s *GitSetup) Run(ctx context.Context) error {
 					p := filepath.Join(repo.BaseDir, "karaokes", u.String()+".kara.json")
 					workers <- struct{}{}
 					wg.Go(func() {
-						app.RunOnFile(ctx, &repo, p, printer)
+						app.RunOnFile(ctx, &repo, p, pr)
 						<-workers
 					})
 				}

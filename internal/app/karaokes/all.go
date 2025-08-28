@@ -12,6 +12,7 @@ import (
 	"github.com/louisroyer/km-probe/internal/backport/sync"
 
 	"github.com/louisroyer/km-probe/internal/app"
+	"github.com/louisroyer/km-probe/internal/app/printer"
 )
 
 // Maximum number of karaokes processed simultaneously.
@@ -26,7 +27,12 @@ const MAX_WORKERS = 0xFF
 
 // Run on all karaokes of all repositories
 func (s *KaraokeSetup) RunAll(ctx context.Context) error {
-	printer := app.NewPrinter()
+	var pr printer.Printer
+	if s.OutputJson {
+		pr = printer.NewJsonPrinter()
+	} else {
+		pr = printer.NewTxtPrinter(s.Hyperlink, s.Color, s.BaseUri)
+	}
 	wg := sync.WaitGroup{}
 	defer wg.Wait()
 	wgRepos := sync.WaitGroup{}
@@ -42,7 +48,7 @@ func (s *KaraokeSetup) RunAll(ctx context.Context) error {
 					func(ctx context.Context, r *app.Repository, p string) error {
 						workers <- struct{}{}
 						wg.Go(func() {
-							app.RunOnFile(ctx, r, p, printer)
+							app.RunOnFile(ctx, r, p, pr)
 							<-workers
 						})
 						return nil

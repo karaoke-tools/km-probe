@@ -7,6 +7,7 @@ package karaokes
 
 import (
 	"context"
+	"fmt"
 	"slices"
 
 	"github.com/louisroyer/km-probe/internal/app"
@@ -21,6 +22,7 @@ type KaraokeSetup struct {
 	*setup.Setup
 	Repositories []app.Repository
 	Uuids        []uuid.UUID
+	BaseUri      string
 }
 
 func FromCli(ctx *cli.Context) (*KaraokeSetup, error) {
@@ -47,6 +49,7 @@ func FromCli(ctx *cli.Context) (*KaraokeSetup, error) {
 	if err != nil {
 		return nil, err
 	}
+	s.BaseUri = fmt.Sprintf("http://localhost:%d/system/karas/", kmConfig.System.FrontendPort)
 	for _, v := range kmConfig.System.Repositories {
 		if len(ctx.StringSlice("repo")) != 0 && !slices.Contains(ctx.StringSlice("repo"), v.Name) {
 			// we can only probe in the configured repository

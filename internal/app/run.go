@@ -10,6 +10,7 @@ import (
 	"errors"
 	"io/fs"
 
+	"github.com/louisroyer/km-probe/internal/app/printer"
 	"github.com/louisroyer/km-probe/internal/karadata"
 	"github.com/louisroyer/km-probe/internal/karajson"
 
@@ -18,7 +19,7 @@ import (
 
 // Parse the karaoke, run probes, and display result
 // p is the filepath to the .kara.json file
-func RunOnFile(ctx context.Context, repo *Repository, p string, printer *Printer) error {
+func RunOnFile(ctx context.Context, repo *Repository, p string, pr printer.Printer) error {
 	karaJson, err := karajson.FromFile(ctx, p)
 	if err != nil {
 		select {
@@ -47,7 +48,7 @@ func RunOnFile(ctx context.Context, repo *Repository, p string, printer *Printer
 			return err
 		}
 	}
-	aggregator := printer.Aggregator()
+	aggregator := pr.Aggregator()
 	aggregator.Reset(repo.BaseDir, karaJson)
 	if err := aggregator.Run(ctx, karaData); err != nil {
 		select {
@@ -61,7 +62,7 @@ func RunOnFile(ctx context.Context, repo *Repository, p string, printer *Printer
 			return err
 		}
 	}
-	if err := printer.Encode(ctx, aggregator); err != nil {
+	if err := pr.Encode(ctx, aggregator); err != nil {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()

@@ -17,6 +17,7 @@ type KmConfig struct {
 }
 
 type System struct {
+	FrontendPort int          `yaml:FrontendPort"`
 	Repositories []Repository `yaml:"Repositories"`
 }
 
@@ -50,5 +51,9 @@ func ParseConf(file string) (*KmConfig, error) {
 	if err := yaml.Unmarshal(yamlFile, &conf); err != nil {
 		return nil, err
 	}
+	if conf.System.FrontendPort == 0 {
+		conf.System.FrontendPort = 1337 // default port
+	}
+
 	return &conf, nil
 }

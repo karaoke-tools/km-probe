@@ -15,12 +15,18 @@ import (
 	"github.com/louisroyer/km-probe/internal/backport/sync"
 
 	"github.com/louisroyer/km-probe/internal/app"
+	"github.com/louisroyer/km-probe/internal/app/printer"
 
 	"github.com/sirupsen/logrus"
 )
 
 func (s *KaraokeSetup) RunByUuid(ctx context.Context) (err error) {
-	printer := app.NewPrinter()
+	var pr printer.Printer
+	if s.OutputJson {
+		pr = printer.NewJsonPrinter()
+	} else {
+		pr = printer.NewTxtPrinter(s.Hyperlink, s.Color, s.BaseUri)
+	}
 
 	// found flag: it is set to true by any goroutine if a file is found
 	// this is safe for concurrent use because when the value is updated, it is always to `true`
@@ -46,7 +52,7 @@ func (s *KaraokeSetup) RunByUuid(ctx context.Context) (err error) {
 			for _, u := range s.Uuids {
 				wg.Go(func() {
 					fp := filepath.Join(repo.BaseDir, "karaokes", u.String()+".kara.json")
-					err := app.RunOnFile(ctx, &repo, fp, printer)
+					err := app.RunOnFile(ctx, &repo, fp, pr)
 					if err == nil || !errors.Is(err, fs.ErrNotExist) {
 						found = true
 					}

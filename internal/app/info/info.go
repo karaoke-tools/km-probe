@@ -12,6 +12,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/louisroyer/km-probe/internal/app/ansi"
 	"github.com/louisroyer/km-probe/internal/app/setup"
 	"github.com/louisroyer/km-probe/internal/probes"
 
@@ -31,29 +32,24 @@ type prb struct {
 	Desc string `json:"description"`
 }
 
-const (
-	AnsiUnderline = "\033[4m"
-	AnsiReset     = "\033[0m"
-)
-
 func (p prb) Println(namelen int, b *strings.Builder, underline bool) {
 	if underline {
-		b.WriteString(AnsiUnderline)
+		b.WriteString(ansi.Underline)
 	}
 	b.WriteString(p.Name)
 	if underline {
-		b.WriteString(AnsiReset)
+		b.WriteString(ansi.Reset)
 	}
 	for _ = range namelen - len(p.Name) {
 		b.WriteString(" ")
 	}
 	b.WriteString("\t")
 	if underline {
-		b.WriteString(AnsiUnderline)
+		b.WriteString(ansi.Underline)
 	}
 	b.WriteString(p.Desc)
 	if underline {
-		b.WriteString(AnsiReset)
+		b.WriteString(ansi.Reset)
 	}
 	fmt.Println(b.String())
 	b.Reset()
