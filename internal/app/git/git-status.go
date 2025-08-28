@@ -18,16 +18,20 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-var ErrUnresolvedMergeConflict = errors.New("Unresolved merge conflict")
+var (
+	ErrUnresolvedMergeConflict = errors.New("Unresolved merge conflict")
+	ErrNotAGitRepo             = errors.New("Not a git repository")
+	ErrParseError              = errors.New("Error while parsing git status output")
+)
 
 func GitModifiedKaras(ctx context.Context, path string) ([]uuid.UUID, error) {
 	kara := []uuid.UUID{}
 	// verify this is a git repository, to avoid doing all the below for nothing
 	// because we can only check the result of the command after parsing stdout
 	if _, err := os.Stat(filepath.Join(path, ".git")); errors.Is(err, fs.ErrNotExist) {
-		return kara, err
+		return kara, ErrNotAGitRepo
 	}
-	cmd := exec.Command("git", "-C", filepath.Clean(path), "status", "--porcelain=v2")
+	cmd := exec.CommandContext(ctx, "git", "-C", filepath.Clean(path), "status", "--porcelain=v2")
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return kara, err
@@ -42,6 +46,9 @@ func GitModifiedKaras(ctx context.Context, path string) ([]uuid.UUID, error) {
 		case <-ctx.Done():
 			return []uuid.UUID{}, ctx.Err()
 		default:
+			if errScan != nil {
+				continue
+			}
 			line := string(scanner.Bytes())
 			file := ""
 			if strings.HasPrefix(line, "#") {
@@ -50,6 +57,7 @@ func GitModifiedKaras(ctx context.Context, path string) ([]uuid.UUID, error) {
 			}
 			c, after, ok := strings.Cut(line, " ")
 			if !ok {
+				errScan = ErrParseError
 				continue
 			}
 			switch c {
@@ -60,9 +68,11 @@ func GitModifiedKaras(ctx context.Context, path string) ([]uuid.UUID, error) {
 				// ordinary changed entry
 				xy, _, ok := strings.Cut(after, " ")
 				if !ok {
+					errScan = ErrParseError
 					continue
 				}
 				if len(xy) != 2 {
+					errScan = ErrParseError
 					continue
 				}
 				if string(xy[1]) == "D" {
@@ -71,6 +81,7 @@ func GitModifiedKaras(ctx context.Context, path string) ([]uuid.UUID, error) {
 				}
 				sp := strings.SplitN(after, " ", 8)
 				if len(sp) != 8 {
+					errScan = ErrParseError
 					continue
 				}
 				file = sp[7]
@@ -78,10 +89,12 @@ func GitModifiedKaras(ctx context.Context, path string) ([]uuid.UUID, error) {
 				// renamed or copied entry
 				sp := strings.SplitN(after, " ", 9)
 				if len(sp) != 9 {
+					errScan = ErrParseError
 					continue
 				}
 				file, _, ok = strings.Cut(sp[8], "\t")
 				if !ok {
+					errScan = ErrParseError
 					continue
 				}
 			case "u":
@@ -94,6 +107,8 @@ func GitModifiedKaras(ctx context.Context, path string) ([]uuid.UUID, error) {
 				// -> we ignore it as well
 				continue
 			default:
+				// unexpected symbol
+				errScan = ErrParseError
 				continue
 			}
 			file, ok = strings.CutPrefix(file, "karaokes/")
@@ -106,10 +121,12 @@ func GitModifiedKaras(ctx context.Context, path string) ([]uuid.UUID, error) {
 				}
 			}
 			if !ok {
+				// not a karaoke, may be another file
 				continue
 			}
 			k, err := uuid.FromString(file)
 			if err != nil {
+				// repo not using UUIDs ?
 				continue
 			}
 			kara = append(kara, k)

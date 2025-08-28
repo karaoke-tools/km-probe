@@ -10,6 +10,7 @@ import (
 	"errors"
 	"path/filepath"
 	"slices"
+	"sync/atomic"
 
 	// TODO: use go 1.25, <https://github.com/louisroyer/km-probe/issues/16>
 	"github.com/louisroyer/km-probe/internal/backport/sync"
@@ -98,13 +99,24 @@ func (s *GitSetup) Run(ctx context.Context) error {
 	// this is safe for concurrent use because when the value is updated, it is always to `true`
 	modified := false
 
+	nbNotGit := atomic.Uint32{}
+	nbHasErr := atomic.Uint32{}
+
 	wg := sync.WaitGroup{}
 	defer wg.Wait()
 	wgRepos := sync.WaitGroup{}
 	defer func() {
 		wgRepos.Wait()
+		if nbNotGit.Load() == uint32(len(s.Repositories)) {
+			logrus.WithError(ErrNotAGitRepo).Error("None of your repositories are git repositories.")
+			return
+		}
 		if !modified {
-			logrus.Info("All repositories are clean. No karaoke to probe.")
+			if nbHasErr.Load() == 0 {
+				logrus.Info("All repositories are clean. No karaoke to probe.")
+			} else if nbHasErr.Load() < uint32(len(s.Repositories)) {
+				logrus.Info("All other repositories are clean. No karaoke to probe.")
+			}
 		}
 	}()
 	workers := make(chan struct{}, MAX_WORKERS) // maximum number of simultaneous workers
@@ -118,8 +130,21 @@ func (s *GitSetup) Run(ctx context.Context) error {
 				// for each modified kara
 				kara, err := GitModifiedKaras(ctx, repo.BaseDir)
 				if err != nil {
-					if errors.Is(err, ErrUnresolvedMergeConflict) {
-						logrus.WithError(err).Error("Merge conflict need to be resolved")
+					nbHasErr.Add(1)
+					if errors.Is(err, ErrNotAGitRepo) {
+						nbNotGit.Add(1)
+					} else if errors.Is(err, ErrUnresolvedMergeConflict) {
+						logrus.WithFields(logrus.Fields{
+							"repository": repo.Name,
+						}).WithError(err).Error("Merge conflict need to be resolved.")
+					} else if errors.Is(err, ErrParseError) {
+						logrus.WithFields(logrus.Fields{
+							"repository": repo.Name,
+						}).WithError(err).Error("Unexpected tokens in the output of porcelain `git status` command.")
+					} else {
+						logrus.WithFields(logrus.Fields{
+							"repository": repo.Name,
+						}).WithError(err).Error("Failed to read output of porcelain `git status` command.")
 					}
 					return
 				}
