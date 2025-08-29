@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/gofrs/uuid"
@@ -129,7 +130,9 @@ func GitModifiedKaras(ctx context.Context, path string) ([]uuid.UUID, error) {
 				// repo not using UUIDs ?
 				continue
 			}
-			kara = append(kara, k)
+			if !slices.Contains(kara, k) {
+				kara = append(kara, k)
+			}
 		}
 	}
 
