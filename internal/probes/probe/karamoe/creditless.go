@@ -66,5 +66,9 @@ func NewCreditless() probe.Probe {
 }
 
 func (p Creditless) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
-	return report.Fail(severity.Info, "if the media is already creditless, add the `Creditless`; if a creditless version exists (and is relevant!! see <https://kara.moe/playlist/quand-le-staff-fait-parti-du-generique> for counter-examples), update the media and add the tag"), nil
+	// if the media is already creditless, add the `Creditless`;
+	// if a creditless version exists
+	// (and is relevant!! see <https://kara.moe/playlist/quand-le-staff-fait-parti-du-generique> for counter-examples),
+	// update the media and add the tag
+	return report.Fail(severity.Info, "not tagged as creditless"), nil
 }

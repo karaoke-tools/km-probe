@@ -95,7 +95,7 @@ func (p *TxtPrinter) encodeAggregator(ctx context.Context, a *probes.Aggregator)
 			if r.Severity() != severity.Info {
 				fmt.Printf("%s [%s]", r.Result(), r.Severity())
 			} else {
-				fmt.Printf("no")
+				fmt.Printf("[info]")
 			}
 		}
 
