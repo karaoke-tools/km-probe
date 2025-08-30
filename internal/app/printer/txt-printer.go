@@ -9,12 +9,16 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"os"
+	"strings"
 
 	"github.com/louisroyer/km-probe/internal/app/ansi"
 	"github.com/louisroyer/km-probe/internal/probes"
 	"github.com/louisroyer/km-probe/internal/probes/report/result"
 	"github.com/louisroyer/km-probe/internal/probes/report/severity"
 	"github.com/louisroyer/km-probe/internal/probes/report/status"
+
+	"github.com/moby/term"
 )
 
 type TxtPrinter struct {
@@ -49,6 +53,10 @@ func (p *TxtPrinter) Encode(ctx context.Context, a *probes.Aggregator) error {
 }
 
 func (p *TxtPrinter) encodeAggregator(ctx context.Context, a *probes.Aggregator) error {
+	size, err := term.GetWinsize(os.Stdout.Fd())
+	if err != nil {
+		return err
+	}
 
 	if p.Hyperlink {
 		u, err := url.JoinPath(p.BaseUri, a.Kid.String())
@@ -66,7 +74,7 @@ func (p *TxtPrinter) encodeAggregator(ctx context.Context, a *probes.Aggregator)
 				fmt.Printf(ansi.Blue)
 			}
 		}
-		fmt.Printf("%s", ansi.Link(u, a.Songname+" ["+a.Kid.String()+"] ("+a.Repository+")"))
+		fmt.Printf("%s", ansi.Link(u, a.Songname+" ["+a.Kid.String()+"] ("+a.Repository+")")) // TODO: split on 2 lines if too long for terminal
 		if p.Color {
 			fmt.Printf(ansi.Reset)
 		}
@@ -90,7 +98,7 @@ func (p *TxtPrinter) encodeAggregator(ctx context.Context, a *probes.Aggregator)
 				fmt.Printf(ansi.Blue)
 			}
 		}
-		fmt.Printf("\t%s: ", k) // TODO: alignment
+		fmt.Printf("  %s: ", k) // TODO: alignment
 		if r.Result() == result.Failed {
 			if r.Severity() != severity.Info {
 				fmt.Printf("%s [%s]", r.Result(), r.Severity())
@@ -103,8 +111,32 @@ func (p *TxtPrinter) encodeAggregator(ctx context.Context, a *probes.Aggregator)
 			fmt.Printf(ansi.Reset)
 		}
 		fmt.Printf("\n")
+		wrap := int(max(1, min(size.Width-4, 120))) // wrap at 120 col. max
 		if msg := r.Message(); msg != "" {
-			fmt.Printf("\t\t%s\n", msg) // TODO: wrap around 120 col. (but don't split inside a word)
+			cursor := 0
+			for next := min(wrap, len(msg)); cursor < len(msg); next = min(next+wrap, len(msg)) {
+				// avoid splitting inside a word
+				for pos := next; pos < len(msg); pos++ {
+					// make eventual firsts space characters of the next line part of this line
+					// (they will be trimmed)
+					if string(msg[pos]) != " " {
+						next = pos + 1
+						break
+					}
+				}
+				if next < len(msg) {
+					for pos := next - 1; pos > cursor; pos-- {
+						// find the last space character of the line,
+						// and make it the end of what we will print (it will be trimmed)
+						if string(msg[pos]) == " " {
+							next = pos
+							break
+						}
+					}
+				}
+				fmt.Printf("    %s\n", strings.TrimSpace(msg[cursor:next]))
+				cursor = next
+			}
 		}
 	}
 	fmt.Printf("\n") // empty line to separate aggregators

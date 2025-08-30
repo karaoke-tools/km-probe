@@ -84,7 +84,7 @@ func (p DoubleConsonant) Run(ctx context.Context, KaraData *karadata.KaraData) (
 										return report.Fail(severity.Critical,
 											"check for double consonants: "+
 												"there is at least an uncorrectly splitted `"+
-												syll+"`"), nil
+												strings.TrimSpace(syll)+"`"), nil
 									}
 								}
 
