@@ -19,6 +19,7 @@ func Probes() []probe.Probe {
 		NewLiveDownload(),
 		NewLongTagOnShortMedia(),
 		NewMusicVideoCreditless(),
+		NewNoOrigin(),
 		NewStyleSingleWhite(),
 		NewVowelMacron(),
 		NewWrongTsuSeparation(),
