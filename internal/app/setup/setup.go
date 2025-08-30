@@ -8,7 +8,7 @@ package setup
 import (
 	"os"
 
-	"github.com/mattn/go-isatty"
+	"github.com/moby/term"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -58,7 +58,7 @@ func FromCli(ctx *cli.Context) *Setup {
 		withWorkers: true,
 		workers:     make(chan struct{}, MAX_WORKERS), // maximum number of simultaneous workers
 	}
-	isTerminal := isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd())
+	isTerminal := term.IsTerminal(os.Stdout.Fd())
 
 	// get value for json
 	switch ctx.String("output-format") {
