@@ -26,8 +26,8 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 	defer cancel()
 	app := &cli.App{
-		Name:                 "KM-probe",
-		Usage:                "Probe for karaoke quality",
+		Name:                 "km-probe",
+		Usage:                "find common mistakes within your Karaoke Mugen repositories",
 		EnableBashCompletion: true,
 		Authors: []*cli.Author{
 			{Name: "Louis Royer"},
