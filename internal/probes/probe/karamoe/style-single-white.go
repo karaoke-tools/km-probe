@@ -74,9 +74,6 @@ func (p StyleSingleWhite) Run(ctx context.Context, KaraData *karadata.KaraData) 
 			if line.Type != lyrics.Dialogue {
 				continue
 			}
-			if !slices.Contains(styles, line.Style) {
-				styles = append(styles, line.Style)
-			}
 			for _, style := range line.Styles() {
 				select {
 				case <-ctx.Done():

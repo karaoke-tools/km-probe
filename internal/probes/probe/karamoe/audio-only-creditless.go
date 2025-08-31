@@ -29,7 +29,7 @@ func NewAudioOnlyCreditless() probe.Probe {
 	return &AudioOnlyCreditless{
 		baseprobe.New(
 			"audio-only-creditless",
-			"audo only songs cannot be creditless",
+			"audio only songs cannot be creditless",
 			cond.Any{
 				cond.HasNoTagFrom{
 					TagType: tag.Songtypes,
