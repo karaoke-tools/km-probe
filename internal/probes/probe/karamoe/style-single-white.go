@@ -136,7 +136,7 @@ func (p StyleSingleWhite) Run(ctx context.Context, KaraData *karadata.KaraData) 
 	}
 	// TODO: update this when multi-track drifting is released
 	if len(styles) < (len(KaraData.Lyrics[0].Styles) - 1) {
-		return report.Fail(severity.Warning, "found some styles not used by Dialogue lines: make sure to enable the \"cleanup lyrics\" function in Karaoke Mugen (or maybe a style is used only by a Comment line?)"), nil
+		return report.Fail(severity.Info, "found some styles not used by Dialogue lines: if you are integrating this karaoke make sure to enable the \"cleanup lyrics\" function in Karaoke Mugen (or maybe a style is used only by a Comment line?)"), nil
 	}
 
 	return report.Pass(), nil

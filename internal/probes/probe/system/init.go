@@ -12,6 +12,7 @@ import (
 // Available probes
 func Probes() []probe.Probe {
 	return []probe.Probe{
+		NewAegisubGarbage(),
 		NewAudioOnlyWithFamilies(),
 		NewAutomation(),
 		NewDoubleYearGroup(),
