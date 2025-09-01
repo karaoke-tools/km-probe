@@ -21,6 +21,7 @@ type Ass struct {
 	Events                  []*lyrics.LyricsParser
 	Extradata               []string
 	AegisubGarbage          bool // has a Aegisub Project Garbage section
+	Fonts                   bool // has Fonts section
 	assUnknownSectionsCount int
 }
 
@@ -57,6 +58,9 @@ func Parse(ctx context.Context, lrc io.Reader) (*Ass, error) {
 					ass.AegisubGarbage = true
 				case "V4+ Styles":
 					state = assStyles
+				case "Fonts":
+					state = assFonts
+					ass.Fonts = true
 				case "Events":
 					state = assEvents
 				case "Aegisub Extradata":

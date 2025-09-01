@@ -14,5 +14,6 @@ const (
 	assStyles
 	assEvents
 	assAegisubExtradata
+	assFonts
 	assUnknownSection
 )

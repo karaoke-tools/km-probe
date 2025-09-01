@@ -16,6 +16,7 @@ func Probes() []probe.Probe {
 		NewAudioOnlyWithFamilies(),
 		NewAutomation(),
 		NewDoubleYearGroup(),
+		NewEmbeddedFonts(),
 		NewEolPunctuation(),
 		NewFullKf(),
 		NewGiantFont(),
