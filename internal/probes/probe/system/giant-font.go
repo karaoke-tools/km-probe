@@ -20,6 +20,7 @@ import (
 
 type GiantFont struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewGiantFont() probe.Probe {
@@ -28,6 +29,7 @@ func NewGiantFont() probe.Probe {
 			"fonts that have unusual big size",
 			cond.NoLyrics{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

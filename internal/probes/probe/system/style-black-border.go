@@ -21,6 +21,7 @@ import (
 
 type StyleBlackBorder struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewStyleBlackBorder() probe.Probe {
@@ -29,6 +30,7 @@ func NewStyleBlackBorder() probe.Probe {
 			"detects non-black border",
 			cond.NoLyrics{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

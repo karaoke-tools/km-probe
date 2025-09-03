@@ -22,6 +22,7 @@ import (
 
 type AudioOnlyWithFamilies struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewAudioOnlyWithFamilies() probe.Probe {
@@ -34,6 +35,7 @@ func NewAudioOnlyWithFamilies() probe.Probe {
 				Msg:     "not an audio only",
 			},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

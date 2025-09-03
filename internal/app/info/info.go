@@ -28,11 +28,49 @@ func FromCli(ctx *cli.Context) *ListProbes {
 }
 
 type prb struct {
-	Name string `json:"name"`
-	Desc string `json:"description"`
+	Name          string `json:"name"`
+	Desc          string `json:"description"`
+	Enabled       bool   `json:"enabled"`
+	EnabledString string `json:"-"`
 }
 
-func (p prb) Println(namelen int, b *strings.Builder, underline bool) {
+func enabledString(enabled bool) string {
+	if enabled {
+		return "enabled"
+	}
+	return "disabled"
+}
+
+type color int
+
+const (
+	green color = iota
+	red
+	noColor
+)
+
+func (p prb) Println(namelen int, enabledlen int, b *strings.Builder, underline bool, color color) {
+	switch color {
+	case green:
+		b.WriteString(ansi.Green)
+	case red:
+		b.WriteString(ansi.Red)
+	}
+	// Enabled
+	if underline {
+		b.WriteString(ansi.Underline)
+	}
+	b.WriteString(p.EnabledString)
+	if underline {
+		b.WriteString(ansi.Reset)
+	}
+	for _ = range enabledlen - len(p.EnabledString) {
+		b.WriteString(" ")
+	}
+
+	b.WriteString("\t")
+
+	// Name
 	if underline {
 		b.WriteString(ansi.Underline)
 	}
@@ -43,12 +81,15 @@ func (p prb) Println(namelen int, b *strings.Builder, underline bool) {
 	for _ = range namelen - len(p.Name) {
 		b.WriteString(" ")
 	}
+
 	b.WriteString("\t")
+
+	// Description
 	if underline {
 		b.WriteString(ansi.Underline)
 	}
 	b.WriteString(p.Desc)
-	if underline {
+	if underline || color != noColor {
 		b.WriteString(ansi.Reset)
 	}
 	fmt.Println(b.String())
@@ -64,20 +105,31 @@ func (l *ListProbes) Run(ctx context.Context) error {
 
 func (l *ListProbes) RunTxt(ctx context.Context) error {
 	list := make([]prb, 0)
-	header := prb{Name: "Name", Desc: "Description"}
-	namelen := len(header.Name)
+	header := prb{Name: "Name", Desc: "Description", EnabledString: "Status"}
+	namelen, enabledlen := len(header.Name), len(header.EnabledString)
 	for _, pf := range probes.AvailableProbes() {
-		item := prb{Name: pf.Name(), Desc: pf.Description()}
+		item := prb{Name: pf.Name(), Desc: pf.Description(), Enabled: pf.Enabled(), EnabledString: enabledString(pf.Enabled())}
 		list = append(list, item)
 		if len(item.Name) > namelen {
 			namelen = len(item.Name)
 		}
+		if len(item.EnabledString) > enabledlen {
+			enabledlen = len(item.EnabledString)
+		}
 	}
 	b := strings.Builder{}
-	header.Println(namelen, &b, l.Color)
+	header.Println(namelen, enabledlen, &b, l.Color, noColor)
 
 	for _, item := range list {
-		item.Println(namelen, &b, false)
+		c := noColor
+		if l.Color {
+			if item.Enabled {
+				c = green
+			} else {
+				c = red
+			}
+		}
+		item.Println(namelen, enabledlen, &b, false, c)
 
 	}
 	return nil
@@ -87,7 +139,7 @@ func (l *ListProbes) RunJson(ctx context.Context) error {
 	encoder := json.NewEncoder(os.Stdout)
 	encoder.SetIndent("", "  ")
 	for _, pf := range probes.AvailableProbes() {
-		encoder.Encode(prb{Name: pf.Name(), Desc: pf.Description()})
+		encoder.Encode(prb{Name: pf.Name(), Desc: pf.Description(), Enabled: pf.Enabled()})
 	}
 	return nil
 }

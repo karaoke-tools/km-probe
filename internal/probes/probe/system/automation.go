@@ -19,6 +19,7 @@ import (
 
 type Automation struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewAutomation() probe.Probe {
@@ -27,6 +28,7 @@ func NewAutomation() probe.Probe {
 			"missing automation script",
 			cond.NoLyrics{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

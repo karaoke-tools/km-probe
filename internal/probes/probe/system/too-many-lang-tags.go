@@ -19,6 +19,7 @@ import (
 
 type TooManyLangTags struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewTooManyLangTags() probe.Probe {
@@ -31,6 +32,7 @@ func NewTooManyLangTags() probe.Probe {
 				Msg:     "has not more than 2 lang tags",
 			},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

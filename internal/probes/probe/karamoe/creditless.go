@@ -24,6 +24,7 @@ import (
 
 type Creditless struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 var possibleCreditlessOrigin = []uuid.UUID{
@@ -62,6 +63,7 @@ func NewCreditless() probe.Probe {
 				},
 			},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

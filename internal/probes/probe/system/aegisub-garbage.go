@@ -18,6 +18,7 @@ import (
 
 type AegisubGarbage struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewAegisubGarbage() probe.Probe {
@@ -26,6 +27,7 @@ func NewAegisubGarbage() probe.Probe {
 			"Aegisub Project Garbage section has not been removed",
 			cond.NoLyrics{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

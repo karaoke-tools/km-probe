@@ -18,6 +18,7 @@ import (
 
 type SingleCollection struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewSingleCollection() probe.Probe {
@@ -26,6 +27,7 @@ func NewSingleCollection() probe.Probe {
 			"multiple collections for a single karaoke",
 			cond.Never{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

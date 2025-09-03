@@ -22,6 +22,7 @@ import (
 
 type OffVocalWithoutParent struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewOffVocalWithoutParent() probe.Probe {
@@ -34,6 +35,7 @@ func NewOffVocalWithoutParent() probe.Probe {
 				Msg:     "not an off vocal",
 			},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

@@ -17,4 +17,9 @@ type Probe interface {
 	PreRun(ctx context.Context, KaraData *karadata.KaraData) (bool, string, error)
 	Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error)
 	Description() string
+	Enabled() bool
+}
+
+type WithDefault interface {
+	Enabled() bool
 }

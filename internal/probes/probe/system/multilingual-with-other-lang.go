@@ -22,6 +22,7 @@ import (
 
 type MultilingualWithOtherLang struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewMultilingualWithOtherLang() probe.Probe {
@@ -41,6 +42,7 @@ func NewMultilingualWithOtherLang() probe.Probe {
 				},
 			},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

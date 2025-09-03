@@ -18,6 +18,7 @@ import (
 
 type EmbeddedFonts struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewEmbeddedFonts() probe.Probe {
@@ -26,6 +27,7 @@ func NewEmbeddedFonts() probe.Probe {
 			"lyrics file embeds fonts",
 			cond.NoLyrics{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

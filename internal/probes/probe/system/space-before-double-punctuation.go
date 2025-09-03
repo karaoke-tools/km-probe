@@ -24,6 +24,7 @@ import (
 
 type SpaceBeforeDoublePunctuation struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewSpaceBeforeDoublePunctuation() probe.Probe {
@@ -39,6 +40,7 @@ func NewSpaceBeforeDoublePunctuation() probe.Probe {
 				},
 			},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

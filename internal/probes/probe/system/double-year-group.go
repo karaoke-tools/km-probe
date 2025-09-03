@@ -22,6 +22,7 @@ import (
 
 type DoubleYearGroup struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewDoubleYearGroup() probe.Probe {
@@ -30,6 +31,7 @@ func NewDoubleYearGroup() probe.Probe {
 			"double-year-group",
 			cond.Never{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

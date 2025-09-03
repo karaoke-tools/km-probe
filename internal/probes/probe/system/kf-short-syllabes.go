@@ -21,6 +21,7 @@ import (
 
 type KfShortSyllabes struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewKfShortSyllabes() probe.Probe {
@@ -29,6 +30,7 @@ func NewKfShortSyllabes() probe.Probe {
 			"kf on very short syllabes",
 			cond.NoLyrics{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

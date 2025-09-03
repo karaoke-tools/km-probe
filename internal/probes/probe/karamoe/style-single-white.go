@@ -28,6 +28,7 @@ import (
 
 type StyleSingleWhite struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewStyleSingleWhite() probe.Probe {
@@ -53,6 +54,7 @@ func NewStyleSingleWhite() probe.Probe {
 				},
 			},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

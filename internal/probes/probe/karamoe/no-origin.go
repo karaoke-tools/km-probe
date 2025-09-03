@@ -22,6 +22,7 @@ import (
 
 type NoOrigin struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewNoOrigin() probe.Probe {
@@ -52,6 +53,7 @@ func NewNoOrigin() probe.Probe {
 				},
 			},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

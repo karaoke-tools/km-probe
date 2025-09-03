@@ -24,6 +24,7 @@ import (
 
 type LyricsWarningZXX struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewLyricsWarningZXX() probe.Probe {
@@ -36,6 +37,7 @@ func NewLyricsWarningZXX() probe.Probe {
 				Msg:     "no lyrics-warning tag",
 			},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

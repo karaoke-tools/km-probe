@@ -20,6 +20,7 @@ import (
 
 type KTimed struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewKTimed() probe.Probe {
@@ -28,6 +29,7 @@ func NewKTimed() probe.Probe {
 			"there is at least one k-tag in the lyrics file",
 			cond.NoLyrics{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

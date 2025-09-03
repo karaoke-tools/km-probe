@@ -25,6 +25,7 @@ import (
 
 type WrongTsuSeparation struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 // In japanese, `つ` should be timed as a single syllabe: `tsu`.
@@ -47,6 +48,7 @@ func NewWrongTsuSeparation() probe.Probe {
 				},
 			},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

@@ -23,6 +23,7 @@ import (
 
 type AudioOnlyCreditless struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewAudioOnlyCreditless() probe.Probe {
@@ -43,6 +44,7 @@ func NewAudioOnlyCreditless() probe.Probe {
 				},
 			},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

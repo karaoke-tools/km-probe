@@ -20,6 +20,7 @@ import (
 
 type StyleScale struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewStyleScale() probe.Probe {
@@ -28,6 +29,7 @@ func NewStyleScale() probe.Probe {
 			"style with scaling parameter",
 			cond.NoLyrics{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

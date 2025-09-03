@@ -25,6 +25,7 @@ import (
 
 type VowelMacron struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewVowelMacron() probe.Probe {
@@ -45,6 +46,7 @@ func NewVowelMacron() probe.Probe {
 				},
 			},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

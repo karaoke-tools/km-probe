@@ -18,6 +18,7 @@ import (
 
 type ScaledBorderAndShadow struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewScaledBorderAndShadow() probe.Probe {
@@ -26,6 +27,7 @@ func NewScaledBorderAndShadow() probe.Probe {
 			"scaled border and shadow not enabled",
 			cond.NoLyrics{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

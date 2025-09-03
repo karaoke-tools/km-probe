@@ -18,6 +18,7 @@ import (
 
 type Resolution struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewResolution() probe.Probe {
@@ -26,6 +27,7 @@ func NewResolution() probe.Probe {
 			"resolution not set to 0×0",
 			cond.NoLyrics{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

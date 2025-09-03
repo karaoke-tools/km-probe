@@ -20,6 +20,7 @@ import (
 
 type EolPunctuation struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewEolPunctuation() probe.Probe {
@@ -28,6 +29,7 @@ func NewEolPunctuation() probe.Probe {
 			"non-significant punctuation at end-of-lines",
 			cond.NoLyrics{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

@@ -20,6 +20,7 @@ import (
 
 type FullKf struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewFullKf() probe.Probe {
@@ -28,6 +29,7 @@ func NewFullKf() probe.Probe {
 			"lyrics with a lot of kf",
 			cond.NoLyrics{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

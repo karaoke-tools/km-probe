@@ -24,6 +24,7 @@ import (
 
 type MusicVideoCreditless struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewMusicVideoCreditless() probe.Probe {
@@ -40,6 +41,7 @@ func NewMusicVideoCreditless() probe.Probe {
 				},
 			},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

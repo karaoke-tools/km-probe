@@ -23,6 +23,7 @@ import (
 
 type AltVersionWithoutParent struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 // version.Cover, version.OffVocal and version.Kana are non critical
@@ -51,6 +52,7 @@ func NewAltVersionWithoutParent() probe.Probe {
 				},
 			},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

@@ -24,6 +24,7 @@ import (
 
 type MediaWarningAudioOnly struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewMediaWarningAudioOnly() probe.Probe {
@@ -36,6 +37,7 @@ func NewMediaWarningAudioOnly() probe.Probe {
 				Msg:     "not an audio only",
 			},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

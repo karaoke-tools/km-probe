@@ -20,6 +20,7 @@ import (
 
 type VideoContainerWithAudioOnlyTag struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewVideoContainerWithAudioOnlyTag() probe.Probe {
@@ -28,6 +29,7 @@ func NewVideoContainerWithAudioOnlyTag() probe.Probe {
 			"video container, but audio only tag",
 			cond.HasNotVideoExtension{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

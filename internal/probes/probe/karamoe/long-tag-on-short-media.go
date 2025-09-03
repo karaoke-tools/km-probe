@@ -20,6 +20,7 @@ import (
 
 type LongTagOnShortMedia struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewLongTagOnShortMedia() probe.Probe {
@@ -28,6 +29,7 @@ func NewLongTagOnShortMedia() probe.Probe {
 			"long tag added manually",
 			cond.GreaterMediaDuration{Duration: 300},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

@@ -25,6 +25,7 @@ import (
 
 type DoubleConsonant struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewDoubleConsonant() probe.Probe {
@@ -46,6 +47,7 @@ func NewDoubleConsonant() probe.Probe {
 				},
 			},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

@@ -22,6 +22,7 @@ import (
 
 type NoLyrics struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewNoLyrics() probe.Probe {
@@ -30,6 +31,7 @@ func NewNoLyrics() probe.Probe {
 			"missing lyrics file",
 			cond.HasLyrics{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

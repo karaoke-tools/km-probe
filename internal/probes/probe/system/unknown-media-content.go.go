@@ -20,6 +20,7 @@ import (
 
 type UnknownMediaContent struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewUnknownMediaContent() probe.Probe {
@@ -28,6 +29,7 @@ func NewUnknownMediaContent() probe.Probe {
 			"missing content tag",
 			cond.Never{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 

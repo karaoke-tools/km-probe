@@ -23,6 +23,7 @@ import (
 
 type LiveDownload struct {
 	baseprobe.BaseProbe
+	probe.WithDefault
 }
 
 func NewLiveDownload() probe.Probe {
@@ -32,6 +33,7 @@ func NewLiveDownload() probe.Probe {
 			"is hardsub available?",
 			cond.Never{},
 		),
+		baseprobe.EnabledByDefault{},
 	}
 }
 
