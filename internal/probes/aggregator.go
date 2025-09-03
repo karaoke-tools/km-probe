@@ -38,7 +38,7 @@ type Aggregator struct {
 
 func NewAggregator() *Aggregator {
 	return &Aggregator{
-		Probes:  AvailableProbes(),
+		Probes:  EnabledProbes(),
 		Reports: make(map[string]report.Report),
 		Stats:   &Stats{},
 	}

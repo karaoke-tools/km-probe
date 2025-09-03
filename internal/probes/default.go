@@ -12,6 +12,7 @@ import (
 )
 
 var availableProbes = genAvailableProbes()
+var enabledProbes = filterEnabled(availableProbes)
 
 func genAvailableProbes() []probe.Probe {
 	a := make([]probe.Probe, 0)
@@ -22,4 +23,18 @@ func genAvailableProbes() []probe.Probe {
 
 func AvailableProbes() []probe.Probe {
 	return availableProbes
+}
+
+func EnabledProbes() []probe.Probe {
+	return enabledProbes
+}
+
+func filterEnabled(pl []probe.Probe) []probe.Probe {
+	a := make([]probe.Probe, 0)
+	for _, p := range pl {
+		if p.Enabled() {
+			a = append(a, p)
+		}
+	}
+	return a
 }
