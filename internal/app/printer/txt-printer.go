@@ -38,13 +38,15 @@ func NewTxtPrinter(hyperlink bool, color bool, baseUri string) Printer {
 }
 
 func (p *TxtPrinter) Encode(ctx context.Context, a *probes.Aggregator) error {
+	builder := &strings.Builder{}
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
 	case <-p.ready:
 		defer p.setReady()
 		defer p.aggregatorPool.Put(a)
-		if err := p.encodeAggregator(ctx, a); err != nil {
+		builder.Reset()
+		if err := p.encodeAggregator(ctx, a, builder); err != nil {
 			return err
 		}
 	}
@@ -52,66 +54,171 @@ func (p *TxtPrinter) Encode(ctx context.Context, a *probes.Aggregator) error {
 
 }
 
-func (p *TxtPrinter) encodeAggregator(ctx context.Context, a *probes.Aggregator) error {
+func (p *TxtPrinter) encodeAggregator(ctx context.Context, a *probes.Aggregator, builder *strings.Builder) error {
 	size, err := term.GetWinsize(os.Stdout.Fd())
 	if err != nil {
 		return err
 	}
 
-	if p.Hyperlink {
-		u, err := url.JoinPath(p.BaseUri, a.Kid.String())
-		if err != nil {
-			return err
-		}
+	msg := fmt.Sprintf("%s [%s] (%s)", a.Songname, a.Kid.String(), a.Repository)
+	cursor := 0
+	wrap := int(max(1, size.Width))
+	for next := min(wrap, len(msg)); cursor < len(msg); next = min(next+wrap, len(msg)) {
 		if p.Color {
 			if a.Stats.FailedCritical > 0 {
-				fmt.Printf(ansi.Red)
+				builder.WriteString(ansi.Red)
 			} else if a.Stats.FailedWarning > 0 {
-				fmt.Printf(ansi.Yellow)
+				builder.WriteString(ansi.Yellow)
 			} else if a.Stats.Passed > 0 {
-				fmt.Printf(ansi.Green)
+				builder.WriteString(ansi.Green)
 			} else {
-				fmt.Printf(ansi.Blue)
+				builder.WriteString(ansi.Blue)
 			}
 		}
-		fmt.Printf("%s", ansi.Link(u, a.Songname+" ["+a.Kid.String()+"] ("+a.Repository+")")) // TODO: split on 2 lines if too long for terminal
-		if p.Color {
-			fmt.Printf(ansi.Reset)
+
+		if p.Hyperlink {
+			builder.WriteString(ansi.LinkStart)
+			u, err := url.JoinPath(p.BaseUri, a.Kid.String())
+			if err != nil {
+				return err
+			}
+			builder.WriteString(u)
+			builder.WriteString(ansi.LinkMiddle)
 		}
-		fmt.Printf("\n")
-	} else {
-		fmt.Println(a.Songname)
+
+		// avoid splitting inside a word
+		for pos := next; pos < len(msg); pos++ {
+			// make eventual firsts space characters of the next line part of this line
+			// (they will be trimmed)
+			if string(msg[pos]) != " " {
+				next = pos + 1
+				break
+			}
+		}
+		if next < len(msg) {
+			for pos := next - 1; pos > cursor; pos-- {
+				// find the last space character of the line,
+				// and make it the end of what we will print (it will be trimmed)
+				if string(msg[pos]) == " " {
+					next = pos
+					break
+				}
+			}
+		}
+		builder.WriteString(strings.TrimSpace(msg[cursor:next]))
+		cursor = next
+
+		if p.Hyperlink {
+			builder.WriteString(ansi.LinkEnd)
+		}
+		if p.Color {
+			builder.WriteString(ansi.Reset)
+		}
+
+		fmt.Println(builder.String())
+		builder.Reset()
 	}
-	// TODO: build this to remove fields with 0
-	fmt.Printf("Passed: %d, Failed (critical): %d, Failed (warning): %d, Info: %d, Skipped: %d, Aborted: %d\n", a.Stats.Passed, a.Stats.FailedCritical, a.Stats.FailedWarning, a.Stats.FailedInfo, a.Stats.Skipped, a.Stats.Aborted)
+
+	first := true
+	if a.Stats.Passed > 0 {
+		builder.WriteString(fmt.Sprintf("Passed: %d", a.Stats.Passed))
+		first = false
+	}
+	if a.Stats.FailedCritical > 0 {
+		if !first {
+			builder.WriteString(", ")
+		}
+		builder.WriteString(fmt.Sprintf("Failed (critical): %d", a.Stats.FailedCritical))
+		first = false
+	}
+	if a.Stats.FailedWarning > 0 {
+		if !first {
+			builder.WriteString(", ")
+		}
+		builder.WriteString(fmt.Sprintf("Failed (warning): %d", a.Stats.FailedWarning))
+		first = false
+	}
+	if a.Stats.FailedInfo > 0 {
+		if !first {
+			builder.WriteString(", ")
+		}
+		builder.WriteString(fmt.Sprintf("Info: %d", a.Stats.FailedInfo))
+		first = false
+	}
+	if a.Stats.Skipped > 0 {
+		if !first {
+			builder.WriteString(", ")
+		}
+		builder.WriteString(fmt.Sprintf("Skipped: %d", a.Stats.Skipped))
+		first = false
+	}
+	if a.Stats.Aborted > 0 {
+		if !first {
+			builder.WriteString(", ")
+		}
+		builder.WriteString(fmt.Sprintf("Aborted: %d", a.Stats.Aborted))
+		first = false
+	}
+	msg = builder.String()
+	builder.Reset()
+	wrap = int(max(1, size.Width-4)) // 2 is size of start of line "  > "
+	cursor = 0
+	for next := min(wrap, len(msg)); cursor < len(msg); next = min(next+wrap, len(msg)) {
+		// avoid splitting inside a word
+		for pos := next; pos < len(msg); pos++ {
+			// make eventual firsts space characters of the next line part of this line
+			// (they will be trimmed)
+			if string(msg[pos]) != " " {
+				next = pos + 1
+				break
+			}
+		}
+		if next < len(msg) {
+			for pos := next - 1; pos > cursor; pos-- {
+				// find the last space character of the line,
+				// and make it the end of what we will print (it will be trimmed)
+				if string(msg[pos]) == " " {
+					next = pos
+					break
+				}
+			}
+		}
+		fmt.Printf("  > %s\n", strings.TrimSpace(msg[cursor:next]))
+		cursor = next
+	}
+
 	for k, r := range a.Reports {
 		if r.Status() != status.Completed || r.Result() != result.Failed {
 			continue
 		}
+		builder.WriteString("  ")
 		if p.Color {
 			switch r.Severity() {
 			case severity.Critical:
-				fmt.Printf(ansi.Red)
+				builder.WriteString(ansi.Red)
 			case severity.Warning:
-				fmt.Printf(ansi.Yellow)
+				builder.WriteString(ansi.Yellow)
 			case severity.Info:
-				fmt.Printf(ansi.Blue)
+				builder.WriteString(ansi.Blue)
 			}
 		}
-		fmt.Printf("  %s: ", k) // TODO: alignment
+		builder.WriteString(k)
+		builder.WriteString(" ")
 		if r.Result() == result.Failed {
 			if r.Severity() != severity.Info {
-				fmt.Printf("%s [%s]", r.Result(), r.Severity())
+				builder.WriteString(fmt.Sprintf("[%s (%s)]", r.Result(), r.Severity()))
 			} else {
-				fmt.Printf("[info]")
+				builder.WriteString("[info]")
 			}
 		}
 
 		if p.Color {
-			fmt.Printf(ansi.Reset)
+			builder.WriteString(ansi.Reset)
 		}
-		fmt.Printf("\n")
-		wrap := int(max(1, min(size.Width-4, 120))) // wrap at 120 col. max
+		fmt.Println(builder.String())
+		builder.Reset()
+
+		wrap := int(max(1, size.Width-4)) // 4 is number of spaces at start of line in final formating
 		if msg := r.Message(); msg != "" {
 			cursor := 0
 			for next := min(wrap, len(msg)); cursor < len(msg); next = min(next+wrap, len(msg)) {

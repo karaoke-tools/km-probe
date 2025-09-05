@@ -20,10 +20,11 @@ const (
 	Bold      = "\033[1m"
 	Underline = "\033[4m"
 
+	// link
+	LinkStart  = "\x1B]8;;"
+	LinkMiddle = "\x1B\x5C"
+	LinkEnd    = "\x1B]8;;\x1B\x5C"
+
 	// reset
 	Reset = "\033[0m"
 )
-
-func Link(anchor string, display string) string {
-	return "\x1B]8;;" + anchor + "\x1B\x5C" + display + "\x1B]8;;\x1B\x5C"
-}
