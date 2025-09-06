@@ -27,12 +27,15 @@ jobs:
       - name: Install depends
         run: go get .
       - name: Build
-        run: go build -v
+        run: go build -v -o km-probe-${{ steps.version.outputs.version }}-${{ matrix.os }}-${{ matrix.arch }}
+      - if: matrix.os == 'windows'
+        name: Add .exe extension
+        run: mv km-probe-${{ steps.version.outputs.version }}-${{ matrix.os }}-${{ matrix.arch }}{,.exe}
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: km-probe-${{ steps.version.outputs.version }}-${{ matrix.os }}-${{ matrix.arch }}
-          path: km-probe
+          path: km-probe*
   release:
     name: Release
     needs: [build-release]
@@ -45,11 +48,15 @@ jobs:
       - name: Get version number
         id: version
         run: echo "version=$(echo ${{ github.ref_name }} | cut -c2- -)" >> $GITHUB_OUTPUT
+      - name: Download artifacts
+        uses: actions/download-artifact@v5
+        with:
+          pattern: km-probe-${{ steps.version.outputs.version }}*
+          merge-multiple: true
       - name: Release
         uses: ncipollo/release-action@v1
         with:
           generateReleaseNotes: true
           makeLatest: "legacy"
           name: "Version ${{ steps.version.outputs.version }}"
-          artifacts: "km-probe-${{ steps.version.outputs.version }}-*" 
-
+          artifacts: "km-probe-${{ steps.version.outputs.version }}*"
