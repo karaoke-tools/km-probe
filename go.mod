@@ -1,6 +1,6 @@
 module github.com/karaoke-tools/km-probe
 
-go 1.25.0
+go 1.25.1
 
 require (
 	github.com/adrg/xdg v0.5.3
