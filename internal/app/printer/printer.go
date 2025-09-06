@@ -9,7 +9,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/louisroyer/km-probe/internal/probes"
+	"github.com/karaoke-tools/km-probe/internal/probes"
 )
 
 // Printer outputs aggretator reports to stdout

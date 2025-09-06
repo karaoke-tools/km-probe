@@ -1,4 +1,4 @@
-module github.com/louisroyer/km-probe
+module github.com/karaoke-tools/km-probe
 
 go 1.25.0
 

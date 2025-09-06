@@ -12,9 +12,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/louisroyer/km-probe/internal/app/ansi"
-	"github.com/louisroyer/km-probe/internal/app/setup"
-	"github.com/louisroyer/km-probe/internal/probes"
+	"github.com/karaoke-tools/km-probe/internal/app/ansi"
+	"github.com/karaoke-tools/km-probe/internal/app/setup"
+	"github.com/karaoke-tools/km-probe/internal/probes"
 
 	"github.com/urfave/cli/v2"
 )

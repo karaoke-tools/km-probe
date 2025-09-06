@@ -13,12 +13,12 @@ import (
 	"slices"
 	"sync/atomic"
 
-	// TODO: use go 1.25, <https://github.com/louisroyer/km-probe/issues/16>
-	"github.com/louisroyer/km-probe/internal/backport/sync"
+	// TODO: use go 1.25, <https://github.com/karaoke-tools/km-probe/issues/16>
+	"github.com/karaoke-tools/km-probe/internal/backport/sync"
 
-	"github.com/louisroyer/km-probe/internal/app"
-	"github.com/louisroyer/km-probe/internal/app/printer"
-	"github.com/louisroyer/km-probe/internal/app/setup"
+	"github.com/karaoke-tools/km-probe/internal/app"
+	"github.com/karaoke-tools/km-probe/internal/app/printer"
+	"github.com/karaoke-tools/km-probe/internal/app/setup"
 
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"

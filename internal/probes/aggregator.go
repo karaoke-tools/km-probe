@@ -10,13 +10,13 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/louisroyer/km-probe/internal/karadata"
-	"github.com/louisroyer/km-probe/internal/karajson"
-	"github.com/louisroyer/km-probe/internal/probes/probe"
-	"github.com/louisroyer/km-probe/internal/probes/report"
-	"github.com/louisroyer/km-probe/internal/probes/report/result"
-	"github.com/louisroyer/km-probe/internal/probes/report/severity"
-	"github.com/louisroyer/km-probe/internal/probes/report/status"
+	"github.com/karaoke-tools/km-probe/internal/karadata"
+	"github.com/karaoke-tools/km-probe/internal/karajson"
+	"github.com/karaoke-tools/km-probe/internal/probes/probe"
+	"github.com/karaoke-tools/km-probe/internal/probes/report"
+	"github.com/karaoke-tools/km-probe/internal/probes/report/result"
+	"github.com/karaoke-tools/km-probe/internal/probes/report/severity"
+	"github.com/karaoke-tools/km-probe/internal/probes/report/status"
 
 	"github.com/gofrs/uuid"
 )

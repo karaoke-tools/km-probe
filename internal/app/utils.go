@@ -11,7 +11,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/louisroyer/km-probe/internal/kmconfig"
+	"github.com/karaoke-tools/km-probe/internal/kmconfig"
 
 	"github.com/adrg/xdg"
 )

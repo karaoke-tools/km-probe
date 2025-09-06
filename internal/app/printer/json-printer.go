@@ -10,7 +10,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/louisroyer/km-probe/internal/probes"
+	"github.com/karaoke-tools/km-probe/internal/probes"
 )
 
 type JsonPrinter struct {

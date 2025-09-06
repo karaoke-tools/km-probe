@@ -8,7 +8,7 @@ package cond
 import (
 	"context"
 
-	"github.com/louisroyer/km-probe/internal/karadata"
+	"github.com/karaoke-tools/km-probe/internal/karadata"
 )
 
 type HasLyrics struct{}

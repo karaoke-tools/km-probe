@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/louisroyer/km-probe/internal/app"
-	"github.com/louisroyer/km-probe/internal/app/setup"
+	"github.com/karaoke-tools/km-probe/internal/app"
+	"github.com/karaoke-tools/km-probe/internal/app/setup"
 
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"

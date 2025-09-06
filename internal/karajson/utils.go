@@ -9,7 +9,7 @@ import (
 	"context"
 	"slices"
 
-	"github.com/louisroyer/km-probe/internal/karajson/tag"
+	"github.com/karaoke-tools/km-probe/internal/karajson/tag"
 
 	"github.com/gofrs/uuid"
 )

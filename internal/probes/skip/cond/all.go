@@ -9,8 +9,8 @@ import (
 	"context"
 	"strings"
 
-	"github.com/louisroyer/km-probe/internal/karadata"
-	"github.com/louisroyer/km-probe/internal/probes/skip"
+	"github.com/karaoke-tools/km-probe/internal/karadata"
+	"github.com/karaoke-tools/km-probe/internal/probes/skip"
 )
 
 type All []skip.Condition

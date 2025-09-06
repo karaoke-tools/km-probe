@@ -10,8 +10,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/louisroyer/km-probe/internal/ass"
-	"github.com/louisroyer/km-probe/internal/karajson"
+	"github.com/karaoke-tools/km-probe/internal/ass"
+	"github.com/karaoke-tools/km-probe/internal/karajson"
 )
 
 // Karaoke information

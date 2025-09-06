@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/louisroyer/km-probe/internal/ass/style/colour"
+	"github.com/karaoke-tools/km-probe/internal/ass/style/colour"
 )
 
 type Style struct {

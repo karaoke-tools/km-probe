@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/louisroyer/km-probe/internal/ass/lyrics"
+	"github.com/karaoke-tools/km-probe/internal/ass/lyrics"
 )
 
 type Ass struct {

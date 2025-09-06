@@ -6,8 +6,8 @@
 package report
 
 import (
-	"github.com/louisroyer/km-probe/internal/probes/report/severity"
-	"github.com/louisroyer/km-probe/internal/probes/report/status"
+	"github.com/karaoke-tools/km-probe/internal/probes/report/severity"
+	"github.com/karaoke-tools/km-probe/internal/probes/report/status"
 )
 
 // When the test is not relevant

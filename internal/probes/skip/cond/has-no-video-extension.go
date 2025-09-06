@@ -10,7 +10,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/louisroyer/km-probe/internal/karadata"
+	"github.com/karaoke-tools/km-probe/internal/karadata"
 )
 
 type HasNotVideoExtension struct{}

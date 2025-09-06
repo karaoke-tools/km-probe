@@ -6,7 +6,7 @@
 package karamoe
 
 import (
-	"github.com/louisroyer/km-probe/internal/probes/probe"
+	"github.com/karaoke-tools/km-probe/internal/probes/probe"
 )
 
 // Available probes

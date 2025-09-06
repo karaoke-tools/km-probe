@@ -8,16 +8,16 @@ package karamoe
 import (
 	"context"
 
-	"github.com/louisroyer/km-probe/internal/karadata"
-	"github.com/louisroyer/km-probe/internal/karajson/karamoe/misc"
-	"github.com/louisroyer/km-probe/internal/karajson/karamoe/origin"
-	"github.com/louisroyer/km-probe/internal/karajson/karamoe/songtype"
-	"github.com/louisroyer/km-probe/internal/karajson/tag"
-	"github.com/louisroyer/km-probe/internal/probes/probe"
-	"github.com/louisroyer/km-probe/internal/probes/probe/karamoe/baseprobe"
-	"github.com/louisroyer/km-probe/internal/probes/report"
-	"github.com/louisroyer/km-probe/internal/probes/report/severity"
-	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
+	"github.com/karaoke-tools/km-probe/internal/karadata"
+	"github.com/karaoke-tools/km-probe/internal/karajson/karamoe/misc"
+	"github.com/karaoke-tools/km-probe/internal/karajson/karamoe/origin"
+	"github.com/karaoke-tools/km-probe/internal/karajson/karamoe/songtype"
+	"github.com/karaoke-tools/km-probe/internal/karajson/tag"
+	"github.com/karaoke-tools/km-probe/internal/probes/probe"
+	"github.com/karaoke-tools/km-probe/internal/probes/probe/karamoe/baseprobe"
+	"github.com/karaoke-tools/km-probe/internal/probes/report"
+	"github.com/karaoke-tools/km-probe/internal/probes/report/severity"
+	"github.com/karaoke-tools/km-probe/internal/probes/skip/cond"
 
 	"github.com/gofrs/uuid"
 )

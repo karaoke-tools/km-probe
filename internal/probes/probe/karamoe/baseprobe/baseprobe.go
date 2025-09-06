@@ -6,8 +6,8 @@
 package baseprobe
 
 import (
-	"github.com/louisroyer/km-probe/internal/probes/probe/baseprobe"
-	"github.com/louisroyer/km-probe/internal/probes/skip"
+	"github.com/karaoke-tools/km-probe/internal/probes/probe/baseprobe"
+	"github.com/karaoke-tools/km-probe/internal/probes/skip"
 )
 
 type BaseProbe struct {

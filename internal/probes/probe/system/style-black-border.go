@@ -9,14 +9,14 @@ import (
 	"context"
 	"strings"
 
-	"github.com/louisroyer/km-probe/internal/ass/style"
-	"github.com/louisroyer/km-probe/internal/ass/style/colour"
-	"github.com/louisroyer/km-probe/internal/karadata"
-	"github.com/louisroyer/km-probe/internal/probes/probe"
-	"github.com/louisroyer/km-probe/internal/probes/probe/system/baseprobe"
-	"github.com/louisroyer/km-probe/internal/probes/report"
-	"github.com/louisroyer/km-probe/internal/probes/report/severity"
-	"github.com/louisroyer/km-probe/internal/probes/skip/cond"
+	"github.com/karaoke-tools/km-probe/internal/ass/style"
+	"github.com/karaoke-tools/km-probe/internal/ass/style/colour"
+	"github.com/karaoke-tools/km-probe/internal/karadata"
+	"github.com/karaoke-tools/km-probe/internal/probes/probe"
+	"github.com/karaoke-tools/km-probe/internal/probes/probe/system/baseprobe"
+	"github.com/karaoke-tools/km-probe/internal/probes/report"
+	"github.com/karaoke-tools/km-probe/internal/probes/report/severity"
+	"github.com/karaoke-tools/km-probe/internal/probes/skip/cond"
 )
 
 type StyleBlackBorder struct {

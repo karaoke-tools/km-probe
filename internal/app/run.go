@@ -10,9 +10,9 @@ import (
 	"errors"
 	"io/fs"
 
-	"github.com/louisroyer/km-probe/internal/app/printer"
-	"github.com/louisroyer/km-probe/internal/karadata"
-	"github.com/louisroyer/km-probe/internal/karajson"
+	"github.com/karaoke-tools/km-probe/internal/app/printer"
+	"github.com/karaoke-tools/km-probe/internal/karadata"
+	"github.com/karaoke-tools/km-probe/internal/karajson"
 
 	"github.com/sirupsen/logrus"
 )

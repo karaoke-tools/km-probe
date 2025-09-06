@@ -8,8 +8,8 @@ package cond
 import (
 	"context"
 
-	"github.com/louisroyer/km-probe/internal/karadata"
-	"github.com/louisroyer/km-probe/internal/karajson/tag"
+	"github.com/karaoke-tools/km-probe/internal/karadata"
+	"github.com/karaoke-tools/km-probe/internal/karajson/tag"
 )
 
 type HasMoreTagsThan struct {

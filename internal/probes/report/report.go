@@ -9,9 +9,9 @@ import (
 	"encoding/json"
 	"sync"
 
-	"github.com/louisroyer/km-probe/internal/probes/report/result"
-	"github.com/louisroyer/km-probe/internal/probes/report/severity"
-	"github.com/louisroyer/km-probe/internal/probes/report/status"
+	"github.com/karaoke-tools/km-probe/internal/probes/report/result"
+	"github.com/karaoke-tools/km-probe/internal/probes/report/severity"
+	"github.com/karaoke-tools/km-probe/internal/probes/report/status"
 )
 
 type Report interface {

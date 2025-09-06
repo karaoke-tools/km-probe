@@ -6,7 +6,7 @@
 package report
 
 import (
-	"github.com/louisroyer/km-probe/internal/probes/report/status"
+	"github.com/karaoke-tools/km-probe/internal/probes/report/status"
 )
 
 // `abort` has no custom information, and can be reused

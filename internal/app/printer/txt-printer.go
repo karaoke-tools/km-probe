@@ -12,11 +12,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/louisroyer/km-probe/internal/app/ansi"
-	"github.com/louisroyer/km-probe/internal/probes"
-	"github.com/louisroyer/km-probe/internal/probes/report/result"
-	"github.com/louisroyer/km-probe/internal/probes/report/severity"
-	"github.com/louisroyer/km-probe/internal/probes/report/status"
+	"github.com/karaoke-tools/km-probe/internal/app/ansi"
+	"github.com/karaoke-tools/km-probe/internal/probes"
+	"github.com/karaoke-tools/km-probe/internal/probes/report/result"
+	"github.com/karaoke-tools/km-probe/internal/probes/report/severity"
+	"github.com/karaoke-tools/km-probe/internal/probes/report/status"
 
 	"github.com/moby/term"
 )

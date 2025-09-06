@@ -6,9 +6,9 @@
 package report
 
 import (
-	"github.com/louisroyer/km-probe/internal/probes/report/result"
-	"github.com/louisroyer/km-probe/internal/probes/report/severity"
-	"github.com/louisroyer/km-probe/internal/probes/report/status"
+	"github.com/karaoke-tools/km-probe/internal/probes/report/result"
+	"github.com/karaoke-tools/km-probe/internal/probes/report/severity"
+	"github.com/karaoke-tools/km-probe/internal/probes/report/status"
 )
 
 // `pass` has no custom information, and can be reused

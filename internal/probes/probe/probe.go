@@ -8,8 +8,8 @@ package probe
 import (
 	"context"
 
-	"github.com/louisroyer/km-probe/internal/karadata"
-	"github.com/louisroyer/km-probe/internal/probes/report"
+	"github.com/karaoke-tools/km-probe/internal/karadata"
+	"github.com/karaoke-tools/km-probe/internal/probes/report"
 )
 
 type Probe interface {

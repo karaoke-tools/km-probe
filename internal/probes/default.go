@@ -6,9 +6,9 @@
 package probes
 
 import (
-	"github.com/louisroyer/km-probe/internal/probes/probe"
-	"github.com/louisroyer/km-probe/internal/probes/probe/karamoe"
-	"github.com/louisroyer/km-probe/internal/probes/probe/system"
+	"github.com/karaoke-tools/km-probe/internal/probes/probe"
+	"github.com/karaoke-tools/km-probe/internal/probes/probe/karamoe"
+	"github.com/karaoke-tools/km-probe/internal/probes/probe/system"
 )
 
 var availableProbes = genAvailableProbes()

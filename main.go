@@ -14,10 +14,10 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/louisroyer/km-probe/internal/app/cliargs"
-	"github.com/louisroyer/km-probe/internal/app/git"
-	"github.com/louisroyer/km-probe/internal/app/info"
-	"github.com/louisroyer/km-probe/internal/app/karaokes"
+	"github.com/karaoke-tools/km-probe/internal/app/cliargs"
+	"github.com/karaoke-tools/km-probe/internal/app/git"
+	"github.com/karaoke-tools/km-probe/internal/app/info"
+	"github.com/karaoke-tools/km-probe/internal/app/karaokes"
 
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
