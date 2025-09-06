@@ -9,6 +9,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"runtime/debug"
 	"slices"
 	"strings"
 	"syscall"
@@ -25,6 +26,10 @@ import (
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 	defer cancel()
+	version := "Unknown version"
+	if info, ok := debug.ReadBuildInfo(); ok {
+		version = info.Main.Version
+	}
 	app := &cli.App{
 		Name:                 "km-probe",
 		Usage:                "find common mistakes within your Karaoke Mugen repositories",
@@ -32,6 +37,7 @@ func main() {
 		Authors: []*cli.Author{
 			{Name: "Louis Royer"},
 		},
+		Version: version,
 		Flags: []cli.Flag{
 			// TODO: urfave/cli/v3: make the flags below Persistent (to allow using them after commands)
 			&cli.StringFlag{

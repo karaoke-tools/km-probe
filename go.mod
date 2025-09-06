@@ -1,8 +1,6 @@
 module github.com/louisroyer/km-probe
 
-go 1.23.0
-
-toolchain go1.23.5
+go 1.25.0
 
 require (
 	github.com/adrg/xdg v0.5.3
