@@ -6,8 +6,8 @@
 - You can run `km-probe` on all karaoke of a repository to find some karaoke having a specific mistake that you want to work on (for example karaoke without automation script).
 
 Not yet implemented, but could be done eventually:
-- As a contributor, you could get an early feedback on karaoke you sent to inbox before a maintainer get the time to look at it (and you may want to update your inbox because you find a mistake).
-- Integration directly into Karaoke Mugen application as an optional plugin.
+- Goal for v1.0.0: Integration directly into Karaoke Mugen application as an optional plugin.
+- Goal for v2.0.0: As a contributor, you could get an early feedback on karaoke you sent to inbox before a maintainer get the time to look at it (and you may want to update your inbox because you find a mistake).
 
 ## What km-probe is not
 - `km-probe` is not a replacement for maintainers. Some checks can only be manual and will never be automated.
@@ -15,7 +15,7 @@ Not yet implemented, but could be done eventually:
 It is only a tool, and it can be wrong. Maintainers still have final word on what is or is not integrated into their karaoke repository,
 and should rely on their own judgment to do this.
 - `km-probe` is not bug-free. If you find a bug, please [report it](https://github.com/karaoke-tools/km-probe/issues) if it is not already.
-- `km-propbe` is not mandatory. You can run Karaoke Mugen application without `km-probe`.
+- `km-probe` is not mandatory. You can run Karaoke Mugen application without `km-probe`.
 However, I hope it will help you making better karaokes and following your repository rules.
 
 ## Supported platforms
@@ -128,5 +128,9 @@ With this last method, bash auto-completions will be installed automatically.
 ##### Uninstall
 Run: `sudo make uninstall`
 
+##### Update
+To update the software, run `git pull`, and do the Build and the Install steps again.
+
 ## License
-`km-probe` is a free and open source software. See the LICENSE file for more information.
+`km-probe` is a free and open source software.
+See the [`LICENSE`](https://github.com/karaoke-tools/km-probe/blob/master/LICENSE) file for more information.
