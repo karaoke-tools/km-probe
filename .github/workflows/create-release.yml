@@ -5,7 +5,37 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
+  build-release:
+    name: Build release artifacts
+    permissions: {}
+    strategy:
+      matrix:
+        os: [linux, darwin, windows]
+        arch: [amd64]
+    runs-on: ubuntu-latest
+    env:
+      GOOS: ${{ matrix.os }}
+      GOARCH: ${{ matrix.arch }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get version number
+        id: version
+        run: echo "version=$(echo ${{ github.ref_name }} | cut -c2- -)" >> $GITHUB_OUTPUT
+      - name: Setup Go
+        uses: actions/setup-go@v5
+      - name: Install depends
+        run: go get .
+      - name: Build
+        run: go build -v
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: km-probe-${{ steps.version.outputs.version }}-${{ matrix.os }}-${{ matrix.arch }}
+          path: km-probe
   release:
+    name: Release
+    needs: [build-release]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -21,3 +51,5 @@ jobs:
           generateReleaseNotes: true
           makeLatest: "legacy"
           name: "Version ${{ steps.version.outputs.version }}"
+          artifacts: "km-probe-${{ steps.version.outputs.version }}-*" 
+
