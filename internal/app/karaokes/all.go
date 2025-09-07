@@ -7,9 +7,7 @@ package karaokes
 
 import (
 	"context"
-
-	// TODO: use go 1.25, <https://github.com/karaoke-tools/km-probe/issues/16>
-	"github.com/karaoke-tools/km-probe/internal/backport/sync"
+	"sync"
 
 	"github.com/karaoke-tools/km-probe/internal/app"
 	"github.com/karaoke-tools/km-probe/internal/app/printer"
