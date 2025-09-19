@@ -108,7 +108,8 @@ func (p StyleSingleWhite) Run(ctx context.Context, KaraData *karadata.KaraData) 
 				// unused style
 				continue
 			}
-			choir := strings.Contains(strings.ToLower(s.Name), "choir")
+			l_name := strings.ToLower(s.Name)
+			choir := strings.Contains(l_name, "choir") || strings.Contains(l_name, "spoken")
 			if s.SecondaryColour == colour.White {
 				if choir {
 					whiteChoirStyleCnt += 1
