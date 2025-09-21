@@ -23,6 +23,7 @@ func Probes() []probe.Probe {
 		NewMusicVideoCreditless(),
 		NewNoOrigin(),
 		NewStyleSingleWhite(),
+		NewVersionConflict(),
 		NewVowelMacron(),
 		NewWrongTsuSeparation(),
 	}
