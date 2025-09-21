@@ -60,6 +60,7 @@ type Lyric struct {
 
 type Data struct {
 	CreatedAt             time.Time         `json:"created_at"`
+	FromDisplayType       string            `json:"from_display_type"`
 	IgnoreHooks           bool              `json:"ignore-hooks"`
 	Kid                   uuid.UUID         `json:"kid"`
 	ModifiedAt            time.Time         `json:"modified_at"`

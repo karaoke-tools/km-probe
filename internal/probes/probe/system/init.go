@@ -18,6 +18,7 @@ func Probes() []probe.Probe {
 		NewDoubleYearGroup(),
 		NewEmbeddedFonts(),
 		NewEolPunctuation(),
+		NewFromDisplayType(),
 		NewFullKf(),
 		NewGiantFont(),
 		NewKfShortSyllabes(),
