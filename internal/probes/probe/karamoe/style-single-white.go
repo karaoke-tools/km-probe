@@ -63,6 +63,7 @@ func (p StyleSingleWhite) Run(ctx context.Context, KaraData *karadata.KaraData) 
 	whiteChoirStyleCnt := 0    // detected choir: white secondary color
 	nonWhiteUnknownStyleCnt := 0
 	whiteUnknownStyleCnt := 0
+	unused := 0
 
 	// TODO: update this when multi-track drifting is released
 	styles := make([]string, 0, len(KaraData.Lyrics[0].Styles)-1)
@@ -106,21 +107,25 @@ func (p StyleSingleWhite) Run(ctx context.Context, KaraData *karadata.KaraData) 
 			}
 			if !slices.Contains(styles, s.Name) {
 				// unused style
+				unused++
 				continue
 			}
 			l_name := strings.ToLower(s.Name)
+			if strings.Contains(l_name, "-furigana") {
+				continue
+			}
 			choir := strings.Contains(l_name, "choir") || strings.Contains(l_name, "spoken")
 			if s.SecondaryColour == colour.White {
 				if choir {
-					whiteChoirStyleCnt += 1
+					whiteChoirStyleCnt++
 				} else {
-					whiteUnknownStyleCnt += 1
+					whiteUnknownStyleCnt++
 				}
 			} else {
 				if choir {
-					nonWhiteChoirStyleCnt += 1
+					nonWhiteChoirStyleCnt++
 				} else {
-					nonWhiteUnknownStyleCnt += 1
+					nonWhiteUnknownStyleCnt++
 				}
 			}
 		}
@@ -138,7 +143,7 @@ func (p StyleSingleWhite) Run(ctx context.Context, KaraData *karadata.KaraData) 
 		return report.Fail(severity.Warning, "found multiple styles with white as secondary color: should it be converted to group singing karaoke?"), nil
 	}
 	// TODO: update this when multi-track drifting is released
-	if len(styles) < (len(KaraData.Lyrics[0].Styles) - 1) {
+	if unused > 0 {
 		return report.Fail(severity.Info, "found some styles not used by Dialogue lines: if you are integrating this karaoke make sure to enable the \"cleanup lyrics\" function in Karaoke Mugen (or maybe a style is used only by a Comment line?)"), nil
 	}
 
