@@ -14,6 +14,8 @@ func Probes() []probe.Probe {
 	return []probe.Probe{
 		NewAltVersionWithoutParent(),
 		NewAudioOnlyCreditless(),
+		NewAutomationAppliedLatin(),
+		NewAutomationAppliedNonLatin(),
 		NewCreditless(),
 		NewDoubleConsonant(),
 		NewLiveDownload(),
