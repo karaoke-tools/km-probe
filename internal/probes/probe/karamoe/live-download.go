@@ -40,7 +40,7 @@ func NewLiveDownload() probe.Probe {
 // State of "no live download" collections as of 2025-01-06
 var collectionsNoLiveDownload = []uuid.UUID{
 	collection.Asia,
-	collection.Kana,
+	collection.NonLatin,
 	collection.West,
 }
 

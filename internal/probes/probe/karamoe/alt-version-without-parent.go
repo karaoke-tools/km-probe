@@ -26,7 +26,7 @@ type AltVersionWithoutParent struct {
 	probe.WithDefault
 }
 
-// version.Cover, version.OffVocal and version.Kana are non critical
+// version.Cover, version.OffVocal and version.NonLatin are non critical
 var versionsWithoutParentCritical = []uuid.UUID{
 	version.Acoustic,
 	version.Alternative,

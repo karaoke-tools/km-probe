@@ -36,8 +36,8 @@ func NewVowelMacron() probe.Probe {
 				cond.NoLyrics{},
 				cond.HasAnyTagFrom{
 					TagType: tag.Collections,
-					Tags:    []uuid.UUID{collection.Kana},
-					Msg:     "kana karaoke",
+					Tags:    []uuid.UUID{collection.NonLatin},
+					Msg:     "non-latin script karaoke",
 				},
 				cond.HasTagsNotFrom{
 					TagType: tag.Langs,

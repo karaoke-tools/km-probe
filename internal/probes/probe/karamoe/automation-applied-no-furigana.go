@@ -11,6 +11,7 @@ import (
 	"github.com/karaoke-tools/km-probe/internal/ass/lyrics"
 	"github.com/karaoke-tools/km-probe/internal/karadata"
 	"github.com/karaoke-tools/km-probe/internal/karajson/karamoe/collection"
+	"github.com/karaoke-tools/km-probe/internal/karajson/system/language"
 	"github.com/karaoke-tools/km-probe/internal/karajson/tag"
 	"github.com/karaoke-tools/km-probe/internal/probes/probe"
 	"github.com/karaoke-tools/km-probe/internal/probes/probe/karamoe/baseprobe"
@@ -21,21 +22,29 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-type AutomationAppliedNonLatin struct {
+type AutomationAppliedNoFurigana struct {
 	baseprobe.BaseProbe
 	probe.WithDefault
 }
 
-func NewAutomationAppliedNonLatin() probe.Probe {
-	return &AutomationAppliedNonLatin{
-		baseprobe.New("automation-applied-non-latin",
-			"automation script not applied (non-latin scripts only) ",
+func NewAutomationAppliedNoFurigana() probe.Probe {
+	return &AutomationAppliedNoFurigana{
+		baseprobe.New("automation-applied-no-furigana",
+			"automation script not applied (karaoke without furigana) ",
 			cond.Any{
 				cond.NoLyrics{},
-				cond.HasNoTagFrom{
-					TagType: tag.Collections,
-					Tags:    []uuid.UUID{collection.Kana},
-					Msg:     "karaoke in latin script",
+				cond.All{
+					// we skip this probe when karaoke is in furigana (non-latin with japanese)
+					cond.HasAnyTagFrom{
+						TagType: tag.Collections,
+						Tags:    []uuid.UUID{collection.NonLatin},
+						Msg:     "karaoke with latin script",
+					},
+					cond.HasAnyTagFrom{
+						TagType: tag.Langs,
+						Tags:    []uuid.UUID{language.JPN},
+						Msg:     "japanese karaoke",
+					},
 				},
 			},
 		),
@@ -43,28 +52,29 @@ func NewAutomationAppliedNonLatin() probe.Probe {
 	}
 }
 
-// This is a generic version of "`automation-applied` probe" where we only check if at least one
-// line has been generated from automation script and no line with "karaoke" effect is uncommented.
-func (p AutomationAppliedNonLatin) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+func (p AutomationAppliedNoFurigana) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	// TODO: update this when multi-track drifting is released
-	fx := false
+	fx := 0
+	karaoke := 0
 	for _, line := range KaraData.Lyrics[0].Events {
 		select {
 		case <-ctx.Done():
 			return report.Abort(), ctx.Err()
 		default:
-			if line.Type == lyrics.Dialogue {
+			if line.Type == lyrics.Comment && line.Effect == "karaoke" {
+				karaoke++
+			} else if line.Type == lyrics.Dialogue {
 				switch line.Effect {
 				case "fx":
-					fx = true
+					fx++
 				case "karaoke":
 					return report.Fail(severity.Critical, "automation script has not been applied"), nil
 				}
 			}
 		}
 	}
-	if fx {
-		return report.Pass(), nil
+	if fx == 0 || karaoke != fx {
+		return report.Fail(severity.Critical, "automation script has not been applied"), nil
 	}
-	return report.Fail(severity.Critical, "automation script has not been applied"), nil
+	return report.Pass(), nil
 }
