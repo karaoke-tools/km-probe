@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/karaoke-tools/km-probe/internal/karadata"
+	"github.com/karaoke-tools/km-probe/internal/karajson/karamoe/origin"
 	"github.com/karaoke-tools/km-probe/internal/karajson/karamoe/songtype"
 	"github.com/karaoke-tools/km-probe/internal/karajson/karamoe/version"
 	"github.com/karaoke-tools/km-probe/internal/karajson/tag"
@@ -35,6 +36,18 @@ func NewFullAudioOnlyOrigin() probe.Probe {
 				cond.HasEmptyTagtype{
 					TagType: tag.Origins,
 					Msg:     "has no origin",
+				},
+				cond.All{
+					cond.HasLessTagsThan{
+						TagType: tag.Origins,
+						Number:  2,
+						Msg:     "has a single origin tag",
+					},
+					cond.HasAnyTagFrom{
+						TagType: tag.Origins,
+						Tags:    []uuid.UUID{origin.Vtuber},
+						Msg:     "vtuber tag",
+					},
 				},
 				cond.HasNoTagFrom{
 					TagType: tag.Versions,
