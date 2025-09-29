@@ -19,22 +19,22 @@ import (
 	"github.com/karaoke-tools/km-probe/internal/probes/skip/cond"
 )
 
-type KfShortSyllabes struct {
+type KfShortSyllables struct {
 	baseprobe.BaseProbe
 	probe.WithDefault
 }
 
-func NewKfShortSyllabes() probe.Probe {
-	return &KfShortSyllabes{
-		baseprobe.New("kf-short-syllabes",
-			"kf on very short syllabes",
+func NewKfShortSyllables() probe.Probe {
+	return &KfShortSyllables{
+		baseprobe.New("kf-short-syllables",
+			"kf on very short syllables",
 			cond.NoLyrics{},
 		),
 		baseprobe.EnabledByDefault{},
 	}
 }
 
-func (p KfShortSyllabes) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+func (p KfShortSyllables) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	warning := false
 	// TODO: update this when multi-track drifting is released
 	for _, line := range KaraData.Lyrics[0].Events {

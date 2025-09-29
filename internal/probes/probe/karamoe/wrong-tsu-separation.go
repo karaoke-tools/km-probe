@@ -28,7 +28,7 @@ type WrongTsuSeparation struct {
 	probe.WithDefault
 }
 
-// In japanese, `つ` should be timed as a single syllabe: `tsu`.
+// In japanese, `つ` should be timed as a single syllable: `tsu`.
 // For example, `ひとつ`(`hitotsu`) should be timed as `hi|to|tsu` and not as `hi|tot|su`.
 func NewWrongTsuSeparation() probe.Probe {
 	return &WrongTsuSeparation{
@@ -70,7 +70,7 @@ func (p WrongTsuSeparation) Run(ctx context.Context, KaraData *karadata.KaraData
 							if strings.HasSuffix(syll, "t") {
 								ok = true
 							} else if ok && strings.HasPrefix(syll, "su") {
-								return report.Fail(severity.Critical, "`tsu` must be timed as a single syllabe"), nil
+								return report.Fail(severity.Critical, "`tsu` must be timed as a single syllable"), nil
 							} else {
 								ok = false
 							}

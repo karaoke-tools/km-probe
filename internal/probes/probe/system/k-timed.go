@@ -47,5 +47,5 @@ func (p KTimed) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Re
 			}
 		}
 	}
-	return report.Fail(severity.Critical, "karaoke must not simply be line-timed, they must be syllabe-timed"), nil
+	return report.Fail(severity.Critical, "karaoke must not simply be line-timed, they must be syllable-timed"), nil
 }

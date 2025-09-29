@@ -21,7 +21,7 @@ func Probes() []probe.Probe {
 		NewFromDisplayType(),
 		NewFullKf(),
 		NewGiantFont(),
-		NewKfShortSyllabes(),
+		NewKfShortSyllables(),
 		NewKTimed(),
 		NewLyricsWarningZXX(),
 		NewMediaWarningAudioOnly(),
