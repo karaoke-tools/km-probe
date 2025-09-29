@@ -18,6 +18,8 @@ func Probes() []probe.Probe {
 		NewAutomationAppliedNoFurigana(),
 		NewCreditless(),
 		NewDoubleConsonant(),
+		NewFullAudioOnlyOrigin(),
+		NewFullAudioOnlySongtype(),
 		NewLiveDownload(),
 		NewLongTagOnShortMedia(),
 		NewMusicVideoCreditless(),

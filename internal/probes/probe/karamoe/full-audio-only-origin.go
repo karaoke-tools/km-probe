@@ -10,6 +10,7 @@ import (
 
 	"github.com/karaoke-tools/km-probe/internal/karadata"
 	"github.com/karaoke-tools/km-probe/internal/karajson/karamoe/songtype"
+	"github.com/karaoke-tools/km-probe/internal/karajson/karamoe/version"
 	"github.com/karaoke-tools/km-probe/internal/karajson/tag"
 	"github.com/karaoke-tools/km-probe/internal/probes/probe"
 	"github.com/karaoke-tools/km-probe/internal/probes/probe/karamoe/baseprobe"
@@ -20,26 +21,30 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-type NoOrigin struct {
+type FullAudioOnlyOrigin struct {
 	baseprobe.BaseProbe
 	probe.WithDefault
 }
 
-func NewNoOrigin() probe.Probe {
-	return &NoOrigin{
+func NewFullAudioOnlyOrigin() probe.Probe {
+	return &FullAudioOnlyOrigin{
 		baseprobe.New(
-			"no-origin",
-			"songtype is OP/ED/IN but origin tag is missing",
+			"full-audio-only-origin",
+			"audio only song cannot have origin when they have not the same size than actual OP/ED/IN",
 			cond.Any{
-				cond.HasMoreTagsThan{
+				cond.HasEmptyTagtype{
 					TagType: tag.Origins,
-					Number:  0,
-					Msg:     "has origin",
+					Msg:     "has no origin",
+				},
+				cond.HasNoTagFrom{
+					TagType: tag.Versions,
+					Tags:    []uuid.UUID{version.Full},
+					Msg:     "is not a full version",
 				},
 				cond.HasNoTagFrom{
 					TagType: tag.Songtypes,
-					Tags:    []uuid.UUID{songtype.OP, songtype.ED, songtype.IN},
-					Msg:     "songtype is not OP/ED/IN",
+					Tags:    []uuid.UUID{songtype.AUDIO},
+					Msg:     "is not an audio only",
 				},
 			},
 		),
@@ -47,6 +52,6 @@ func NewNoOrigin() probe.Probe {
 	}
 }
 
-func (p NoOrigin) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
-	return report.Fail(severity.Critical, "add the missing origin tag"), nil
+func (p FullAudioOnlyOrigin) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+	return report.Fail(severity.Critical, "remove origin tag"), nil
 }
