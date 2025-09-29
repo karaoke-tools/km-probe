@@ -67,6 +67,7 @@ type Data struct {
 	Parents               []uuid.UUID       `json:"parents"`
 	Repository            string            `json:"repository"`
 	Songname              string            `json:"songname"`
+	Songorder             *json.Number      `json:"songorder,omitempty"`
 	Tags                  Tags              `json:"tags"`
 	Titles                map[string]string `json:"titles"`
 	TitlesAliases         []string          `json:"titles_aliases"`

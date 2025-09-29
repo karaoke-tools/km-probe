@@ -11,7 +11,7 @@ import (
 
 var (
 	// origins
-	Fanworks                 = uuid.Must(uuid.FromString("3026d1b1-4109-4d6c-9600-7e68fbf4a789"))
+	Fanworks                 = uuid.Must(uuid.FromString("ac5085db-52d8-44b4-8fbb-1697b24d2046"))
 	Movie                    = uuid.Must(uuid.FromString("c8ca9dea-d8b4-48fe-8427-d911653232e9"))
 	Musical                  = uuid.Must(uuid.FromString("75b8f183-59d6-4294-bc2e-d1e0f34a1443"))
 	OriginalNetworkAnimation = uuid.Must(uuid.FromString("8db3e098-06ef-45e5-bba9-cb04a21c1e66"))
