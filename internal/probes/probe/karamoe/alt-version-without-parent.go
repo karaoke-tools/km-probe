@@ -26,7 +26,12 @@ type AltVersionWithoutParent struct {
 	probe.WithDefault
 }
 
-// version.Cover, version.OffVocal and version.NonLatin are non critical
+var versionsWithoutParentInfo = []uuid.UUID{
+	version.Cover,
+	version.OffVocal,
+	version.NonLatin,
+}
+
 var versionsWithoutParentCritical = []uuid.UUID{
 	version.Acoustic,
 	version.Alternative,
@@ -37,6 +42,10 @@ var versionsWithoutParentCritical = []uuid.UUID{
 
 func isVersionWithoutParentCritical(versionType uuid.UUID) bool {
 	return slices.Contains(versionsWithoutParentCritical, versionType)
+}
+
+func isVersionWithoutParentInfo(versionType uuid.UUID) bool {
+	return slices.Contains(versionsWithoutParentInfo, versionType)
 }
 
 func NewAltVersionWithoutParent() probe.Probe {
@@ -59,6 +68,10 @@ func NewAltVersionWithoutParent() probe.Probe {
 func (p AltVersionWithoutParent) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
 	if slices.ContainsFunc(KaraData.KaraJson.Data.Tags.Versions, isVersionWithoutParentCritical) {
 		return report.Fail(severity.Critical, "check if a potential parent exists, or if the version tag is relevant"), nil
+	}
+
+	if slices.ContainsFunc(KaraData.KaraJson.Data.Tags.Versions, isVersionWithoutParentInfo) {
+		return report.Fail(severity.Info, "has a version tag but no parent: if the parent exist, don't forget to add it"), nil
 	}
 	return report.Pass(), nil
 }
