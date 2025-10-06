@@ -25,6 +25,7 @@ func Probes() []probe.Probe {
 		NewMusicVideoCreditless(),
 		NewNoOrigin(),
 		NewSongorderNoOpEd(),
+		NewSongtypeConflict(),
 		NewStyleSingleWhite(),
 		NewVersionConflict(),
 		NewVowelMacron(),
