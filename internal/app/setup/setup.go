@@ -77,9 +77,9 @@ func FromCli(ctx *cli.Context) *Setup {
 	case "always":
 		s.Color = true
 	default:
-		// by default, we display colors if this is not a json output
+		// by default, we display colors if this is a terminal
 		// note: colors are currently not supported with json output
-		s.Color = !s.OutputJson
+		s.Color = isTerminal
 		if os.Getenv("NO_COLOR") != "" || os.Getenv("TERM") == "dumb" {
 			s.Color = false
 		}
