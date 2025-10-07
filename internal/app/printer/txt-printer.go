@@ -55,14 +55,14 @@ func (p *TxtPrinter) Encode(ctx context.Context, a *probes.Aggregator) error {
 }
 
 func (p *TxtPrinter) encodeAggregator(ctx context.Context, a *probes.Aggregator, builder *strings.Builder) error {
-	size, err := term.GetWinsize(os.Stdout.Fd())
-	if err != nil {
-		return err
+	width := uint16(200)
+	if size, err := term.GetWinsize(os.Stdout.Fd()); err == nil {
+		width = size.Width
 	}
 
 	msg := fmt.Sprintf("%s [%s] (%s)", a.Songname, a.Kid.String(), a.Repository)
 	cursor := 0
-	wrap := int(max(1, size.Width))
+	wrap := int(max(1, width))
 	for next := min(wrap, len(msg)); cursor < len(msg); next = min(next+wrap, len(msg)) {
 		if p.Color {
 			if a.Stats.FailedCritical > 0 {
@@ -161,7 +161,7 @@ func (p *TxtPrinter) encodeAggregator(ctx context.Context, a *probes.Aggregator,
 	}
 	msg = builder.String()
 	builder.Reset()
-	wrap = int(max(1, size.Width-4)) // 2 is size of start of line "  > "
+	wrap = int(max(1, width-4)) // 2 is size of start of line "  > "
 	cursor = 0
 	for next := min(wrap, len(msg)); cursor < len(msg); next = min(next+wrap, len(msg)) {
 		// avoid splitting inside a word
@@ -218,7 +218,7 @@ func (p *TxtPrinter) encodeAggregator(ctx context.Context, a *probes.Aggregator,
 		fmt.Println(builder.String())
 		builder.Reset()
 
-		wrap := int(max(1, size.Width-4)) // 4 is number of spaces at start of line in final formating
+		wrap := int(max(1, width-4)) // 4 is number of spaces at start of line in final formating
 		if msg := r.Message(); msg != "" {
 			cursor := 0
 			for next := min(wrap, len(msg)); cursor < len(msg); next = min(next+wrap, len(msg)) {
