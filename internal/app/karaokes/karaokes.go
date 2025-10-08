@@ -33,7 +33,7 @@ func FromCli(ctx *cli.Context) (*KaraokeSetup, error) {
 	}
 
 	// parse uuid
-	enabledUuids := ctx.StringSlice("uuid")
+	enabledUuids := ctx.StringSlice("kid")
 	for _, enabledUuid := range enabledUuids {
 		if u, err := uuid.FromString(enabledUuid); err != nil {
 			logrus.WithError(err).WithFields(logrus.Fields{

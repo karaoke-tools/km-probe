@@ -43,17 +43,17 @@ To list available probes, run `km-probe info`.
 If you want to run probes on all karaokes, you can use the command `km-probe karaokes`
 
 ### Run only on a subset of karaokes
-You can restrict the karaokes analysed by providing a repository and/or a karaoke UUID.
+You can restrict the karaokes analysed by providing a repository and/or a KID (Karaoke UUID).
 
 For example:
 
 ```bash
-$ km-probe karaokes --repo=mugen.re --uuid=c8e61289-31fd-430a-8a56-f0ed95f84d50
+$ km-probe karaokes --repo=mugen.re --kid=c8e61289-31fd-430a-8a56-f0ed95f84d50
 ```
 
 If you add those options multiple times, more karaoke will be analysed:
-- If you specify multiple repositories, all specified repositories will be searched
-- If you specify multiple uuids, all karaokes with this uuid will be analysed across all searched repositories
+- If you specify multiple repositories, all specified repositories will be searched.
+- If you specify multiple KIDs, all karaokes a KID from the list will be analysed across all searched repositories.
 
 ### Run only on new/modified karaokes
 If you want to run only on new/modified karaoke (in comparison to the last local commit on the repository), you can run

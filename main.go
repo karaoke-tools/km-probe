@@ -94,15 +94,15 @@ func main() {
 				},
 				Flags: []cli.Flag{
 					&cli.StringSliceFlag{
-						Name:     "uuid",
-						Usage:    "select only karaokes with this `UUID`",
-						Required: false,
-						Action:   cliargs.CheckUuids,
-					},
-					&cli.StringSliceFlag{
 						Name:     "repo",
 						Usage:    "select only karaokes from this `REPOSITORY`",
 						Required: false,
+					},
+					&cli.StringSliceFlag{
+						Name:     "kid",
+						Usage:    "select only karaokes with this `KID` (Karaoke UUID)",
+						Required: false,
+						Action:   cliargs.CheckUuids,
 					},
 				},
 			},
