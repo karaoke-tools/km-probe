@@ -51,16 +51,15 @@ For example:
 $ km-probe karaokes --kid=c8e61289-31fd-430a-8a56-f0ed95f84d50
 ```
 
-This flag can be provided multiple times to list analyse several karaokes.
+This flag can be provided multiple times to analyse several karaokes.
 
 
 ### Run only on new/modified karaokes
-If you want to run only on new/modified karaoke (in comparison to the last local commit on the repository), you can run
-the command `km-probe git`. You can restrict the search to a specific repository with the `--repo` argument.
+If you want to run only on new/modified karaoke (in comparison to the last local commit on the repository), you can run the command `km-probe git`.
 
 ### Global options
 #### Repositories
-By default, only enabled repositories are searched. If you want to search only from a subset of enabled repositories, you can use the flag `--repo`.
+By default, all enabled repositories are searched. If you want to search only from a subset of enabled repositories, you can use the flag `--repo`.
 When this flag is used with a repository name, all other repositories will be considered disabled.
 
 For example:
@@ -72,7 +71,7 @@ $ km-probe --repo=mugen.re karaokes --all
 This flag can be provided multiple times to enable several repositories.
 
 #### Output format
-By default the tool try to detect the optimal output format depending on the context.
+By default, the output format is detected automatically depending on the context.
 If the output is in a terminal, it will be displayed in human readable format.
 If the output is redirected to a file or another tool, the output is using `json` format.
 This allow you to easily re-use the output with other tools like [`jq`](https://github.com/jqlang/jq).
@@ -86,21 +85,20 @@ Some old terminal may not support ANSI escape codes. You can disable color using
 #### Hyperlinks
 By default, an hyperlink is created on the songname of analysed karaokes.
 It targets a modification page from your Karaoke Mugen application for this karaoke.
-Unfortunately, it is currently not possible to make this open directly into the application instead of in your browser (but it may be in the future).
+Unfortunately, it is currently not possible to open links directly into the application instead of in your browser (but it may be in the future).
 
 Not all terminals support hyperlinks. Some requires a special configuration to enable them but as long as ANSI escaping codes are supported
-on by your terminal, you should not notice them if there is no specific support for hyperlinks.
+by your terminal, you should not notice them even if there is no specific support for hyperlinks.
 
 If hyperlinks annoy you, they can be disabled using the `--hyperlink=never` option.
 
 ## How to install
 ### From release artifacts
 1. Download the binary that matches your system for the latest release.
-2. In all the documentation we will assume you have renamed it to `km-probe`
+2. In all this documentation we will assume you have renamed it to `km-probe`
 3. Make it executable (on Linux `chmod +x km-probe`)
-4. Move it to a directory present in your `PATH` environment variable
-(so you can use the software without indicating the full path).
-For example on Linux `mkdir -p ~/bin && mv km-probe ~/bin` should work on most distributions.
+4. Move it to a directory present in your `PATH` environment variable (so you can use the software without indicating the full path).
+For example, on Linux `mkdir -p ~/bin && mv km-probe ~/bin` should work on most distributions.
 
 ### Other methods
 For all the methods below, you must have Go toolchain installed on your computer.
