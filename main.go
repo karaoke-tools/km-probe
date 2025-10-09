@@ -10,7 +10,6 @@ import (
 	"os"
 	"os/signal"
 	"runtime/debug"
-	"slices"
 	"strings"
 	"syscall"
 
@@ -20,7 +19,7 @@ import (
 	"github.com/karaoke-tools/km-probe/internal/app/karaokes"
 
 	"github.com/sirupsen/logrus"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 func main() {
@@ -30,16 +29,15 @@ func main() {
 	if info, ok := debug.ReadBuildInfo(); ok {
 		version = info.Main.Version
 	}
-	app := &cli.App{
-		Name:                 "km-probe",
-		Usage:                "find common mistakes within your Karaoke Mugen repositories",
-		EnableBashCompletion: true,
-		Authors: []*cli.Author{
-			{Name: "Louis Royer"},
+	app := &cli.Command{
+		Name:                  "km-probe",
+		Usage:                 "find common mistakes within your Karaoke Mugen repositories",
+		EnableShellCompletion: true,
+		Authors: []any{
+			"Louis Royer",
 		},
 		Version: version,
 		Flags: []cli.Flag{
-			// TODO: urfave/cli/v3: make the flags below Persistent (to allow using them after commands)
 			&cli.StringFlag{
 				Name:   "output-format",
 				Usage:  strings.Join([]string{"configure output `FORMAT`; ", cliargs.DisplayFormat}, ""),
@@ -58,72 +56,63 @@ func main() {
 				Value:  "auto",
 				Action: cliargs.CheckWhen,
 			},
+			&cli.StringSliceFlag{
+				Name:     "repo",
+				Usage:    "disable all repositories except this `REPOSITORY`",
+				Required: false,
+			},
 		},
-		Action: func(ctx *cli.Context) error {
-			// XXX: workaround for https://github.com/urfave/cli/issues/1993
-			// this disables the completion when the argument is `--`, which is better than bugged values
-			if slices.Contains([]string{"--generate-bash-completion"}, ctx.Args().First()) {
-				return nil
-			}
-			cli.ShowAppHelp(ctx)
-			return nil
-		},
+		OnUsageError:             cliargs.UsageError,
+		InvalidFlagAccessHandler: cliargs.InvalidFlagAccess,
+		CommandNotFound:          cliargs.CommandNotFound,
 		Commands: []*cli.Command{
 			{
-				Name:   "git",
-				Usage:  "Probes karaokes that has been modified locally and not yet committed to git",
-				Before: cliargs.CheckUnknownArgs,
-				Action: func(ctx *cli.Context) error {
-					return git.RunFromCli(ctx)
-				},
-				Flags: []cli.Flag{
-					// TODO: global flag (when info subcommand is able to use it)
-					&cli.StringSliceFlag{
-						Name:     "repo",
-						Usage:    "restrict selection to karaokes from this `REPOSITORY`",
-						Required: false,
-					},
-				},
+				Name:                     "git",
+				Usage:                    "Probes karaokes that has been modified locally and not yet committed to git",
+				Before:                   cliargs.CheckUnknownArgs,
+				Action:                   git.RunFromCommand,
+				OnUsageError:             cliargs.UsageError,
+				InvalidFlagAccessHandler: cliargs.InvalidFlagAccess,
 			},
 			{
-				Name:    "karaokes",
-				Aliases: []string{"karaoke", "kara"},
-				Usage:   "Probes selected karaokes of all enabled repositories",
-				Before:  cliargs.CheckUnknownArgs,
-				Action: func(ctx *cli.Context) error {
-					return karaokes.RunFromCli(ctx)
-				},
-				Flags: []cli.Flag{
-					&cli.StringSliceFlag{
-						Name:     "repo",
-						Usage:    "restrict selection to karaokes from this `REPOSITORY`",
-						Required: false,
+				Name:                     "karaokes",
+				Aliases:                  []string{"karaoke", "kara"},
+				Usage:                    "Probes selected karaokes of all enabled repositories",
+				Before:                   cliargs.CheckUnknownArgs,
+				Action:                   karaokes.RunFromCommand,
+				OnUsageError:             cliargs.UsageError,
+				InvalidFlagAccessHandler: cliargs.InvalidFlagAccess,
+				MutuallyExclusiveFlags: []cli.MutuallyExclusiveFlags{{
+					Flags: [][]cli.Flag{
+						{
+							&cli.StringSliceFlag{
+								Name:     "kid",
+								Usage:    "add karaokes with this `KID` (Karaoke UUID) to the selection",
+								Required: false,
+								Action:   cliargs.CheckUuids,
+							},
+						},
+						{
+							&cli.BoolFlag{
+								Name:     "all",
+								Usage:    "add all karaokes to the selection",
+								Required: false,
+							},
+						},
 					},
-					&cli.StringSliceFlag{
-						Name:     "kid",
-						Usage:    "add karaokes with this `KID` (Karaoke UUID) to the selection",
-						Required: false,
-						Action:   cliargs.CheckUuids,
-					},
-					// TODO: mutually exclusive with --kid
-					&cli.BoolFlag{
-						Name:     "all",
-						Usage:    "add all karaokes to the selection",
-						Required: false,
-					},
-				},
+				}},
 			},
 			{
-				Name:   "info",
-				Usage:  "Shows a list of available probes",
-				Before: cliargs.CheckUnknownArgs,
-				Action: func(ctx *cli.Context) error {
-					return info.RunFromCli(ctx)
-				},
+				Name:                     "info",
+				Usage:                    "Shows a list of available probes",
+				Before:                   cliargs.CheckUnknownArgs,
+				Action:                   info.RunFromCommand,
+				OnUsageError:             cliargs.UsageError,
+				InvalidFlagAccessHandler: cliargs.InvalidFlagAccess,
 			},
 		},
 	}
-	if err := app.RunContext(ctx, os.Args); err != nil {
+	if err := app.Run(ctx, os.Args); err != nil {
 		logrus.WithError(err).Fatal("Fatal error while running the application")
 	}
 }

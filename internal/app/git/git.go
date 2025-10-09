@@ -19,7 +19,7 @@ import (
 	"github.com/karaoke-tools/km-probe/internal/app/setup"
 
 	"github.com/sirupsen/logrus"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 type GitSetup struct {
@@ -28,9 +28,9 @@ type GitSetup struct {
 	BaseUri      string
 }
 
-func FromCli(ctx *cli.Context) (*GitSetup, error) {
+func FromCommand(command *cli.Command) (*GitSetup, error) {
 	s := &GitSetup{
-		Setup:        setup.FromCli(ctx),
+		Setup:        setup.FromCommand(command),
 		Repositories: make([]app.Repository, 0),
 	}
 
@@ -40,7 +40,7 @@ func FromCli(ctx *cli.Context) (*GitSetup, error) {
 	}
 	s.BaseUri = fmt.Sprintf("http://localhost:%d/system/karas/", kmConfig.System.FrontendPort)
 	for _, v := range kmConfig.System.Repositories {
-		if len(ctx.StringSlice("repo")) != 0 && !slices.Contains(ctx.StringSlice("repo"), v.Name) {
+		if len(command.StringSlice("repo")) != 0 && !slices.Contains(command.StringSlice("repo"), v.Name) {
 			// we can only probe in the configured repository
 			continue
 		}
@@ -70,17 +70,17 @@ func FromCli(ctx *cli.Context) (*GitSetup, error) {
 	}
 	if len(s.Repositories) == 0 {
 		logrus.WithFields(logrus.Fields{
-			"any-directories-from": ctx.StringSlice("repo"),
+			"any-directories-from": command.StringSlice("repo"),
 		}).Error("No repository found with the given names")
 	}
 	return s, nil
 }
 
-func RunFromCli(ctx *cli.Context) error {
-	if s, err := FromCli(ctx); err != nil {
+func RunFromCommand(ctx context.Context, command *cli.Command) error {
+	if s, err := FromCommand(command); err != nil {
 		return err
 	} else {
-		return s.Run(ctx.Context)
+		return s.Run(ctx)
 	}
 }
 

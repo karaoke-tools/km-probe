@@ -6,12 +6,13 @@
 package cliargs
 
 import (
+	"context"
 	"errors"
 	"regexp"
 	"slices"
 	"strings"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 // Arguments types
@@ -31,45 +32,58 @@ var re_uuid = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 var (
 	ErrWhenArgumentInvalid   = errors.New(strings.Join([]string{"Invalid value: ", DisplayWhen}, ""))
 	ErrFormatArgumentInvalid = errors.New(strings.Join([]string{"Invalid value: ", DisplayFormat}, ""))
-	ErrUuidArgumentInvalid   = errors.New("Invalid value: UUID argument is not matching the UUID format")
+	ErrUuidArgumentInvalid   = errors.New("Invalid value: KID argument is not matching the UUID format")
 	ErrUnknownArgument       = errors.New("Unknown argument")
+	ErrUnknownCommand        = errors.New("Unknown command")
 )
 
+// Usage error func
+func UsageError(ctx context.Context, command *cli.Command, err error, isSubcommand bool) error {
+	return err
+}
+
 // Errors when there are still unparsed arguments
-func CheckUnknownArgs(ctx *cli.Context) error {
-	if ctx.Args().Present() {
-		// XXX: workaround for https://github.com/urfave/cli/issues/1993
-		// this disables the completion when the argument is `--`, which is better than bugged values
-		if !slices.Contains([]string{"--generate-bash-completion"}, ctx.Args().First()) {
-			cli.ShowAppHelp(ctx)
-		}
-		return ErrUnknownArgument
+func CheckUnknownArgs(ctx context.Context, command *cli.Command) (context.Context, error) {
+	if command.Args().Present() {
+		cli.ShowAppHelp(command)
+		return ctx, ErrUnknownArgument
 	}
-	return nil
+	return ctx, nil
+}
+
+// Errors when the command does not exist
+func CommandNotFound(ctx context.Context, command *cli.Command, s string) {
+	cli.ShowAppHelp(command)
+}
+
+// Errors when flag does not exist
+func InvalidFlagAccess(ctx context.Context, command *cli.Command, s string) {
+	cli.ShowAppHelp(command)
 }
 
 // Validate argument type "WHEN"
-func CheckWhen(ctx *cli.Context, v string) error {
+func CheckWhen(ctx context.Context, command *cli.Command, v string) error {
 	if !slices.Contains(when, v) {
-		cli.ShowAppHelp(ctx)
+		cli.ShowAppHelp(command)
 		return ErrWhenArgumentInvalid
 	}
 	return nil
 }
 
 // Validate argument type "FORMAT"
-func CheckFormat(ctx *cli.Context, v string) error {
+func CheckFormat(ctx context.Context, command *cli.Command, v string) error {
 	if !slices.Contains(format, v) {
-		cli.ShowAppHelp(ctx)
+		cli.ShowAppHelp(command)
 		return ErrFormatArgumentInvalid
 	}
 	return nil
 }
 
 // Validate argument type "UUID"
-func CheckUuids(ctx *cli.Context, v []string) error {
+func CheckUuids(ctx context.Context, command *cli.Command, v []string) error {
 	for _, u := range v {
 		if !re_uuid.Match([]byte(u)) {
+			cli.ShowAppHelp(command)
 			return ErrUuidArgumentInvalid
 		}
 	}

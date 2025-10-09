@@ -16,7 +16,7 @@ clean:
 reinstall: uninstall install
 install:
 	$(INSTALL) km-probe $(DESTDIR)$(bindir)/km-probe
-	$(INSTALL) bash-completion/completions/km-probe $(DESTDIR)$(BASHCOMPLETIONSDIR)/km-probe
+	$(DESTDIR)$(bindir)/km-probe completion bash > $(DESTDIR)$(BASHCOMPLETIONSDIR)/km-probe
 	@echo "================================="
 	@echo ">> Now run the following command:"
 	@echo "\tsource $(DESTDIR)$(BASHCOMPLETIONSDIR)/km-probe"

@@ -15,7 +15,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 type KaraokeSetup struct {
@@ -26,16 +26,16 @@ type KaraokeSetup struct {
 	BaseUri      string
 }
 
-func FromCli(ctx *cli.Context) (*KaraokeSetup, error) {
+func FromCommand(command *cli.Command) (*KaraokeSetup, error) {
 	s := &KaraokeSetup{
-		Setup:        setup.FromCli(ctx),
+		Setup:        setup.FromCommand(command),
 		Repositories: make([]app.Repository, 0),
 		Uuids:        make([]uuid.UUID, 0),
 		All:          false,
 	}
 
 	// parse uuid
-	enabledUuids := ctx.StringSlice("kid")
+	enabledUuids := command.StringSlice("kid")
 	for _, enabledUuid := range enabledUuids {
 		if u, err := uuid.FromString(enabledUuid); err != nil {
 			logrus.WithError(err).WithFields(logrus.Fields{
@@ -47,7 +47,7 @@ func FromCli(ctx *cli.Context) (*KaraokeSetup, error) {
 		}
 	}
 
-	if ctx.Bool("all") {
+	if command.Bool("all") {
 		s.All = true
 	} else if len(s.Uuids) == 0 {
 		// TODO: check if stdin is connected to tty and update this to Error.
@@ -60,7 +60,7 @@ func FromCli(ctx *cli.Context) (*KaraokeSetup, error) {
 	}
 	s.BaseUri = fmt.Sprintf("http://localhost:%d/system/karas/", kmConfig.System.FrontendPort)
 	for _, v := range kmConfig.System.Repositories {
-		if len(ctx.StringSlice("repo")) != 0 && !slices.Contains(ctx.StringSlice("repo"), v.Name) {
+		if len(command.StringSlice("repo")) != 0 && !slices.Contains(command.StringSlice("repo"), v.Name) {
 			// we can only probe in the configured repository
 			continue
 		}
@@ -90,17 +90,17 @@ func FromCli(ctx *cli.Context) (*KaraokeSetup, error) {
 	}
 	if len(s.Repositories) == 0 {
 		logrus.WithFields(logrus.Fields{
-			"any-directories-from": ctx.StringSlice("repo"),
+			"any-directories-from": command.StringSlice("repo"),
 		}).Error("No repository found with the given names")
 	}
 	return s, nil
 }
 
-func RunFromCli(ctx *cli.Context) error {
-	if s, err := FromCli(ctx); err != nil {
+func RunFromCommand(ctx context.Context, command *cli.Command) error {
+	if s, err := FromCommand(command); err != nil {
 		return err
 	} else {
-		return s.Run(ctx.Context)
+		return s.Run(ctx)
 	}
 }
 

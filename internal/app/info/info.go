@@ -16,15 +16,15 @@ import (
 	"github.com/karaoke-tools/km-probe/internal/app/setup"
 	"github.com/karaoke-tools/km-probe/internal/probes"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 type ListProbes struct {
 	*setup.Setup
 }
 
-func FromCli(ctx *cli.Context) *ListProbes {
-	return &ListProbes{Setup: setup.FromCli(ctx)}
+func FromCommand(command *cli.Command) *ListProbes {
+	return &ListProbes{Setup: setup.FromCommand(command)}
 }
 
 type prb struct {
@@ -144,6 +144,6 @@ func (l *ListProbes) RunJson(ctx context.Context) error {
 	return nil
 }
 
-func RunFromCli(ctx *cli.Context) error {
-	return FromCli(ctx).Run(ctx.Context)
+func RunFromCommand(ctx context.Context, command *cli.Command) error {
+	return FromCommand(command).Run(ctx)
 }

@@ -10,7 +10,7 @@ import (
 
 	"github.com/moby/term"
 	"github.com/sirupsen/logrus"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 // Maximum number of karaokes processed simultaneously.
@@ -53,7 +53,7 @@ func (s *Setup) StopWork() {
 	}
 }
 
-func FromCli(ctx *cli.Context) *Setup {
+func FromCommand(command *cli.Command) *Setup {
 	s := &Setup{
 		withWorkers: true,
 		workers:     make(chan struct{}, MAX_WORKERS), // maximum number of simultaneous workers
@@ -61,7 +61,7 @@ func FromCli(ctx *cli.Context) *Setup {
 	isTerminal := term.IsTerminal(os.Stdout.Fd())
 
 	// get value for json
-	switch ctx.String("output-format") {
+	switch command.String("output-format") {
 	case "txt":
 		s.OutputJson = false
 	case "json":
@@ -71,7 +71,7 @@ func FromCli(ctx *cli.Context) *Setup {
 	}
 
 	// get value for color, this enables the use of ansi codes
-	switch ctx.String("color") {
+	switch command.String("color") {
 	case "never":
 		s.Color = false
 	case "always":
@@ -86,7 +86,7 @@ func FromCli(ctx *cli.Context) *Setup {
 	}
 
 	// get value for hypelink
-	switch ctx.String("hyperlink") {
+	switch command.String("hyperlink") {
 	case "never":
 		s.Hyperlink = false
 	case "always":
