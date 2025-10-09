@@ -40,7 +40,7 @@ To get a list of available commands and options, run `km-probe help`.
 To list available probes, run `km-probe info`.
 
 ### Run on karaokes
-If you want to run probes on all karaokes, you can use the command `km-probe karaokes`
+If you want to run probes on all karaokes, you can use the command `km-probe karaokes --all`
 
 ### Run only on a subset of karaokes
 You can restrict the karaokes analysed by providing a repository and/or a KID (Karaoke UUID).

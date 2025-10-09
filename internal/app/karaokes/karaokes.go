@@ -22,6 +22,7 @@ type KaraokeSetup struct {
 	*setup.Setup
 	Repositories []app.Repository
 	Uuids        []uuid.UUID
+	All          bool
 	BaseUri      string
 }
 
@@ -30,6 +31,7 @@ func FromCli(ctx *cli.Context) (*KaraokeSetup, error) {
 		Setup:        setup.FromCli(ctx),
 		Repositories: make([]app.Repository, 0),
 		Uuids:        make([]uuid.UUID, 0),
+		All:          false,
 	}
 
 	// parse uuid
@@ -43,6 +45,13 @@ func FromCli(ctx *cli.Context) (*KaraokeSetup, error) {
 		} else {
 			s.Uuids = append(s.Uuids, u)
 		}
+	}
+
+	if ctx.Bool("all") {
+		s.All = true
+	} else if len(s.Uuids) == 0 {
+		// TODO: check if stdin is connected to tty and update this to Error.
+		logrus.Info("No KID (Karaoke UUID) has been provided, nothing to do.")
 	}
 
 	kmConfig, err := app.LoadConf()
@@ -96,7 +105,7 @@ func RunFromCli(ctx *cli.Context) error {
 }
 
 func (s *KaraokeSetup) Run(ctx context.Context) error {
-	if len(s.Uuids) == 0 {
+	if s.All {
 		return s.RunAll(ctx)
 	}
 	return s.RunByUuid(ctx)

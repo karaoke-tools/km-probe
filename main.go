@@ -77,9 +77,10 @@ func main() {
 					return git.RunFromCli(ctx)
 				},
 				Flags: []cli.Flag{
+					// TODO: global flag (when info subcommand is able to use it)
 					&cli.StringSliceFlag{
 						Name:     "repo",
-						Usage:    "select only karaokes from this `REPOSITORY`",
+						Usage:    "restrict selection to karaokes from this `REPOSITORY`",
 						Required: false,
 					},
 				},
@@ -87,7 +88,7 @@ func main() {
 			{
 				Name:    "karaokes",
 				Aliases: []string{"karaoke", "kara"},
-				Usage:   "Probes all karaokes of all enabled repositories",
+				Usage:   "Probes selected karaokes of all enabled repositories",
 				Before:  cliargs.CheckUnknownArgs,
 				Action: func(ctx *cli.Context) error {
 					return karaokes.RunFromCli(ctx)
@@ -95,14 +96,20 @@ func main() {
 				Flags: []cli.Flag{
 					&cli.StringSliceFlag{
 						Name:     "repo",
-						Usage:    "select only karaokes from this `REPOSITORY`",
+						Usage:    "restrict selection to karaokes from this `REPOSITORY`",
 						Required: false,
 					},
 					&cli.StringSliceFlag{
 						Name:     "kid",
-						Usage:    "select only karaokes with this `KID` (Karaoke UUID)",
+						Usage:    "add karaokes with this `KID` (Karaoke UUID) to the selection",
 						Required: false,
 						Action:   cliargs.CheckUuids,
+					},
+					// TODO: mutually exclusive with --kid
+					&cli.BoolFlag{
+						Name:     "all",
+						Usage:    "add all karaokes to the selection",
+						Required: false,
 					},
 				},
 			},
