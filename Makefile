@@ -6,6 +6,7 @@ BASHCOMPLETIONSDIR = $(exec_prefix)/share/bash-completion/completions
 
 RM = rm -f
 INSTALL = install -D
+MKDIRP = mkdir -p
 
 .PHONY: install uninstall build clean default
 default: build
@@ -16,6 +17,7 @@ clean:
 reinstall: uninstall install
 install:
 	$(INSTALL) km-probe $(DESTDIR)$(bindir)/km-probe
+	$(MKDIRP) $(DESTDIR)$(BASHCOMPLETIONSDIR)
 	$(DESTDIR)$(bindir)/km-probe completion bash > $(DESTDIR)$(BASHCOMPLETIONSDIR)/km-probe
 	@echo "================================="
 	@echo ">> Now run the following command:"
