@@ -11,7 +11,7 @@ import (
 	"github.com/karaoke-tools/km-probe/internal/karadata"
 	"github.com/karaoke-tools/km-probe/internal/karajson/tag"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 )
 
 type HasAnyTagFrom struct {

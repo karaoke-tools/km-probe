@@ -18,7 +18,7 @@ import (
 	"github.com/karaoke-tools/km-probe/internal/probes/report/severity"
 	"github.com/karaoke-tools/km-probe/internal/probes/report/status"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 )
 
 type Aggregator struct {

@@ -11,7 +11,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 )
 
 func FromFile(ctx context.Context, path string) (*KaraJson, error) {

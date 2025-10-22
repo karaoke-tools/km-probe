@@ -11,7 +11,7 @@ import (
 
 	"github.com/karaoke-tools/km-probe/internal/karajson/tag"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 )
 
 func (k KaraJson) Tag(t tag.Tag) []uuid.UUID {

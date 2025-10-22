@@ -13,7 +13,7 @@ import (
 	"github.com/karaoke-tools/km-probe/internal/app"
 	"github.com/karaoke-tools/km-probe/internal/app/setup"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v3"
 )

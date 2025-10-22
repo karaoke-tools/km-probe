@@ -6,7 +6,7 @@
 package platform
 
 import (
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 )
 
 var (

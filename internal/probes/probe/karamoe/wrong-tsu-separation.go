@@ -20,7 +20,7 @@ import (
 	"github.com/karaoke-tools/km-probe/internal/probes/report/severity"
 	"github.com/karaoke-tools/km-probe/internal/probes/skip/cond"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 )
 
 type WrongTsuSeparation struct {
