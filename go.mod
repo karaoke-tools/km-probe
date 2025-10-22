@@ -7,7 +7,7 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/moby/term v0.5.2
 	github.com/sirupsen/logrus v1.9.3
-	github.com/urfave/cli/v3 v3.4.1
+	github.com/urfave/cli/v3 v3.5.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
