@@ -122,13 +122,20 @@ func (l Line) StripTags() string {
 	return strings.Join(r[:], "")
 }
 
-var re_kf_len = regexp.MustCompile(`{\\kf(\d+)}`)
+func (l Line) String() string {
+	return strings.Join(l.TagsSplit[:], "")
+}
+
+var re_kf_len = regexp.MustCompile(`{\\kf(\d+)}\s*[^\s{]`)
 
 func (l Line) KfLen() []int {
 	r := make([]int, 0)
-	for _, e := range l.TagsSplit {
-		if f := re_kf_len.FindStringSubmatch(e); f != nil {
-			if i, err := strconv.Atoi(f[1]); err == nil {
+	if f := re_kf_len.FindAllStringSubmatch(l.String(), len(l.TagsSplit)/2); f != nil {
+		for _, e := range f {
+			if len(e) < 2 {
+				continue
+			}
+			if i, err := strconv.Atoi(e[1]); err == nil {
 				r = append(r, i)
 			}
 		}
