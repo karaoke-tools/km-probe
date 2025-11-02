@@ -36,6 +36,7 @@ func Probes() []probe.Probe {
 		NewStyleScale(),
 		NewTooManyLangTags(),
 		NewUnknownMediaContent(),
+		NewUnicodeWeirdSpaces(),
 		NewVideoContainerWithAudioOnlyTag(),
 	}
 }
