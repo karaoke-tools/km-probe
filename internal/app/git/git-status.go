@@ -33,6 +33,12 @@ func GitModifiedKaras(ctx context.Context, path string) ([]uuid.UUID, error) {
 		return kara, ErrNotAGitRepo
 	}
 	cmd := exec.CommandContext(ctx, "git", "-C", filepath.Clean(path), "status", "--porcelain=v2")
+
+	// Clear environment variables:
+	// - We don't want any third party process (or the user) to be able to interact with git process
+	// - We don't want to risk leaking any environment variable to git process
+	cmd.Env = []string{}
+
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return kara, err
