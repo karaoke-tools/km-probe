@@ -126,19 +126,46 @@ func (l Line) String() string {
 	return strings.Join(l.TagsSplit[:], "")
 }
 
-var re_kf_len = regexp.MustCompile(`{\\kf(\d+)}\s*[^\s{]`)
+var re_kf = regexp.MustCompile(`{\\kf(\d+)}`)
+var re_k = regexp.MustCompile(`{\\k(\d+)}`)
 
 func (l Line) KfLen() []int {
 	r := make([]int, 0)
-	if f := re_kf_len.FindAllStringSubmatch(l.String(), len(l.TagsSplit)/2); f != nil {
-		for _, e := range f {
-			if len(e) < 2 {
-				continue
+	kfChain := 0
+	for _, ts := range l.TagsSplit {
+		if f := re_kf.FindStringSubmatch(ts); f != nil {
+			duration := 0
+			if i, err := strconv.Atoi(f[1]); err == nil {
+				duration = i
 			}
-			if i, err := strconv.Atoi(e[1]); err == nil {
-				r = append(r, i)
+			if kfChain == 0 {
+				r = append(r, duration)
+			} else {
+				lastDuration := r[len(r)-1]
+				kfInverseMean := kfChain * duration                                         // to avoid doing working with floats
+				if (lastDuration+1 >= kfInverseMean) && (kfInverseMean >= lastDuration-1) { // duration = (mean of duration) ± ε
+					r[len(r)-1] = lastDuration + duration
+				} else {
+					r = append(r, duration)
+					kfChain = 0
+				}
+			}
+			kfChain++
+		} else if kfChain > 0 {
+			if f := re_k.FindStringSubmatch(ts); f != nil { // is a k-tag
+				kfChain = 0
+			} else { // is the content of the syllable
+				if len(r) > 0 && strings.TrimSpace(ts) == "" {
+					r = r[:len(r)-1] // we remove empty kf syllables
+				}
+				if !strings.Contains(ts, "|") {
+					kfChain = 0
+				}
 			}
 		}
+	}
+	if kfChain > 0 && len(r) > 0 { // last syllable is empty
+		r = r[:len(r)-1]
 	}
 	return r
 }
