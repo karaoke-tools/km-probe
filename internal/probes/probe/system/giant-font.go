@@ -39,6 +39,10 @@ const (
 )
 
 func (p GiantFont) Run(ctx context.Context, KaraData *karadata.KaraData) (report.Report, error) {
+	// TODO: update this when multi-track drifting is released
+	if KaraData.Lyrics[0].ScriptInfo.PlayResX != 0 || KaraData.Lyrics[0].ScriptInfo.PlayResY != 0 {
+		return report.Skip("resolution is not 0×0"), nil
+	}
 	warn := false
 	// TODO: update this when multi-track drifting is released
 	for _, line := range KaraData.Lyrics[0].Styles {
@@ -52,7 +56,7 @@ func (p GiantFont) Run(ctx context.Context, KaraData *karadata.KaraData) (report
 					return report.Abort(), err
 				}
 				if s.Fontsize >= GIANT_FONT_SIZE_CRITICAL {
-					return report.Fail(severity.Critical, "found a style with a big fontsize: if resolution is already 0x0, consider reducing font size (it may be hard to identify big text as lyrics to actually sing)"), nil
+					return report.Fail(severity.Critical, "found a style with a big fontsize: consider reducing font size (it may be hard to identify big text as lyrics to actually sing)"), nil
 				}
 				if s.Fontsize >= GIANT_FONT_SIZE_WARNING {
 					warn = true
@@ -61,7 +65,7 @@ func (p GiantFont) Run(ctx context.Context, KaraData *karadata.KaraData) (report
 		}
 	}
 	if warn {
-		return report.Fail(severity.Warning, "found a style with a big fontsize: if resolution is already 0x0, consider reducing font size (it may be hard to identify big text as lyrics to actually sing) "), nil
+		return report.Fail(severity.Warning, "found a style with a big fontsize: consider reducing font size (it may be hard to identify big text as lyrics to actually sing) "), nil
 	}
 	return report.Pass(), nil
 }
