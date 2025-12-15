@@ -35,7 +35,7 @@ jobs:
         name: Add .exe extension
         run: mv km-probe-${{ steps.version.outputs.version }}-${{ matrix.os }}-${{ matrix.arch }}{,.exe}
       - name: Upload build artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: km-probe-${{ steps.version.outputs.version }}-${{ matrix.os }}-${{ matrix.arch }}
           path: km-probe*
