@@ -7,7 +7,9 @@ on:
 jobs:
   build-release:
     name: Build release artifacts
-    permissions: {}
+    permissions:
+      id-token: write
+      attestations: write
     strategy:
       matrix:
         os: [linux, darwin, windows]
@@ -34,6 +36,10 @@ jobs:
       - if: matrix.os == 'windows'
         name: Add .exe extension
         run: mv km-probe-${{ steps.version.outputs.version }}-${{ matrix.os }}-${{ matrix.arch }}{,.exe}
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: km-probe*
       - name: Upload build artifact
         uses: actions/upload-artifact@v6
         with:
