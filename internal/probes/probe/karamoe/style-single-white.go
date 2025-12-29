@@ -15,6 +15,7 @@ import (
 	"github.com/karaoke-tools/km-probe/internal/ass/style/colour"
 	"github.com/karaoke-tools/km-probe/internal/karadata"
 	"github.com/karaoke-tools/km-probe/internal/karajson/karamoe/misc"
+	"github.com/karaoke-tools/km-probe/internal/karajson/karamoe/origin"
 	"github.com/karaoke-tools/km-probe/internal/karajson/system/language"
 	"github.com/karaoke-tools/km-probe/internal/karajson/tag"
 	"github.com/karaoke-tools/km-probe/internal/probes/probe"
@@ -51,6 +52,13 @@ func NewStyleSingleWhite() probe.Probe {
 					TagType: tag.Langs,
 					Tags:    []uuid.UUID{language.MUL},
 					Msg:     "is multilingual karaoke", // we can use one color by language
+				},
+				cond.HasAnyTagFrom{
+					TagType: tag.Origins,
+					Tags:    []uuid.UUID{origin.Musical},
+					// musicals often have dialogues,
+					// and it's okay to have multiple colors even if this is not a group singing karaoke
+					Msg: "is from a musical",
 				},
 			},
 		),
