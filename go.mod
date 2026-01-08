@@ -1,6 +1,6 @@
 module github.com/karaoke-tools/km-probe
 
-go 1.25.1
+go 1.25.5
 
 require (
 	github.com/adrg/xdg v0.5.3
@@ -13,5 +13,5 @@ require (
 
 require (
 	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
-	golang.org/x/sys v0.37.0 // indirect
+	golang.org/x/sys v0.40.0 // indirect
 )
