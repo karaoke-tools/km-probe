@@ -22,14 +22,15 @@ type BaseProbe struct {
 
 func New(pkg string, name string, desc string, skipCond skip.Condition) BaseProbe {
 	return BaseProbe{
-		name:     strings.Join([]string{pkg, name}, "."),
+		pkg:      pkg,
+		name:     name,
 		desc:     desc,
 		skipCond: skipCond,
 	}
 }
 
 func (p BaseProbe) Name() string {
-	return p.name
+	return strings.Join([]string{p.pkg, p.name}, ".")
 }
 
 func (p BaseProbe) Description() string {
