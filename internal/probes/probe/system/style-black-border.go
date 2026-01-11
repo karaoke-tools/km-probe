@@ -50,7 +50,6 @@ func (p StyleBlackBorder) Run(ctx context.Context, KaraData *karadata.KaraData) 
 					// border color must be black
 					return report.Fail(severity.Warning, "outline must be black (this probe can only check if this is pure black, nuances of black might be okay"), nil
 				}
-				break
 			}
 		}
 	}
