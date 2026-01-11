@@ -10,5 +10,5 @@ import (
 )
 
 var (
-	ErrMalformedLine = errors.New("Malformed style line")
+	ErrMalformedLine = errors.New("malformed style line")
 )

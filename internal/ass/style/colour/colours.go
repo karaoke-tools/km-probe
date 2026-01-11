@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	ErrInvalidFormat = errors.New("Invalid colour format")
+	ErrInvalidFormat = errors.New("invalid colour format")
 )
 
 type ColourComponent uint8

@@ -12,6 +12,6 @@ import (
 var (
 	ErrConfigNotFound         = errors.New("KM configuration file not found")
 	ErrDataRepositoryNotFound = errors.New("KM data repository not found")
-	ErrKaraokeNotFound        = errors.New("Karaoke not found")
-	ErrDuplicateKaraoke       = errors.New("Karaoke found in multiple repositories")
+	ErrKaraokeNotFound        = errors.New("karaoke not found")
+	ErrDuplicateKaraoke       = errors.New("karaoke found in multiple repositories")
 )

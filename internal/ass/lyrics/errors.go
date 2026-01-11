@@ -10,5 +10,5 @@ import (
 )
 
 var (
-	ErrMalformedLine = errors.New("Malformed lyrics line")
+	ErrMalformedLine = errors.New("malformed lyrics line")
 )

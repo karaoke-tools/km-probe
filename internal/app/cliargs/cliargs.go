@@ -30,11 +30,11 @@ var re_uuid = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 
 // Argument parsing errors
 var (
-	ErrWhenArgumentInvalid   = errors.New(strings.Join([]string{"Invalid value: ", DisplayWhen}, ""))
-	ErrFormatArgumentInvalid = errors.New(strings.Join([]string{"Invalid value: ", DisplayFormat}, ""))
-	ErrUuidArgumentInvalid   = errors.New("Invalid value: KID argument is not matching the UUID format")
-	ErrUnknownArgument       = errors.New("Unknown argument")
-	ErrUnknownCommand        = errors.New("Unknown command")
+	ErrWhenArgumentInvalid   = errors.New(strings.Join([]string{"invalid value: ", DisplayWhen}, ""))
+	ErrFormatArgumentInvalid = errors.New(strings.Join([]string{"invalid value: ", DisplayFormat}, ""))
+	ErrUuidArgumentInvalid   = errors.New("invalid value: KID argument is not matching the UUID format")
+	ErrUnknownArgument       = errors.New("unknown argument")
+	ErrUnknownCommand        = errors.New("unknown command")
 )
 
 // Usage error func

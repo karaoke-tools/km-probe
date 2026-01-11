@@ -10,5 +10,5 @@ import (
 )
 
 var (
-	ErrNoMedias = errors.New("No medias")
+	ErrNoMedias = errors.New("no medias")
 )

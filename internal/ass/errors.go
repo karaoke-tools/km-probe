@@ -10,5 +10,5 @@ import (
 )
 
 var (
-	ErrMalformedFile = errors.New("Malformed ASS file")
+	ErrMalformedFile = errors.New("malformed ASS file")
 )

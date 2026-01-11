@@ -20,9 +20,9 @@ import (
 )
 
 var (
-	ErrUnresolvedMergeConflict = errors.New("Unresolved merge conflict")
-	ErrNotAGitRepo             = errors.New("Not a git repository")
-	ErrParseError              = errors.New("Error while parsing git status output")
+	ErrUnresolvedMergeConflict = errors.New("unresolved merge conflict")
+	ErrNotAGitRepo             = errors.New("not a git repository")
+	ErrParseError              = errors.New("error while parsing git status output")
 )
 
 func GitModifiedKaras(ctx context.Context, path string) ([]uuid.UUID, error) {
