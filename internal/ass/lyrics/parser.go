@@ -173,7 +173,7 @@ func (l Line) KfLen() []int {
 var re_style = regexp.MustCompile(`(?:\\)r(.*?)(?:\\|\})`)
 
 func (l *LyricsParser) Styles() []string {
-	r := make([]string, 1, 1)
+	r := make([]string, 1)
 	r[0] = l.Style
 	for _, e := range l.Text.TagsSplit {
 		if f := re_style.FindStringSubmatch(e); f != nil {
