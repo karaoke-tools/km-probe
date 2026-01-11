@@ -117,7 +117,7 @@ func (a *Aggregator) Run(ctx context.Context, KaraData *karadata.KaraData) error
 			}
 		}
 		// get result of probes
-		for _, _ = range a.Probes {
+		for range a.Probes {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()

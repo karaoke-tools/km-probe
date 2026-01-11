@@ -64,7 +64,7 @@ func (p prb) Println(namelen int, enabledlen int, b *strings.Builder, underline 
 	if underline {
 		b.WriteString(ansi.Reset)
 	}
-	for _ = range enabledlen - len(p.EnabledString) {
+	for range enabledlen - len(p.EnabledString) {
 		b.WriteString(" ")
 	}
 
@@ -78,7 +78,7 @@ func (p prb) Println(namelen int, enabledlen int, b *strings.Builder, underline 
 	if underline {
 		b.WriteString(ansi.Reset)
 	}
-	for _ = range namelen - len(p.Name) {
+	for range namelen - len(p.Name) {
 		b.WriteString(" ")
 	}
 
