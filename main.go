@@ -39,22 +39,22 @@ func main() {
 		Version: version,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:   "output-format",
-				Usage:  strings.Join([]string{"configure output `FORMAT`; ", cliargs.DisplayFormat}, ""),
-				Value:  "auto",
-				Action: cliargs.CheckFormat,
+				Name:      "output-format",
+				Usage:     strings.Join([]string{"configure output `FORMAT`; ", cliargs.DisplayFormat}, ""),
+				Value:     "auto",
+				Validator: cliargs.CheckFormat,
 			},
 			&cli.StringFlag{
-				Name:   "color",
-				Usage:  strings.Join([]string{"specify `WHEN` to colorize output; ", cliargs.DisplayWhen}, ""),
-				Value:  "auto",
-				Action: cliargs.CheckWhen,
+				Name:      "color",
+				Usage:     strings.Join([]string{"specify `WHEN` to colorize output; ", cliargs.DisplayWhen}, ""),
+				Value:     "auto",
+				Validator: cliargs.CheckWhen,
 			},
 			&cli.StringFlag{
-				Name:   "hyperlink",
-				Usage:  strings.Join([]string{"specify `WHEN` to create hyperlinks in output using OSC 8 escape sequence; only for non-json output; ", cliargs.DisplayWhen}, ""),
-				Value:  "auto",
-				Action: cliargs.CheckWhen,
+				Name:      "hyperlink",
+				Usage:     strings.Join([]string{"specify `WHEN` to create hyperlinks in output using OSC 8 escape sequence; only for non-json output; ", cliargs.DisplayWhen}, ""),
+				Value:     "auto",
+				Validator: cliargs.CheckWhen,
 			},
 			&cli.StringSliceFlag{
 				Name:     "repo",
@@ -87,9 +87,9 @@ func main() {
 					Flags: [][]cli.Flag{
 						{
 							&cli.StringSliceFlag{
-								Name:   "kid",
-								Usage:  "add karaokes with this `KID` (Karaoke UUID) to the selection",
-								Action: cliargs.CheckUuids,
+								Name:      "kid",
+								Usage:     "add karaokes with this `KID` (Karaoke UUID) to the selection",
+								Validator: cliargs.CheckUuids,
 							},
 							&cli.BoolFlag{
 								Name:  "git",
@@ -125,10 +125,10 @@ func main() {
 				Usage: "Manages false-positives marks",
 				Flags: []cli.Flag{
 					&cli.StringSliceFlag{
-						Name:     "kid",
-						Usage:    "add karaokes with this `KID` (Karaoke UUID) to the selection",
-						Required: true,
-						Action:   cliargs.CheckUuids,
+						Name:      "kid",
+						Usage:     "add karaokes with this `KID` (Karaoke UUID) to the selection",
+						Required:  true,
+						Validator: cliargs.CheckUuids,
 					},
 				},
 				Commands: []*cli.Command{
