@@ -62,28 +62,28 @@ func InvalidFlagAccess(ctx context.Context, command *cli.Command, s string) {
 }
 
 // Validate argument type "WHEN"
-func CheckWhen(ctx context.Context, command *cli.Command, v string) error {
+func CheckWhen(v string) error {
 	if !slices.Contains(when, v) {
-		cli.ShowAppHelp(command)
+		//cli.ShowAppHelp(command)
 		return ErrWhenArgumentInvalid
 	}
 	return nil
 }
 
 // Validate argument type "FORMAT"
-func CheckFormat(ctx context.Context, command *cli.Command, v string) error {
+func CheckFormat(v string) error {
 	if !slices.Contains(format, v) {
-		cli.ShowAppHelp(command)
+		//cli.ShowAppHelp(command)
 		return ErrFormatArgumentInvalid
 	}
 	return nil
 }
 
 // Validate argument type "UUID"
-func CheckUuids(ctx context.Context, command *cli.Command, v []string) error {
+func CheckUuids(v []string) error {
 	for _, u := range v {
 		if !re_uuid.Match([]byte(u)) {
-			cli.ShowAppHelp(command)
+			//	cli.ShowAppHelp(command)
 			return ErrUuidArgumentInvalid
 		}
 	}
