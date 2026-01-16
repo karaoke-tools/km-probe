@@ -65,6 +65,8 @@ func main() {
 		OnUsageError:             cliargs.UsageError,
 		InvalidFlagAccessHandler: cliargs.InvalidFlagAccess,
 		CommandNotFound:          cliargs.CommandNotFound,
+		// XXX: https://github.com/urfave/cli/issues/2249
+		// DefaultCommand:           "karaokes",
 		Commands: []*cli.Command{
 			{
 				Name:                     "git",
