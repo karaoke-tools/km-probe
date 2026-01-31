@@ -122,7 +122,7 @@ func (p StyleSingleWhite) Run(ctx context.Context, KaraData *karadata.KaraData) 
 			if strings.Contains(l_name, "-furigana") {
 				continue
 			}
-			choir := strings.Contains(l_name, "choir") || strings.Contains(l_name, "spoken")
+			choir := strings.Contains(l_name, "choir") || strings.Contains(l_name, "spoken") || strings.Contains(l_name, "dialogue")
 			if s.SecondaryColour == colour.White {
 				if choir {
 					whiteChoirStyleCnt++
