@@ -32,7 +32,21 @@ func GitModifiedKaras(ctx context.Context, path string) ([]uuid.UUID, error) {
 	if _, err := os.Stat(filepath.Join(path, ".git")); errors.Is(err, fs.ErrNotExist) {
 		return kara, ErrNotAGitRepo
 	}
-	cmd := exec.CommandContext(ctx, "git", "-C", filepath.Clean(path), "status", "--porcelain=v2")
+	cleanRepoPath := filepath.Clean(path)
+	cmd := exec.CommandContext(ctx, "git",
+		// indicate repository's directory
+		"-C", cleanRepoPath,
+		// avoid errors when run as root (from a Docker container)
+		// - we are not doing any write operation,
+		//   so this will not mess up permissions
+		// - we consider all git directories listed in configuration as trusted
+		//   (because manually set by the user)
+		"-c", "safe.directory="+cleanRepoPath,
+		// run "git status" command
+		"status",
+		// use "porcelain" stable API
+		"--porcelain=v2",
+	)
 
 	// Clear environment variables:
 	// - We don't want any third party process (or the user) to be able to interact with git process
