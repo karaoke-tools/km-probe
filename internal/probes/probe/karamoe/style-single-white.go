@@ -122,7 +122,10 @@ func (p StyleSingleWhite) Run(ctx context.Context, KaraData *karadata.KaraData) 
 			if strings.Contains(l_name, "-furigana") {
 				continue
 			}
-			choir := strings.Contains(l_name, "choir") || strings.Contains(l_name, "spoken") || strings.Contains(l_name, "dialogue")
+			choir := strings.Contains(l_name, "choir") ||
+				strings.Contains(l_name, "spoken") ||
+				strings.Contains(l_name, "dialogue") ||
+				strings.Contains(l_name, "rubyscript") // when mixing rubscript lines with normal lines (2 template scripts)
 			if s.SecondaryColour == colour.White {
 				if choir {
 					whiteChoirStyleCnt++
