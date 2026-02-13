@@ -14,17 +14,17 @@ import (
 
 	"github.com/karaoke-tools/km-probe/internal/app/ansi"
 	"github.com/karaoke-tools/km-probe/internal/app/setup"
-	"github.com/karaoke-tools/km-probe/internal/probes"
+	"github.com/karaoke-tools/km-probe/internal/lints"
 
 	"github.com/urfave/cli/v3"
 )
 
-type ListProbes struct {
+type ListLints struct {
 	*setup.Setup
 }
 
-func FromCommand(command *cli.Command) *ListProbes {
-	return &ListProbes{Setup: setup.FromCommand(command)}
+func FromCommand(command *cli.Command) *ListLints {
+	return &ListLints{Setup: setup.FromCommand(command)}
 }
 
 type prb struct {
@@ -96,18 +96,18 @@ func (p prb) Println(namelen int, enabledlen int, b *strings.Builder, underline 
 	b.Reset()
 }
 
-func (l *ListProbes) Run(ctx context.Context) error {
+func (l *ListLints) Run(ctx context.Context) error {
 	if l.OutputJson {
 		return l.RunJson(ctx)
 	}
 	return l.RunTxt(ctx)
 }
 
-func (l *ListProbes) RunTxt(ctx context.Context) error {
+func (l *ListLints) RunTxt(ctx context.Context) error {
 	list := make([]prb, 0)
 	header := prb{Name: "Name", Desc: "Description", EnabledString: "Status"}
 	namelen, enabledlen := len(header.Name), len(header.EnabledString)
-	for _, pf := range probes.AvailableProbes() {
+	for _, pf := range lints.Available() {
 		item := prb{Name: pf.Name(), Desc: pf.Description(), Enabled: pf.Enabled(), EnabledString: enabledString(pf.Enabled())}
 		list = append(list, item)
 		if len(item.Name) > namelen {
@@ -135,10 +135,10 @@ func (l *ListProbes) RunTxt(ctx context.Context) error {
 	return nil
 }
 
-func (l *ListProbes) RunJson(ctx context.Context) error {
+func (l *ListLints) RunJson(ctx context.Context) error {
 	encoder := json.NewEncoder(os.Stdout)
 	encoder.SetIndent("", "  ")
-	for _, pf := range probes.AvailableProbes() {
+	for _, pf := range lints.Available() {
 		encoder.Encode(prb{Name: pf.Name(), Desc: pf.Description(), Enabled: pf.Enabled()})
 	}
 	return nil

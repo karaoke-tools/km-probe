@@ -13,10 +13,10 @@ import (
 	"strings"
 
 	"github.com/karaoke-tools/km-probe/internal/app/ansi"
-	"github.com/karaoke-tools/km-probe/internal/probes"
-	"github.com/karaoke-tools/km-probe/internal/probes/report/result"
-	"github.com/karaoke-tools/km-probe/internal/probes/report/severity"
-	"github.com/karaoke-tools/km-probe/internal/probes/report/status"
+	"github.com/karaoke-tools/km-probe/internal/lints"
+	"github.com/karaoke-tools/km-probe/internal/lints/report/result"
+	"github.com/karaoke-tools/km-probe/internal/lints/report/severity"
+	"github.com/karaoke-tools/km-probe/internal/lints/report/status"
 
 	"github.com/moby/term"
 )
@@ -37,7 +37,7 @@ func NewTxtPrinter(hyperlink bool, color bool, baseUri string) Printer {
 	}
 }
 
-func (p *TxtPrinter) Encode(ctx context.Context, a *probes.Aggregator) error {
+func (p *TxtPrinter) Encode(ctx context.Context, a *lints.Aggregator) error {
 	builder := &strings.Builder{}
 	select {
 	case <-ctx.Done():
@@ -54,7 +54,7 @@ func (p *TxtPrinter) Encode(ctx context.Context, a *probes.Aggregator) error {
 
 }
 
-func (p *TxtPrinter) encodeAggregator(ctx context.Context, a *probes.Aggregator, builder *strings.Builder) error {
+func (p *TxtPrinter) encodeAggregator(ctx context.Context, a *lints.Aggregator, builder *strings.Builder) error {
 	width := uint16(200)
 	if size, err := term.GetWinsize(os.Stdout.Fd()); err == nil {
 		width = size.Width

@@ -1,0 +1,69 @@
+// Copyright Louis Royer. All rights reserved.
+// Use of this source code is governed by a MIT-style license that can be
+// found in the LICENSE file.
+// SPDX-License-Identifier: MIT
+
+package songs
+
+import (
+	"context"
+	"errors"
+	"io/fs"
+	"path/filepath"
+	"sync"
+	"sync/atomic"
+
+	"github.com/karaoke-tools/km-probe/internal/app"
+	"github.com/karaoke-tools/km-probe/internal/app/printer"
+
+	"github.com/sirupsen/logrus"
+)
+
+func (s *SongsSetup) RunByUuid(ctx context.Context) error {
+	var pr printer.Printer
+	if s.OutputJson {
+		pr = printer.NewJsonPrinter()
+	} else {
+		pr = printer.NewTxtPrinter(s.Hyperlink, s.Color, s.BaseUri)
+	}
+
+	nbFound := make([]atomic.Uint32, len(s.Uuids))
+
+	wg := sync.WaitGroup{}
+	defer func() {
+		wg.Wait()
+		for i := range nbFound { // do not copy atomic.Uint32
+			if nbFound[i].Load() == 0 {
+				logrus.WithFields(logrus.Fields{
+					"uuid": s.Uuids[i],
+				}).WithError(app.ErrSongNotFound).Error("No song not found with this UUID.")
+			} else if nbFound[i].Load() > 1 {
+				logrus.WithFields(logrus.Fields{
+					"uuid":     s.Uuids[i],
+					"nb-found": nbFound[i].Load(),
+				}).WithError(app.ErrDuplicateSong).Error("Found multiple songs with this UUID (in multiple repositories).")
+			}
+		}
+
+	}()
+
+	for i, u := range s.Uuids {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			for _, repo := range s.Repositories {
+				s.StartWork()
+				wg.Go(func() {
+					defer s.StopWork()
+					fp := filepath.Join(repo.BaseDir, "karaokes", u.String()+".kara.json")
+					err := app.RunOnFile(ctx, &repo, fp, pr)
+					if err == nil || !errors.Is(err, fs.ErrNotExist) {
+						nbFound[i].Add(1)
+					}
+				})
+			}
+		}
+	}
+	return nil
+}

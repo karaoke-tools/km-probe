@@ -16,7 +16,8 @@ import (
 	"github.com/karaoke-tools/km-probe/internal/app/cliargs"
 	"github.com/karaoke-tools/km-probe/internal/app/git"
 	"github.com/karaoke-tools/km-probe/internal/app/info"
-	"github.com/karaoke-tools/km-probe/internal/app/karaokes"
+	"github.com/karaoke-tools/km-probe/internal/app/songs"
+	_ "github.com/karaoke-tools/km-probe/internal/repos"
 
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v3"
@@ -66,11 +67,11 @@ func main() {
 		InvalidFlagAccessHandler: cliargs.InvalidFlagAccess,
 		CommandNotFound:          cliargs.CommandNotFound,
 		// XXX: https://github.com/urfave/cli/issues/2249
-		// DefaultCommand:           "karaokes",
+		// DefaultCommand:           "songs",
 		Commands: []*cli.Command{
 			{
 				Name:                     "git",
-				Usage:                    "Probes karaokes that has been modified locally and not yet committed in git",
+				Usage:                    "Lints songs that has been modified locally and not yet committed in git",
 				Before:                   cliargs.CheckUnknownArgs,
 				Action:                   git.RunFromCommand,
 				OnUsageError:             cliargs.UsageError,
@@ -78,11 +79,11 @@ func main() {
 				Hidden:                   true,
 			},
 			{
-				Name:                     "karaokes",
-				Aliases:                  []string{"karaoke", "kara"},
-				Usage:                    "Probes selected karaokes from all enabled repositories",
+				Name:                     "songs",
+				Aliases:                  []string{"song"},
+				Usage:                    "Lints selected songs from all enabled repositories",
 				Before:                   cliargs.CheckUnknownArgs,
-				Action:                   karaokes.RunFromCommand,
+				Action:                   songs.RunFromCommand,
 				OnUsageError:             cliargs.UsageError,
 				InvalidFlagAccessHandler: cliargs.InvalidFlagAccess,
 				MutuallyExclusiveFlags: []cli.MutuallyExclusiveFlags{{
@@ -90,12 +91,12 @@ func main() {
 						{
 							&cli.StringSliceFlag{
 								Name:      "kid",
-								Usage:     "add karaokes with this `KID` (Karaoke UUID) to the selection",
+								Usage:     "add songs with this `KID` (Karaoke UUID) to the selection",
 								Validator: cliargs.CheckUuids,
 							},
 							&cli.BoolFlag{
 								Name:  "git",
-								Usage: "add karaokes that has been modified locally and not yet committed in git to the selection",
+								Usage: "add songs that has been modified locally and not yet committed in git to the selection",
 								// TODO: if this flag is set, do equivalent of git.RunFromCommand
 								Action: func(ctx context.Context, cmd *cli.Command, b bool) error {
 									logrus.Fatal("Not implemented")
@@ -104,7 +105,7 @@ func main() {
 							},
 							&cli.StringSliceFlag{
 								Name:  "playlist",
-								Usage: "add karaokes from this playlist `FILE` to the selection",
+								Usage: "add songs from this playlist `FILE` to the selection",
 								Action: func(ctx context.Context, cmd *cli.Command, s []string) error {
 									// TODO
 									logrus.Fatal("Not implemented")
@@ -115,7 +116,7 @@ func main() {
 						{
 							&cli.BoolFlag{
 								Name:  "all",
-								Usage: "add all karaokes to the selection",
+								Usage: "add all songs to the selection",
 							},
 						},
 					},
@@ -128,7 +129,7 @@ func main() {
 				Flags: []cli.Flag{
 					&cli.StringSliceFlag{
 						Name:      "kid",
-						Usage:     "add karaokes with this `KID` (Karaoke UUID) to the selection",
+						Usage:     "add songs with this `KID` (Karaoke UUID) to the selection",
 						Required:  true,
 						Validator: cliargs.CheckUuids,
 					},
@@ -136,7 +137,7 @@ func main() {
 				Commands: []*cli.Command{
 					{
 						Name:   "mark",
-						Usage:  "Marks probe's result as false-positive on a set of karaokes",
+						Usage:  "Marks lint's result as false-positive on a set of songs",
 						Before: cliargs.CheckUnknownArgs,
 						Action: func(ctx context.Context, cmd *cli.Command) error {
 							logrus.Fatal("Not implemented")
@@ -146,19 +147,19 @@ func main() {
 						InvalidFlagAccessHandler: cliargs.InvalidFlagAccess,
 						Flags: []cli.Flag{
 							&cli.StringSliceFlag{
-								Name:     "probe",
-								Usage:    "specify the `NAME` of false-positive probe",
+								Name:     "lint",
+								Usage:    "specify the `NAME` of false-positive lint",
 								Required: true,
 							},
 						},
 					},
 					{
 						Name:  "unmark",
-						Usage: "Unmarks probe's result as false-positive on a set of karaokes",
+						Usage: "Unmarks lint's result as false-positive on a set of songs",
 						Flags: []cli.Flag{
 							&cli.StringSliceFlag{
-								Name:     "probe",
-								Usage:    "specify the `NAME` of no longer false-positive probe",
+								Name:     "lint",
+								Usage:    "specify the `NAME` of no longer false-positive lint",
 								Required: true,
 							},
 						},
@@ -173,7 +174,7 @@ func main() {
 					},
 					{
 						Name:   "clear",
-						Usage:  "Clears all false-positive marks on a set of karaokes",
+						Usage:  "Clears all false-positive marks on a set of songs",
 						Before: cliargs.CheckUnknownArgs,
 						Action: func(ctx context.Context, cmd *cli.Command) error {
 							// TODO
@@ -185,7 +186,7 @@ func main() {
 					},
 					{
 						Name:   "show",
-						Usage:  "Shows false-positive marks on a set of karaokes",
+						Usage:  "Shows false-positive marks on a set of songs",
 						Before: cliargs.CheckUnknownArgs,
 						Action: func(ctx context.Context, cmd *cli.Command) error {
 							// TODO
@@ -202,7 +203,7 @@ func main() {
 			},
 			{
 				Name:                     "info",
-				Usage:                    "Shows a list of available probes",
+				Usage:                    "Shows a list of available lints",
 				Before:                   cliargs.CheckUnknownArgs,
 				Action:                   info.RunFromCommand,
 				OnUsageError:             cliargs.UsageError,

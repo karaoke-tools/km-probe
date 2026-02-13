@@ -13,7 +13,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-// Maximum number of karaokes processed simultaneously.
+// Maximum number of songs processed simultaneously.
 // It is not useful to increase this number
 // because we are bound by the speed of the json encoder.
 // Increasing the number of worker will consume more memory
