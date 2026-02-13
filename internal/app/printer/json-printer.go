@@ -10,7 +10,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/karaoke-tools/km-probe/internal/probes"
+	"github.com/karaoke-tools/km-probe/internal/lints"
 )
 
 type JsonPrinter struct {
@@ -27,7 +27,7 @@ func NewJsonPrinter() Printer {
 	}
 }
 
-func (p *JsonPrinter) Encode(ctx context.Context, a *probes.Aggregator) error {
+func (p *JsonPrinter) Encode(ctx context.Context, a *lints.Aggregator) error {
 	select {
 	case <-ctx.Done():
 		return ctx.Err()

@@ -14,10 +14,10 @@ import (
 	"github.com/karaoke-tools/km-probe/internal/karajson"
 )
 
-// Karaoke information
+// Song information
 type KaraData struct {
-	KaraJson *karajson.KaraJson // metadata of the karaoke
-	Lyrics   []*ass.Ass         // lyrics of the karaoke
+	KaraJson *karajson.KaraJson // metadata of the song
+	Lyrics   []*ass.Ass         // lyrics of the song
 }
 
 // Create a new `KaraData` from a `KaraJson`

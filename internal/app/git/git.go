@@ -41,7 +41,7 @@ func FromCommand(command *cli.Command) (*GitSetup, error) {
 	s.BaseUri = fmt.Sprintf("http://localhost:%d/system/karas/", kmConfig.System.FrontendPort)
 	for _, v := range kmConfig.System.Repositories {
 		if len(command.StringSlice("repo")) != 0 && !slices.Contains(command.StringSlice("repo"), v.Name) {
-			// we can only probe in the configured repository
+			// we can only run lints in the configured repository
 			continue
 		}
 		baseDir, err := app.SearchKmDataDirPath(v.BaseDir)
@@ -115,17 +115,17 @@ func (s *GitSetup) Run(ctx context.Context) error {
 				if uint32(len(s.Repositories))-nbNotGit.Load() == 1 {
 					logrus.WithFields(logrus.Fields{
 						"repository": s.Repositories[0].Name,
-					}).Info("Your git repository is clean. No karaoke to probe.")
+					}).Info("Your git repository is clean. No song to lint.")
 				} else {
 					logrus.WithFields(logrus.Fields{
 						"num-total-git-repositories": uint32(len(s.Repositories)) - nbNotGit.Load(),
-					}).Info("All git repositories are clean. No karaoke to probe.")
+					}).Info("All git repositories are clean. No song to lint.")
 				}
 			} else if nbHasErr.Load() < uint32(len(s.Repositories)) { // at least one repository is clean
 				logrus.WithFields(logrus.Fields{
 					"num-total-git-repositories":  uint32(len(s.Repositories)) - nbNotGit.Load(),
 					"num-failed-git-repositories": nbHasErr.Load() - nbNotGit.Load(),
-				}).Info("All other git repositories are clean. No karaoke to probe.")
+				}).Info("All other git repositories are clean. No song to lint.")
 			}
 		}
 	}()

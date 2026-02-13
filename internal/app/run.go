@@ -17,7 +17,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Parse the karaoke, run probes, and display result
+// Parse the song, run lints, and display result
 // p is the filepath to the .kara.json file
 func RunOnFile(ctx context.Context, repo *Repository, p string, pr printer.Printer) error {
 	karaJson, err := karajson.FromFile(ctx, p)
@@ -58,7 +58,7 @@ func RunOnFile(ctx context.Context, repo *Repository, p string, pr printer.Print
 			logrus.WithError(err).WithFields(logrus.Fields{
 				"repository": repo.Name,
 				"filepath":   p,
-			}).Error("Probe aggregator failure")
+			}).Error("Lint aggregator failure")
 			return err
 		}
 	}

@@ -2,17 +2,17 @@
 `km-probe` is an utility to help you find common mistakes within your Karaoke Mugen repositories.
 
 ## When km-probe could be useful
-- As a repository maintainer, you can run `km-probe` find potential mistakes in all non-commited new karaokes and karaokes modifications (for example, karaokes with resolution not set to 0×0).
-- You can run `km-probe` on all karaoke of a repository to find some karaoke having a specific mistake that you want to work on (for example karaoke without automation script).
+- As a repository maintainer, you can run `km-probe` find potential mistakes in all non-commited new songs and songs modifications (for example, lyrics files with resolution not set to 0×0).
+- You can run `km-probe` on all songs of a repository to find some songs having a specific mistake that you want to work on (for example lyrics files without automation script).
 
 Not yet implemented, but could be done eventually:
 - Goal for v1.0.0: Integration directly into Karaoke Mugen application as an optional plugin.
-- Goal for v2.0.0: As a contributor, you could get an early feedback on karaoke you sent to inbox before a maintainer get the time to look at it (and you may want to update your inbox because you find a mistake).
+- Goal for v2.0.0: As a contributor, you could get an early feedback on songs you sent to inbox before a maintainer get the time to look at it (and you may want to update your inbox because you find a mistake).
 
 ## What km-probe is not
 - `km-probe` is not a replacement for maintainers. Some checks can only be manual and will never be automated.
 - `km-probe` is not intended to force contributors or maintainers to create karaoke according to "the only correct way to do karaokes".
-It is only a tool, and it can be wrong. Maintainers still have final word on what is or is not integrated into their karaoke repository,
+It is only a tool, and it can be wrong. Maintainers still have final word on what is or is not integrated into their songs repository,
 and should rely on their own judgment to do this.
 - `km-probe` is not bug-free. If you find a bug, please [report it](https://github.com/karaoke-tools/km-probe/issues) if it is not already.
 - `km-probe` is not mandatory. You can run Karaoke Mugen application without `km-probe`.
@@ -36,26 +36,26 @@ Until v1.0.0, we are still in the initial development phase, so backward compati
 ## How to use
 To get a list of available commands and options, run `km-probe help`.
 
-### List available probes
-To list available probes, run `km-probe info`.
+### List available lints
+To list available lints, run `km-probe info`.
 
-### Run on karaokes
-If you want to run probes on all karaokes, you can use the command `km-probe karaokes --all`
+### Run on all songs
+If you want to run lints on all songs, you can use the command `km-probe songs --all`
 
-### Run only on a subset of karaokes
-You can select precisely which karaokes to analyse by providing a KID (Karaoke UUID) with the `--kid` flag.
+### Run only on a subset of songs
+You can select precisely which songs to analyse by providing a KID (Karaoke UUID) with the `--kid` flag.
 
 For example:
 
 ```bash
-$ km-probe karaokes --kid=c8e61289-31fd-430a-8a56-f0ed95f84d50
+$ km-probe songs --kid=c8e61289-31fd-430a-8a56-f0ed95f84d50
 ```
 
-This flag can be provided multiple times to analyse several karaokes.
+This flag can be provided multiple times to analyse several songs.
 
 
-### Run only on new/modified karaokes
-If you want to run only on new/modified karaoke (in comparison to the last local commit on the repository), you can run the command `km-probe git`.
+### Run only on new/modified songs
+If you want to run only on new/modified song (in comparison to the last local commit on the repository), you can run the command `km-probe git`.
 
 ### Global options
 #### Repositories
@@ -65,7 +65,7 @@ When this flag is used with a repository name, all other repositories will be co
 For example:
 
 ```bash
-$ km-probe --repo=mugen.re karaokes --all
+$ km-probe --repo=mugen.re songs --all
 ```
 
 This flag can be provided multiple times to enable several repositories.
@@ -83,8 +83,8 @@ By default, human output will be displayed using ANSI escape codes for color.
 Some old terminal may not support ANSI escape codes. You can disable color using the `--color=never` option, or with the environment variable [`NO_COLOR`](https://no-color.org/).
 
 #### Hyperlinks
-By default, an hyperlink is created on the songname of analysed karaokes.
-It targets a modification page from your Karaoke Mugen application for this karaoke.
+By default, an hyperlink is created on the name of analysed songs.
+It targets a modification page from your Karaoke Mugen application for this song.
 Unfortunately, it is currently not possible to open links directly into the application instead of in your browser (but it may be in the future).
 
 Not all terminals support hyperlinks. Some requires a special configuration to enable them but as long as ANSI escaping codes are supported

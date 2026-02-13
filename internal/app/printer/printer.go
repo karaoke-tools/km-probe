@@ -9,13 +9,13 @@ import (
 	"context"
 	"sync"
 
-	"github.com/karaoke-tools/km-probe/internal/probes"
+	"github.com/karaoke-tools/km-probe/internal/lints"
 )
 
 // Printer outputs aggretator reports to stdout
 type Printer interface {
-	Encode(ctx context.Context, a *probes.Aggregator) error
-	Aggregator() *probes.Aggregator
+	Encode(ctx context.Context, a *lints.Aggregator) error
+	Aggregator() *lints.Aggregator
 }
 
 type BasePrinter struct {
@@ -30,7 +30,7 @@ func NewBasePrinter() *BasePrinter {
 		ready: ready,
 		aggregatorPool: sync.Pool{
 			New: func() any {
-				return probes.NewAggregator()
+				return lints.NewAggregator()
 			},
 		},
 	}
@@ -40,6 +40,6 @@ func (p *BasePrinter) setReady() {
 	p.ready <- struct{}{}
 }
 
-func (p *BasePrinter) Aggregator() *probes.Aggregator {
-	return p.aggregatorPool.Get().(*probes.Aggregator)
+func (p *BasePrinter) Aggregator() *lints.Aggregator {
+	return p.aggregatorPool.Get().(*lints.Aggregator)
 }
