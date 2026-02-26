@@ -10,7 +10,7 @@ jobs:
     permissions:
       id-token: write
       attestations: write
-      artifacts-metadata: write
+      artifact-metadata: write
     strategy:
       matrix:
         os: [linux, darwin, windows]
