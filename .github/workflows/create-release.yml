@@ -59,7 +59,7 @@ jobs:
         id: version
         run: echo "version=$(echo ${{ github.ref_name }} | cut -c2- -)" >> $GITHUB_OUTPUT
       - name: Download artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           pattern: km-probe-${{ steps.version.outputs.version }}*
           merge-multiple: true
