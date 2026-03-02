@@ -32,6 +32,7 @@ type Repository struct {
 	AutoMediaDownloads string `yaml:"AutoMediaDownloads"`
 	MaintainerMode     bool   `yaml:"MaintainerMode"`
 	Path               Path   `yaml:"Path"`
+	System             bool   `yaml:"System"`
 }
 
 type Path struct {

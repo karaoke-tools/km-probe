@@ -60,6 +60,10 @@ func FromCommand(command *cli.Command) (*SongsSetup, error) {
 	}
 	s.BaseUri = fmt.Sprintf("http://localhost:%d/system/karas/", kmConfig.System.FrontendPort)
 	for _, v := range kmConfig.System.Repositories {
+		if v.System {
+			// system repository doesn't contain any karaoke and is not managed by user
+			continue
+		}
 		if len(command.StringSlice("repo")) != 0 && !slices.Contains(command.StringSlice("repo"), v.Name) {
 			// we can only run lints in the configured repository
 			continue
