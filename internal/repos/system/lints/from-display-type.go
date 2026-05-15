@@ -35,11 +35,15 @@ func (p FromDisplayType) Run(ctx context.Context, KaraData *karadata.KaraData) (
 	switch KaraData.KaraJson.Data.FromDisplayType {
 	case "series":
 		return report.Fail(severity.Warning,
-			"from-display-type is manually set to series, but this is already the default"), nil
+			"from-display-type is manually set to `"+KaraData.KaraJson.Data.FromDisplayType+"` but this is already the default"), nil
 	case "singergroups":
+		if len(KaraData.KaraJson.Data.Tags.Series) == 0 {
+			return report.Fail(severity.Warning,
+				"from-display-type is manually set to `"+KaraData.KaraJson.Data.FromDisplayType+"` but this is already the default"), nil
+		}
 		fallthrough
 	case "singers":
-		if len(KaraData.KaraJson.Data.Tags.Series) == 0 {
+		if len(KaraData.KaraJson.Data.Tags.Series) == 0 && len(KaraData.KaraJson.Data.Tags.Singergroups) == 0 {
 			return report.Fail(severity.Warning,
 				"from-display-type is manually set to `"+KaraData.KaraJson.Data.FromDisplayType+"` but this is already the default"), nil
 		}
