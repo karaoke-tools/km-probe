@@ -55,6 +55,10 @@ func (p GiantFont) Run(ctx context.Context, KaraData *karadata.KaraData) (report
 				if err != nil {
 					return report.Abort(), err
 				}
+				if strings.Contains(strings.ToLower(s.Name), "symbol") {
+					// style used by some multi-singer karaoke to make symbols bigger
+					continue
+				}
 				if s.Fontsize >= GIANT_FONT_SIZE_CRITICAL {
 					return report.Fail(severity.Critical, "found a style with a big fontsize: consider reducing font size (it may be hard to identify big text as lyrics to actually sing)"), nil
 				}
